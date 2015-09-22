@@ -65,6 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CompositionRoot.cs" />
+    <Compile Include="DocumentsController.cs" />
     <Compile Include="HomeController.cs" />
     <Compile Include="HttpConfigurator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

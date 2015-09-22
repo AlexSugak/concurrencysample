@@ -14,27 +14,68 @@ namespace Sample.Documents.Api.IntegrationTests
     /// </summary>
     public class DocumentsApiTests
     {
-        /// <summary>
-        /// We start with "ice breaker" test to force us to create something listening for requests on the other end
-        /// </summary>
+        // We start with "ice breaker" tests to force us to create something listening for requests on the other end
+
         [Fact]
         public void GET_api_home_returns_OK()
         {
-            var server = TestServer.Create(app => new OwinStartup().Configuration(app));
-            var client = server.HttpClient;
-            try
+            using (var client = TestServerHttpClientFactory.Create())
             {
-                using(client)
-                {
-                    var response = client.GetAsync("/api").Result;
+                var response = client.GetAsync("/api").Result;
 
-                    Assert.True(response.IsSuccessStatusCode, "Actual response status code was: " + response.StatusCode);
-                }
+                Assert.True(response.IsSuccessStatusCode, "Actual response status code was: " + response.StatusCode);
             }
-            catch
+        }
+
+        [Fact]
+        public void GET_documents_resource_returns_json_content()
+        {
+            using (var client = TestServerHttpClientFactory.Create())
             {
-                client.Dispose();
-                throw;
+                var response = client.GetAsync("/api/documents").Result;
+
+                Assert.Equal("application/json", response.Content.Headers.ContentType.MediaType);
+
+                var json = response.Content.ReadAsJsonAsync().Result;
+                Assert.NotNull(json);
+            }
+        }
+
+        [Fact]
+        public void POST_documents_resource_returns_success()
+        {
+            using (var client = TestServerHttpClientFactory.Create())
+            {
+                var json = new 
+                {
+                    title = "Sample document",
+                    content = "this is a sample document content"
+                };
+
+                var response = client.PostAsJsonAsync("/api/documents", json).Result;
+
+                Assert.True(response.IsSuccessStatusCode, "Actual response status code was: " + response.StatusCode);
+            }
+        }
+
+        [Fact]
+        public void GET_documents_resource_returns_POSTed_document_in_content()
+        {
+            using (var client = TestServerHttpClientFactory.Create())
+            {
+                var json = new
+                {
+                    title = "Sample document",
+                    content = "this is a sample document content"
+                };
+                var expected = json.ToJObject();
+
+                client.PostAsJsonAsync("/documents", json).Wait();
+
+                var response = client.GetAsync("/api/documents").Result;
+                var actual = response.Content.ReadAsJsonAsync().Result;
+
+                Assert.Contains(expected, actual.documents);
             }
         }
     }

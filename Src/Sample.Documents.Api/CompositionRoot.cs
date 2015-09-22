@@ -26,6 +26,11 @@ namespace Sample.Documents.Api
                 return new HomeController();
             }
 
+            if(controllerType == typeof(DocumentsController))
+            {
+                return new DocumentsController();
+            }
+
             throw new NotImplementedException(
                 string.Format("controller of type {0} is not supported", controllerType.FullName));
         }
