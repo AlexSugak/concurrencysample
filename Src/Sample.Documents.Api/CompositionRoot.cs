@@ -15,8 +15,15 @@ namespace Sample.Documents.Api
     /// </summary>
     public class CompositionRoot : IHttpControllerActivator
     {
-        public CompositionRoot()
+        private IGetAllDocumentsQuery _getAllDocuments;
+        private readonly ISubmitNewDocumentCommand _submitDocumentCmd;
+
+        public CompositionRoot(
+            IGetAllDocumentsQuery getAllDocuments,
+            ISubmitNewDocumentCommand submitDocumentCmd)
         {
+            _getAllDocuments = getAllDocuments;
+            _submitDocumentCmd = submitDocumentCmd;
         }
 
         public IHttpController Create(
@@ -31,7 +38,7 @@ namespace Sample.Documents.Api
 
             if(controllerType == typeof(DocumentsController))
             {
-                return new DocumentsController();
+                return new DocumentsController(_getAllDocuments, _submitDocumentCmd);
             }
 
             throw new NotImplementedException(

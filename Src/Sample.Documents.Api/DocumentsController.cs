@@ -18,75 +18,63 @@ namespace Sample.Documents.Api
     [RoutePrefix("api/documents")]
     public class DocumentsController : ApiController
     {
-        private string _connectionString;
+        private readonly IGetAllDocumentsQuery _getAllDocuments;
+        private readonly ISubmitNewDocumentCommand _submitDocumentCmd;
 
-        public DocumentsController()
+        public DocumentsController(
+            IGetAllDocumentsQuery getAllDocuments,
+            ISubmitNewDocumentCommand submitDocumentCmd)
         {
-            _connectionString = ConfigurationManager.ConnectionStrings["DocumentsDBConnectionString"].ConnectionString;
+            _getAllDocuments = getAllDocuments;
+            _submitDocumentCmd = submitDocumentCmd;
         }
 
         [Route("")]
-        public HttpResponseMessage Get()
+        public IHttpActionResult Get()
         {
-            return this.Request.CreateResponse<DocumentsModel>(new DocumentsModel()
+            return this.Ok<DocumentsModel>(new DocumentsModel()
             {
                 Documents = ReadDocuments().ToArray()
             });
         }
 
         [Route("")]
-        public HttpResponseMessage Post(DocumentModel model)
+        public IHttpActionResult Post(DocumentModel model)
         {
-            WriteDocument(model);
-            return this.Request.CreateResponse(HttpStatusCode.Created);
+            var id = Guid.NewGuid();
+            try
+            {
+                WriteDocument(id, model);
+            }
+            catch(ValidationException e)
+            {
+                return this.BadRequest(e.Message);
+            }
+
+            return this.Created<DocumentResponseModel>("", new DocumentResponseModel() 
+            {
+                Id = id.ToString(),
+                Title = model.Title,
+                Content = model.Content
+            });
         }
 
-        private void WriteDocument(DocumentModel model)
+        private void WriteDocument(Guid id, DocumentModel model)
         {
-            using(var connection = new SqlConnection(_connectionString))
-            {
-                connection.Open();
-                using(var transaction = connection.BeginTransaction())
-                {
-                    string cmdText = "INSERT INTO dbo.Documents ([Id], [Title], [Content]) VALUES (@id, @title, @content)";
-                    using(var cmd = new SqlCommand(cmdText, transaction.Connection, transaction))
-                    {
-                        cmd.Parameters.Add(new SqlParameter("@id", Guid.NewGuid()));
-                        cmd.Parameters.Add(new SqlParameter("@title", model.Title));
-                        cmd.Parameters.Add(new SqlParameter("@content", model.Content));
-
-                        cmd.ExecuteNonQuery();
-                    }
-
-                    transaction.Commit();
-                }
-            }
+            _submitDocumentCmd.Execute(new NewDocument(id, model.Title, model.Content));
         }
 
         private IEnumerable<DocumentResponseModel> ReadDocuments()
         {
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                connection.Open();
-
-                string cmdText = "SELECT * FROM dbo.Documents";
-                using(var cmd = new SqlCommand(cmdText, connection))
-                {
-                    using(var reader = cmd.ExecuteReader())
-                    {
-                        while(reader.Read())
+            return _getAllDocuments
+                        .Execute()
+                        .Select(d => new DocumentResponseModel()
                         {
-                            yield return new DocumentResponseModel() 
-                            {
-                                Id = reader["Id"].ToString(),
-                                Title = (string)reader["Title"],
-                                Content = (string)reader["Content"],
-                                CheckedOutBy = reader["CheckedOutBy"] as string
-                            };
-                        }
-                    }
-                }
-            }
+                            Id = d.Id.ToString(),
+                            Title = d.Title,
+                            Content = d.Content,
+                            CheckedOutBy = d.CheckedOutBy
+                        });
         }
     }
 

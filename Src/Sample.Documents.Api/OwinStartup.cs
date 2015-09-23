@@ -1,6 +1,7 @@
 ﻿using Owin;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,8 +16,12 @@ namespace Sample.Documents.Api
     {
         public void Configuration(IAppBuilder app)
         {
+            var connectionString = ConfigurationManager.ConnectionStrings["DocumentsDBConnectionString"].ConnectionString;
+            var getAllDocumentsQuery = new SqlGetAllDocumentsQuery(connectionString);
+            var submitDocCmd = new SqlSubmitNewDocumentCommand(connectionString);
+
             var config = new HttpConfiguration();
-            var compositon = new CompositionRoot();
+            var compositon = new CompositionRoot(getAllDocumentsQuery, submitDocCmd);
             HttpConfigurator.Configure(config, compositon);
             app.UseWebApi(config);
         }
