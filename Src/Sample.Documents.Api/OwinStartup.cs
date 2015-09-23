@@ -18,7 +18,7 @@ namespace Sample.Documents.Api
         {
             var connectionString = ConfigurationManager.ConnectionStrings["DocumentsDBConnectionString"].ConnectionString;
             var getAllDocumentsQuery = new SqlGetAllDocumentsQuery(connectionString);
-            var submitDocCmd = new SqlSubmitNewDocumentCommand(connectionString);
+            var submitDocCmd = new NewDocumentValidator(new SqlSubmitNewDocumentCommand(connectionString));
 
             var config = new HttpConfiguration();
             var compositon = new CompositionRoot(getAllDocumentsQuery, submitDocCmd);
