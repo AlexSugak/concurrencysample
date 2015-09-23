@@ -28,12 +28,12 @@ namespace Sample.Documents.Api
         public string Content { get; set; }
     }
 
-    public class NewDocumentValidator : ISubmitNewDocumentCommand
+    public class SubmitNewDocumentValidator : ISubmitNewDocumentCommand
     {
         private readonly ISubmitNewDocumentCommand _implementation;
         private readonly AbstractValidator<NewDocument> _validator;
 
-        public NewDocumentValidator(ISubmitNewDocumentCommand implementation)
+        public SubmitNewDocumentValidator(ISubmitNewDocumentCommand implementation)
         {
             _implementation = implementation;
             _validator = new Validator();
@@ -68,10 +68,10 @@ namespace Sample.Documents.Api
         }
     }
 
-    public class SqlSubmitNewDocumentCommand : ISubmitNewDocumentCommand
+    public class SubmitNewDocumentSqlCommand : ISubmitNewDocumentCommand
     {
         private readonly string _connectionString;
-        public SqlSubmitNewDocumentCommand(string connectionString)
+        public SubmitNewDocumentSqlCommand(string connectionString)
         {
             _connectionString = connectionString;
         }
