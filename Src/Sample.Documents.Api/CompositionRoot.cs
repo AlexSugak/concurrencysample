@@ -10,6 +10,9 @@ using System.Web.Http.Dispatcher;
 
 namespace Sample.Documents.Api
 {
+    /// <summary>
+    /// Composes api controllers which are the root components of this application 
+    /// </summary>
     public class CompositionRoot : IHttpControllerActivator
     {
         public CompositionRoot()

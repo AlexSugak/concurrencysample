@@ -8,6 +8,9 @@ using System.Web.Http.Dispatcher;
 
 namespace Sample.Documents.Api
 {
+    /// <summary>
+    /// Configures required Http settings to setup web api
+    /// </summary>
     public static class HttpConfigurator
     {
         private static void ConfigureRoutes(HttpConfiguration configuration)

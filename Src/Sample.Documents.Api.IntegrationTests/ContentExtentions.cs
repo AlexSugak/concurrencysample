@@ -10,6 +10,11 @@ namespace Sample.Documents.Api.IntegrationTests
 {
     public static class ContentExtentions
     {
+        /// <summary>
+        /// Reads http content as json
+        /// </summary>
+        /// <param name="content">Http content returned by request</param>
+        /// <returns>parsed json in a form of dynamic object</returns>
         public static Task<dynamic> ReadAsJsonAsync(this HttpContent content)
         {
             if (content == null)
