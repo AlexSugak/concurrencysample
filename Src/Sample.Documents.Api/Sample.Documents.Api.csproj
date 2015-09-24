@@ -74,6 +74,7 @@
     <Compile Include="CompositionRoot.cs" />
     <Compile Include="Controllers\DocumentsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\SecuredApiController.cs" />
     <Compile Include="Exceptions\CannotLockAlreadyLockedDocumentException.cs" />
     <Compile Include="Exceptions\CannotRemoveAnotherUsersLockException.cs" />
     <Compile Include="HttpConfigurator.cs" />

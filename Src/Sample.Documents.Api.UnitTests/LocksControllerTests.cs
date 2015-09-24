@@ -13,6 +13,7 @@ using Sample.Documents.Api.Commands;
 using Sample.Documents.Api.Exceptions;
 using System.Net;
 using System.Net.Http;
+using Sample.Documents.Api.Controllers;
 
 namespace Sample.Documents.Api.UnitTests
 {

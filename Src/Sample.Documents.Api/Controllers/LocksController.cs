@@ -11,12 +11,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
 
-namespace Sample.Documents.Api
+namespace Sample.Documents.Api.Controllers
 {
     [RoutePrefix("api/documents/{documentId}/lock")]
-    public class LocksController : ApiController
+    public class LocksController : SecuredApiController
     {
-        private readonly IUserNameQuery _userQuery;
         private readonly IPutLockOnDocumentCommand _putLockCmd;
         private readonly IRemoveLockFromDocumentCommand _removeLockCmd;
 
@@ -24,8 +23,8 @@ namespace Sample.Documents.Api
             IUserNameQuery userQuery,
             IPutLockOnDocumentCommand putLockCmd,
             IRemoveLockFromDocumentCommand removeLockCmd)
+            : base(userQuery)
         {
-            _userQuery = userQuery;
             _putLockCmd = putLockCmd;
             _removeLockCmd = removeLockCmd;
         }
@@ -33,43 +32,37 @@ namespace Sample.Documents.Api
         [Route("")]
         public IHttpActionResult Put(Guid documentId)
         {
-            var userName = _userQuery.Execute(this.Request);
-            if(string.IsNullOrEmpty(userName))
+            return InvokeWhenUserExists(userName => 
             {
-                return this.Unauthorized();
-            }
+                try
+                {
+                    _putLockCmd.Execute(userName, documentId);
+                }
+                catch(CannotLockAlreadyLockedDocumentException)
+                {
+                    return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.PreconditionFailed));
+                }
 
-            try
-            {
-                _putLockCmd.Execute(userName, documentId);
-            }
-            catch(CannotLockAlreadyLockedDocumentException)
-            {
-                return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.PreconditionFailed));
-            }
-
-            return this.Ok();
+                return this.Ok();
+            });
         }
 
         [Route("")]
         public IHttpActionResult Delete(Guid documentId)
         {
-            var userName = _userQuery.Execute(this.Request);
-            if (string.IsNullOrEmpty(userName))
+            return InvokeWhenUserExists(userName =>
             {
-                return this.Unauthorized();
-            }
+                try
+                {
+                    _removeLockCmd.Execute(userName, documentId);
+                }
+                catch (CannotRemoveAnotherUsersLockException)
+                {
+                    return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.PreconditionFailed));
+                }
 
-            try
-            {
-                _removeLockCmd.Execute(userName, documentId);
-            }
-            catch(CannotRemoveAnotherUsersLockException)
-            {
-                return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.PreconditionFailed));
-            }
-
-            return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.NoContent));
+                return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.NoContent));
+            });
         }
     }
 }

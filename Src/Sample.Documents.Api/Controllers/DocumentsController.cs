@@ -8,15 +8,14 @@ using System.Web.Http;
 using Sample.Documents.Api.Commands;
 using Sample.Documents.Api.Queries;
 
-namespace Sample.Documents.Api
+namespace Sample.Documents.Api.Controllers
 {
     /// <summary>
     /// Controller for documents resource
     /// </summary>
     [RoutePrefix("api/documents")]
-    public class DocumentsController : ApiController
+    public class DocumentsController : SecuredApiController
     {
-        private readonly IUserNameQuery _userQuery;
         private readonly IGetAllDocumentsQuery _getAllDocuments;
         private readonly ISubmitNewDocumentCommand _submitDocumentCmd;
 
@@ -24,8 +23,8 @@ namespace Sample.Documents.Api
             IUserNameQuery userQuery,
             IGetAllDocumentsQuery getAllDocuments,
             ISubmitNewDocumentCommand submitDocumentCmd)
+            : base(userQuery)
         {
-            _userQuery = userQuery;
             _getAllDocuments = getAllDocuments;
             _submitDocumentCmd = submitDocumentCmd;
         }
@@ -33,48 +32,35 @@ namespace Sample.Documents.Api
         [Route("")]
         public IHttpActionResult Get()
         {
-            var userName = _userQuery.Execute(this.Request);
-            if (string.IsNullOrEmpty(userName))
-            {
-                return this.Unauthorized();
-            }
-
-            return this.Ok<DocumentsModel>(new DocumentsModel()
-            {
-                Documents = ReadDocuments().ToArray()
-            });
+            return InvokeWhenUserExists(userName => this.Ok<DocumentsModel>(
+                                                            new DocumentsModel()
+                                                            {
+                                                                Documents = ReadDocuments().ToArray()
+                                                            }));
         }
 
         [Route("")]
         public IHttpActionResult Post(DocumentModel model)
         {
-            var userName = _userQuery.Execute(this.Request);
-            if (string.IsNullOrEmpty(userName))
+            return InvokeWhenUserExists(userName => 
             {
-                return this.Unauthorized();
-            }
+                var id = Guid.NewGuid();
+                try
+                {
+                    _submitDocumentCmd.Execute(new NewDocument(id, model.Title, model.Content));
+                }
+                catch(ValidationException e)
+                {
+                    return this.BadRequest(e.Message);
+                }
 
-            var id = Guid.NewGuid();
-            try
-            {
-                WriteDocument(id, model);
-            }
-            catch(ValidationException e)
-            {
-                return this.BadRequest(e.Message);
-            }
-
-            return this.Created<DocumentResponseModel>("", new DocumentResponseModel() 
-            {
-                Id = id.ToString(),
-                Title = model.Title,
-                Content = model.Content
+                return this.Created<DocumentResponseModel>("", new DocumentResponseModel()
+                {
+                    Id = id.ToString(),
+                    Title = model.Title,
+                    Content = model.Content
+                });
             });
-        }
-
-        private void WriteDocument(Guid id, DocumentModel model)
-        {
-            _submitDocumentCmd.Execute(new NewDocument(id, model.Title, model.Content));
         }
 
         private IEnumerable<DocumentResponseModel> ReadDocuments()

@@ -8,6 +8,7 @@ using System.Web.Http.Controllers;
 using System.Web.Http.Dispatcher;
 using Sample.Documents.Api.Commands;
 using Sample.Documents.Api.Queries;
+using Sample.Documents.Api.Controllers;
 
 namespace Sample.Documents.Api
 {

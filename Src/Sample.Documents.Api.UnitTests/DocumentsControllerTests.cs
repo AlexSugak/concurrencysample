@@ -10,6 +10,7 @@ using System.Web.Http.Results;
 using Sample.Documents.Api.Queries;
 using Sample.Documents.Api.Commands;
 using System.Net.Http;
+using Sample.Documents.Api.Controllers;
 
 namespace Sample.Documents.Api.UnitTests
 {
