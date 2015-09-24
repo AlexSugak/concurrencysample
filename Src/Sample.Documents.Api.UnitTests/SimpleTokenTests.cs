@@ -69,7 +69,7 @@ namespace Sample.Documents.Api.UnitTests
 
         [Theory]
         [InlineData(null)]
-        [InlineData("")]
+        [InlineData("   ")]
         [InlineData("foo")]
         [InlineData("bar")]
         [InlineData("foo=bar&baz")]

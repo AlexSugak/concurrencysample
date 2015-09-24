@@ -33,7 +33,19 @@ namespace Sample.Documents.Api
 
         public static bool TryParse(string input, out SimpleToken token)
         {
-            if(string.IsNullOrEmpty(input) || !input.Contains("="))
+            if(input == null)
+            {
+                token = null;
+                return false;
+            }
+
+            if(input == string.Empty)
+            {
+                token = new SimpleToken();
+                return true;
+            }
+
+            if (!input.Contains("="))
             {
                 token = null;
                 return false;
