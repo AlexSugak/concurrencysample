@@ -16,13 +16,16 @@ namespace Sample.Documents.Api
     [RoutePrefix("api/documents")]
     public class DocumentsController : ApiController
     {
+        private readonly IUserNameQuery _userQuery;
         private readonly IGetAllDocumentsQuery _getAllDocuments;
         private readonly ISubmitNewDocumentCommand _submitDocumentCmd;
 
         public DocumentsController(
+            IUserNameQuery userQuery,
             IGetAllDocumentsQuery getAllDocuments,
             ISubmitNewDocumentCommand submitDocumentCmd)
         {
+            _userQuery = userQuery;
             _getAllDocuments = getAllDocuments;
             _submitDocumentCmd = submitDocumentCmd;
         }
@@ -30,6 +33,12 @@ namespace Sample.Documents.Api
         [Route("")]
         public IHttpActionResult Get()
         {
+            var userName = _userQuery.Execute(this.Request);
+            if (string.IsNullOrEmpty(userName))
+            {
+                return this.Unauthorized();
+            }
+
             return this.Ok<DocumentsModel>(new DocumentsModel()
             {
                 Documents = ReadDocuments().ToArray()
@@ -39,6 +48,12 @@ namespace Sample.Documents.Api
         [Route("")]
         public IHttpActionResult Post(DocumentModel model)
         {
+            var userName = _userQuery.Execute(this.Request);
+            if (string.IsNullOrEmpty(userName))
+            {
+                return this.Unauthorized();
+            }
+
             var id = Guid.NewGuid();
             try
             {

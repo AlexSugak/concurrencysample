@@ -48,7 +48,7 @@ namespace Sample.Documents.Api
 
             if(controllerType == typeof(DocumentsController))
             {
-                return new DocumentsController(_getAllDocuments, _submitDocumentCmd);
+                return new DocumentsController(_userNameQuery, _getAllDocuments, _submitDocumentCmd);
             }
 
             if (controllerType == typeof(LocksController))

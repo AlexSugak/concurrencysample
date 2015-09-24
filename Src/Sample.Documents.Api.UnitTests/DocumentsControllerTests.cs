@@ -9,6 +9,7 @@ using Moq;
 using System.Web.Http.Results;
 using Sample.Documents.Api.Queries;
 using Sample.Documents.Api.Commands;
+using System.Net.Http;
 
 namespace Sample.Documents.Api.UnitTests
 {
@@ -16,11 +17,29 @@ namespace Sample.Documents.Api.UnitTests
     {
         [Theory]
         [MoqAutoData]
+        public void get_returns_correct_result_when_no_auth_header_in_request(  
+            Mock<IUserNameQuery> userQuery, 
+            Mock<IGetAllDocumentsQuery> getAllQuery,
+            Mock<ISubmitNewDocumentCommand> submitNewCmd)
+        {
+            var sut = new DocumentsController(userQuery.Object, getAllQuery.Object, submitNewCmd.Object);
+
+            var response = sut.Get();
+
+            response.Should().BeOfType<UnauthorizedResult>("because auth header was not specified");
+        }
+
+        [Theory]
+        [MoqAutoData]
         public void get_returns_200_OK_Result(
+            string userName,
+            Mock<IUserNameQuery> userQuery, 
             Mock<IGetAllDocumentsQuery> getAllQuery, 
             Mock<ISubmitNewDocumentCommand> submitNewCmd)
         {
-            var sut = new DocumentsController(getAllQuery.Object, submitNewCmd.Object);
+            userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
+                     .Returns(userName);
+            var sut = new DocumentsController(userQuery.Object, getAllQuery.Object, submitNewCmd.Object);
 
             var result = sut.Get();
 
@@ -34,11 +53,16 @@ namespace Sample.Documents.Api.UnitTests
         [MoqAutoData]
         public void get_returns_documents_returned_by_query(
             List<DocumentDetails> documents,
+            string userName,
+            Mock<IUserNameQuery> userQuery, 
             Mock<IGetAllDocumentsQuery> getAllQuery,
             Mock<ISubmitNewDocumentCommand> submitNewCmd)
         {
-            getAllQuery.Setup(q => q.Execute()).Returns(documents);
-            var sut = new DocumentsController(getAllQuery.Object, submitNewCmd.Object);
+            getAllQuery.Setup(q => q.Execute())
+                       .Returns(documents);
+            userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
+                     .Returns(userName);
+            var sut = new DocumentsController(userQuery.Object, getAllQuery.Object, submitNewCmd.Object);
 
             var result = sut.Get();
 
@@ -50,12 +74,31 @@ namespace Sample.Documents.Api.UnitTests
 
         [Theory]
         [MoqAutoData]
-        public void post_returns_201_Created_when_command_succeeds(
+        public void post_returns_correct_result_when_no_auth_header_in_request(
             DocumentModel document,
+            Mock<IUserNameQuery> userQuery,
             Mock<IGetAllDocumentsQuery> getAllQuery,
             Mock<ISubmitNewDocumentCommand> submitNewCmd)
         {
-            var sut = new DocumentsController(getAllQuery.Object, submitNewCmd.Object);
+            var sut = new DocumentsController(userQuery.Object, getAllQuery.Object, submitNewCmd.Object);
+
+            var response = sut.Post(document);
+
+            response.Should().BeOfType<UnauthorizedResult>("because auth header was not specified");
+        }
+
+        [Theory]
+        [MoqAutoData]
+        public void post_returns_201_Created_when_command_succeeds(
+            DocumentModel document,
+            string userName,
+            Mock<IUserNameQuery> userQuery, 
+            Mock<IGetAllDocumentsQuery> getAllQuery,
+            Mock<ISubmitNewDocumentCommand> submitNewCmd)
+        {
+            userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
+                     .Returns(userName);
+            var sut = new DocumentsController(userQuery.Object, getAllQuery.Object, submitNewCmd.Object);
 
             var result = sut.Post(document);
 
@@ -68,11 +111,16 @@ namespace Sample.Documents.Api.UnitTests
         public void post_returns_400_BadRequest_on_validation_exception(
             DocumentModel document,
             ValidationException exception,
+            string userName,
+            Mock<IUserNameQuery> userQuery, 
             Mock<IGetAllDocumentsQuery> getAllQuery,
             Mock<ISubmitNewDocumentCommand> submitNewCmd)
         {
-            submitNewCmd.Setup(c => c.Execute(It.IsAny<NewDocument>())).Throws(exception);
-            var sut = new DocumentsController(getAllQuery.Object, submitNewCmd.Object);
+            submitNewCmd.Setup(c => c.Execute(It.IsAny<NewDocument>()))
+                        .Throws(exception);
+            userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
+                     .Returns(userName);
+            var sut = new DocumentsController(userQuery.Object, getAllQuery.Object, submitNewCmd.Object);
 
             var result = sut.Post(document);
 
