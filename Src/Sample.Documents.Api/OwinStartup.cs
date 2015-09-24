@@ -22,9 +22,17 @@ namespace Sample.Documents.Api
             var getAllDocumentsQuery = new SqlGetAllDocumentsQuery(connectionString);
             var submitDocCmd = new SubmitNewDocumentValidator(new SubmitNewDocumentSqlCommand(connectionString));
             var userNameQuery = new SimppleTokenUserNameQuery();
+            var putLockCmd = new PutLockOnDocumentSqlCommand(connectionString);
+            var removeLockCmd = new RemoveLockFromDocumentSqlCommand(connectionString);
 
             var config = new HttpConfiguration();
-            var compositon = new CompositionRoot(getAllDocumentsQuery, submitDocCmd, userNameQuery);
+            var compositon = new CompositionRoot(
+                                    getAllDocumentsQuery, 
+                                    submitDocCmd, 
+                                    userNameQuery, 
+                                    putLockCmd, 
+                                    removeLockCmd);
+
             HttpConfigurator.Configure(config, compositon);
             app.UseWebApi(config);
         }

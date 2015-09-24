@@ -19,15 +19,21 @@ namespace Sample.Documents.Api
         private readonly IGetAllDocumentsQuery _getAllDocuments;
         private readonly ISubmitNewDocumentCommand _submitDocumentCmd;
         private readonly IUserNameQuery _userNameQuery;
+        private readonly IPutLockOnDocumentCommand _putLockCmd;
+        private readonly IRemoveLockFromDocumentCommand _removeLockCmd;
 
         public CompositionRoot(
             IGetAllDocumentsQuery getAllDocuments,
             ISubmitNewDocumentCommand submitDocumentCmd,
-            IUserNameQuery userNameQuery)
+            IUserNameQuery userNameQuery,
+            IPutLockOnDocumentCommand putLockCmd,
+            IRemoveLockFromDocumentCommand removeLockCmd)
         {
             _getAllDocuments = getAllDocuments;
             _submitDocumentCmd = submitDocumentCmd;
             _userNameQuery = userNameQuery;
+            _putLockCmd = putLockCmd;
+            _removeLockCmd = removeLockCmd;
         }
 
         public IHttpController Create(
@@ -47,7 +53,7 @@ namespace Sample.Documents.Api
 
             if (controllerType == typeof(LocksController))
             {
-                return new LocksController(_userNameQuery);
+                return new LocksController(_userNameQuery, _putLockCmd, _removeLockCmd);
             }
 
             throw new NotImplementedException(

@@ -1,9 +1,12 @@
-﻿using Sample.Documents.Api.Queries;
+﻿using Sample.Documents.Api.Commands;
+using Sample.Documents.Api.Exceptions;
+using Sample.Documents.Api.Queries;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Data.SqlClient;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -13,36 +16,36 @@ namespace Sample.Documents.Api
     [RoutePrefix("api/documents/{documentId}/lock")]
     public class LocksController : ApiController
     {
-        private readonly string _connectionString;
         private readonly IUserNameQuery _userQuery;
+        private readonly IPutLockOnDocumentCommand _putLockCmd;
+        private readonly IRemoveLockFromDocumentCommand _removeLockCmd;
 
-        public LocksController(IUserNameQuery userQuery)
+        public LocksController(
+            IUserNameQuery userQuery,
+            IPutLockOnDocumentCommand putLockCmd,
+            IRemoveLockFromDocumentCommand removeLockCmd)
         {
-            _connectionString = ConfigurationManager.ConnectionStrings["DocumentsDBConnectionString"].ConnectionString;
             _userQuery = userQuery;
+            _putLockCmd = putLockCmd;
+            _removeLockCmd = removeLockCmd;
         }
 
         [Route("")]
         public IHttpActionResult Put(Guid documentId)
         {
             var userName = _userQuery.Execute(this.Request);
-
-            using (var connection = new SqlConnection(_connectionString))
+            if(string.IsNullOrEmpty(userName))
             {
-                connection.Open();
-                using (var transaction = connection.BeginTransaction())
-                {
-                    string cmdText = "UPDATE [dbo].[Documents] SET [CheckedOutBy] = @user WHERE [Id] = @id";
-                    using (var cmd = new SqlCommand(cmdText, transaction.Connection, transaction))
-                    {
-                        cmd.Parameters.Add(new SqlParameter("@id", documentId));
-                        cmd.Parameters.Add(new SqlParameter("@user", userName));
+                return this.Unauthorized();
+            }
 
-                        cmd.ExecuteNonQuery();
-                    }
-
-                    transaction.Commit();
-                }
+            try
+            {
+                _putLockCmd.Execute(userName, documentId);
+            }
+            catch(CannotLockAlreadyLockedDocumentException)
+            {
+                return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.PreconditionFailed));
             }
 
             return this.Ok();
@@ -51,23 +54,22 @@ namespace Sample.Documents.Api
         [Route("")]
         public IHttpActionResult Delete(Guid documentId)
         {
-            using (var connection = new SqlConnection(_connectionString))
+            var userName = _userQuery.Execute(this.Request);
+            if (string.IsNullOrEmpty(userName))
             {
-                connection.Open();
-                using (var transaction = connection.BeginTransaction())
-                {
-                    string cmdText = "UPDATE [dbo].[Documents] SET [CheckedOutBy] = null WHERE [Id] = @id";
-                    using (var cmd = new SqlCommand(cmdText, transaction.Connection, transaction))
-                    {
-                        cmd.Parameters.Add(new SqlParameter("@id", documentId));
-                        cmd.ExecuteNonQuery();
-                    }
-
-                    transaction.Commit();
-                }
+                return this.Unauthorized();
             }
 
-            return this.Ok();
+            try
+            {
+                _removeLockCmd.Execute(userName, documentId);
+            }
+            catch(CannotRemoveAnotherUsersLockException)
+            {
+                return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.PreconditionFailed));
+            }
+
+            return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.NoContent));
         }
     }
 }
