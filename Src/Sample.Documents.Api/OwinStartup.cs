@@ -1,11 +1,12 @@
-﻿using Owin;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Web.Http;
+using Owin;
+using Sample.Documents.Api.Commands;
+using Sample.Documents.Api.Queries;
 
 namespace Sample.Documents.Api
 {
@@ -17,11 +18,13 @@ namespace Sample.Documents.Api
         public void Configuration(IAppBuilder app)
         {
             var connectionString = ConfigurationManager.ConnectionStrings["DocumentsDBConnectionString"].ConnectionString;
+
             var getAllDocumentsQuery = new SqlGetAllDocumentsQuery(connectionString);
             var submitDocCmd = new SubmitNewDocumentValidator(new SubmitNewDocumentSqlCommand(connectionString));
+            var userNameQuery = new SimppleTokenUserNameQuery();
 
             var config = new HttpConfiguration();
-            var compositon = new CompositionRoot(getAllDocumentsQuery, submitDocCmd);
+            var compositon = new CompositionRoot(getAllDocumentsQuery, submitDocCmd, userNameQuery);
             HttpConfigurator.Configure(config, compositon);
             app.UseWebApi(config);
         }

@@ -3,27 +3,31 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Dispatcher;
+using Sample.Documents.Api.Commands;
+using Sample.Documents.Api.Queries;
 
 namespace Sample.Documents.Api
 {
     /// <summary>
-    /// Composes api controllers which are the root components of this application 
+    /// Composes api controllers which are the app root components 
     /// </summary>
     public class CompositionRoot : IHttpControllerActivator
     {
-        private IGetAllDocumentsQuery _getAllDocuments;
+        private readonly IGetAllDocumentsQuery _getAllDocuments;
         private readonly ISubmitNewDocumentCommand _submitDocumentCmd;
+        private readonly IUserNameQuery _userNameQuery;
 
         public CompositionRoot(
             IGetAllDocumentsQuery getAllDocuments,
-            ISubmitNewDocumentCommand submitDocumentCmd)
+            ISubmitNewDocumentCommand submitDocumentCmd,
+            IUserNameQuery userNameQuery)
         {
             _getAllDocuments = getAllDocuments;
             _submitDocumentCmd = submitDocumentCmd;
+            _userNameQuery = userNameQuery;
         }
 
         public IHttpController Create(
@@ -39,6 +43,11 @@ namespace Sample.Documents.Api
             if(controllerType == typeof(DocumentsController))
             {
                 return new DocumentsController(_getAllDocuments, _submitDocumentCmd);
+            }
+
+            if (controllerType == typeof(LocksController))
+            {
+                return new LocksController(_userNameQuery);
             }
 
             throw new NotImplementedException(

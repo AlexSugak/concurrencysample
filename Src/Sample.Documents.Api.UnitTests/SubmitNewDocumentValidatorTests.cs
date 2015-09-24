@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit.Extensions;
 using FluentAssertions;
+using Sample.Documents.Api.Commands;
 
 namespace Sample.Documents.Api.UnitTests
 {

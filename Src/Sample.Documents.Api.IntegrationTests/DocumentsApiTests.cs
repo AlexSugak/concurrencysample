@@ -1,11 +1,13 @@
-﻿using Microsoft.Owin.Testing;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Owin.Testing;
 using Xunit;
+using Xunit.Extensions;
+using Ploeh.AutoFixture.Xunit;
 
 namespace Sample.Documents.Api.IntegrationTests
 {
@@ -16,11 +18,12 @@ namespace Sample.Documents.Api.IntegrationTests
     {
         // We start with "ice breaker" tests to force us to create something listening for requests on the other end
 
-        [Fact]
+        [Theory]
+        [AutoData]
         [UseDatabase]
-        public void GET_api_home_returns_OK()
+        public void GET_api_home_returns_OK(string userName)
         {
-            using (var client = TestServerHttpClientFactory.Create())
+            using (var client = TestServerHttpClientFactory.Create(userName))
             {
                 var response = client.GetAsync("/api").Result;
 
@@ -28,11 +31,12 @@ namespace Sample.Documents.Api.IntegrationTests
             }
         }
 
-        [Fact]
+        [Theory]
+        [AutoData]
         [UseDatabase]
-        public void GET_documents_resource_returns_json_content()
+        public void GET_documents_resource_returns_json_content(string userName)
         {
-            using (var client = TestServerHttpClientFactory.Create())
+            using (var client = TestServerHttpClientFactory.Create(userName))
             {
                 var response = client.GetAsync("/api/documents").Result;
 
@@ -43,11 +47,12 @@ namespace Sample.Documents.Api.IntegrationTests
             }
         }
 
-        [Fact]
+        [Theory]
+        [AutoData]
         [UseDatabase]
-        public void POST_documents_resource_returns_success()
+        public void POST_documents_resource_returns_success(string userName)
         {
-            using (var client = TestServerHttpClientFactory.Create())
+            using (var client = TestServerHttpClientFactory.Create(userName))
             {
                 var json = new 
                 {
@@ -61,11 +66,12 @@ namespace Sample.Documents.Api.IntegrationTests
             }
         }
 
-        [Fact]
+        [Theory]
+        [AutoData]
         [UseDatabase]
-        public void GET_documents_resource_returns_POSTed_document_in_content()
+        public void GET_documents_resource_returns_POSTed_document_in_content(string userName)
         {
-            using (var client = TestServerHttpClientFactory.Create())
+            using (var client = TestServerHttpClientFactory.Create(userName))
             {
                 var json = new
                 {
@@ -85,9 +91,10 @@ namespace Sample.Documents.Api.IntegrationTests
 
         // now we do the "spike", i.e. tests that force us to implement everything down to the database
 
-        [Fact]
+        [Theory]
+        [AutoData]
         [UseDatabase]
-        public void GET_documents_resouce_returns_document_stored_in_database()
+        public void GET_documents_resouce_returns_document_stored_in_database(string userName)
         {
             var document = new
             {
@@ -102,7 +109,7 @@ namespace Sample.Documents.Api.IntegrationTests
             var db = Simple.Data.Database.OpenNamedConnection("DocumentsDBConnectionString");
             db.Documents.Insert(document);
 
-            using (var client = TestServerHttpClientFactory.Create())
+            using (var client = TestServerHttpClientFactory.Create(userName))
             {
                 var response = client.GetAsync("/api/documents").Result;
                 var actual = response.Content.ReadAsJsonAsync().Result;
@@ -111,9 +118,10 @@ namespace Sample.Documents.Api.IntegrationTests
             }
         }
 
-        [Fact]
+        [Theory]
+        [AutoData]
         [UseDatabase]
-        public void POSTed_document_saved_to_database()
+        public void POSTed_document_saved_to_database(string userName)
         {
             var document = new
             {
@@ -121,7 +129,7 @@ namespace Sample.Documents.Api.IntegrationTests
                 content = "not empty content",
             };
 
-            using (var client = TestServerHttpClientFactory.Create())
+            using (var client = TestServerHttpClientFactory.Create(userName))
             {
                 client.PostAsJsonAsync("/api/documents", document).Wait();
             }

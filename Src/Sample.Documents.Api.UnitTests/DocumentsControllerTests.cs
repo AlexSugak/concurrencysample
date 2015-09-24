@@ -7,6 +7,8 @@ using Xunit.Extensions;
 using FluentAssertions;
 using Moq;
 using System.Web.Http.Results;
+using Sample.Documents.Api.Queries;
+using Sample.Documents.Api.Commands;
 
 namespace Sample.Documents.Api.UnitTests
 {
