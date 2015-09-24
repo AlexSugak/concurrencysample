@@ -47,5 +47,27 @@ namespace Sample.Documents.Api
 
             return this.Ok();
         }
+
+        [Route("")]
+        public IHttpActionResult Delete(Guid documentId)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                using (var transaction = connection.BeginTransaction())
+                {
+                    string cmdText = "UPDATE [dbo].[Documents] SET [CheckedOutBy] = null WHERE [Id] = @id";
+                    using (var cmd = new SqlCommand(cmdText, transaction.Connection, transaction))
+                    {
+                        cmd.Parameters.Add(new SqlParameter("@id", documentId));
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    transaction.Commit();
+                }
+            }
+
+            return this.Ok();
+        }
     }
 }
