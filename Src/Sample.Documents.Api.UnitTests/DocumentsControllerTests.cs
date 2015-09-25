@@ -21,9 +21,10 @@ namespace Sample.Documents.Api.UnitTests
         public void get_returns_correct_result_when_no_auth_header_in_request(  
             Mock<IUserNameQuery> userQuery, 
             Mock<IGetAllDocumentsQuery> getAllQuery,
-            Mock<ISubmitNewDocumentCommand> submitNewCmd)
+            Mock<ISubmitNewDocumentCommand> submitNewCmd,
+            Mock<IUpdateDocumentCommand> updateCmd)
         {
-            var sut = new DocumentsController(userQuery.Object, getAllQuery.Object, submitNewCmd.Object);
+            var sut = new DocumentsController(userQuery.Object, getAllQuery.Object, submitNewCmd.Object, updateCmd.Object);
 
             var response = sut.Get();
 
@@ -36,11 +37,12 @@ namespace Sample.Documents.Api.UnitTests
             string userName,
             Mock<IUserNameQuery> userQuery, 
             Mock<IGetAllDocumentsQuery> getAllQuery, 
-            Mock<ISubmitNewDocumentCommand> submitNewCmd)
+            Mock<ISubmitNewDocumentCommand> submitNewCmd,
+            Mock<IUpdateDocumentCommand> updateCmd)
         {
             userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
                      .Returns(userName);
-            var sut = new DocumentsController(userQuery.Object, getAllQuery.Object, submitNewCmd.Object);
+            var sut = new DocumentsController(userQuery.Object, getAllQuery.Object, submitNewCmd.Object, updateCmd.Object);
 
             var result = sut.Get();
 
@@ -57,13 +59,14 @@ namespace Sample.Documents.Api.UnitTests
             string userName,
             Mock<IUserNameQuery> userQuery, 
             Mock<IGetAllDocumentsQuery> getAllQuery,
-            Mock<ISubmitNewDocumentCommand> submitNewCmd)
+            Mock<ISubmitNewDocumentCommand> submitNewCmd,
+            Mock<IUpdateDocumentCommand> updateCmd)
         {
             getAllQuery.Setup(q => q.Execute())
                        .Returns(documents);
             userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
                      .Returns(userName);
-            var sut = new DocumentsController(userQuery.Object, getAllQuery.Object, submitNewCmd.Object);
+            var sut = new DocumentsController(userQuery.Object, getAllQuery.Object, submitNewCmd.Object, updateCmd.Object);
 
             var result = sut.Get();
 
@@ -79,9 +82,10 @@ namespace Sample.Documents.Api.UnitTests
             DocumentModel document,
             Mock<IUserNameQuery> userQuery,
             Mock<IGetAllDocumentsQuery> getAllQuery,
-            Mock<ISubmitNewDocumentCommand> submitNewCmd)
+            Mock<ISubmitNewDocumentCommand> submitNewCmd,
+            Mock<IUpdateDocumentCommand> updateCmd)
         {
-            var sut = new DocumentsController(userQuery.Object, getAllQuery.Object, submitNewCmd.Object);
+            var sut = new DocumentsController(userQuery.Object, getAllQuery.Object, submitNewCmd.Object, updateCmd.Object);
 
             var response = sut.Post(document);
 
@@ -95,11 +99,12 @@ namespace Sample.Documents.Api.UnitTests
             string userName,
             Mock<IUserNameQuery> userQuery, 
             Mock<IGetAllDocumentsQuery> getAllQuery,
-            Mock<ISubmitNewDocumentCommand> submitNewCmd)
+            Mock<ISubmitNewDocumentCommand> submitNewCmd,
+            Mock<IUpdateDocumentCommand> updateCmd)
         {
             userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
                      .Returns(userName);
-            var sut = new DocumentsController(userQuery.Object, getAllQuery.Object, submitNewCmd.Object);
+            var sut = new DocumentsController(userQuery.Object, getAllQuery.Object, submitNewCmd.Object, updateCmd.Object);
 
             var result = sut.Post(document);
 
@@ -115,13 +120,14 @@ namespace Sample.Documents.Api.UnitTests
             string userName,
             Mock<IUserNameQuery> userQuery, 
             Mock<IGetAllDocumentsQuery> getAllQuery,
-            Mock<ISubmitNewDocumentCommand> submitNewCmd)
+            Mock<ISubmitNewDocumentCommand> submitNewCmd,
+            Mock<IUpdateDocumentCommand> updateCmd)
         {
             submitNewCmd.Setup(c => c.Execute(It.IsAny<NewDocument>()))
                         .Throws(exception);
             userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
                      .Returns(userName);
-            var sut = new DocumentsController(userQuery.Object, getAllQuery.Object, submitNewCmd.Object);
+            var sut = new DocumentsController(userQuery.Object, getAllQuery.Object, submitNewCmd.Object, updateCmd.Object);
 
             var result = sut.Post(document);
 

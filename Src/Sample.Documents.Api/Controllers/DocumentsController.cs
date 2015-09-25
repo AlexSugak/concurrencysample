@@ -18,15 +18,18 @@ namespace Sample.Documents.Api.Controllers
     {
         private readonly IGetAllDocumentsQuery _getAllDocuments;
         private readonly ISubmitNewDocumentCommand _submitDocumentCmd;
+        private readonly IUpdateDocumentCommand _updateDocumentCmd;
 
         public DocumentsController(
             IUserNameQuery userQuery,
             IGetAllDocumentsQuery getAllDocuments,
-            ISubmitNewDocumentCommand submitDocumentCmd)
+            ISubmitNewDocumentCommand submitDocumentCmd,
+            IUpdateDocumentCommand updateDocumentCmd)
             : base(userQuery)
         {
             _getAllDocuments = getAllDocuments;
             _submitDocumentCmd = submitDocumentCmd;
+            _updateDocumentCmd = updateDocumentCmd;
         }
 
         [Route("")]
@@ -59,6 +62,23 @@ namespace Sample.Documents.Api.Controllers
                     Id = id.ToString(),
                     Title = model.Title,
                     Content = model.Content
+                });
+            });
+        }
+
+        [Route("{documentId}")]
+        public IHttpActionResult Put(DocumentModel model, Guid documentId)
+        {
+            return InvokeWhenUserExists(userName =>
+            {
+                _updateDocumentCmd.Execute(new UpdatedDocument(documentId, model.Title, model.Content));
+
+                return this.Ok<DocumentResponseModel>(new DocumentResponseModel()
+                {
+                    Id = documentId.ToString(),
+                    Title = model.Title,
+                    Content = model.Content,
+                    CheckedOutBy = userName
                 });
             });
         }

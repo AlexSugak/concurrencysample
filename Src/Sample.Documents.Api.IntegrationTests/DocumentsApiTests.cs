@@ -141,5 +141,43 @@ namespace Sample.Documents.Api.IntegrationTests
             Assert.Equal(document.title.ToString(), dbDocuments.First().Title.ToString());
             Assert.Equal(document.content.ToString(), dbDocuments.First().Content.ToString());
         }
+
+        [Theory]
+        [AutoData]
+        [UseDatabase]
+        public void PUT_updates_document_in_the_database(
+            Guid docId,
+            string userName,
+            string newTitle,
+            string newContent)
+        {
+            var dbDocument = new
+            {
+                Id = docId,
+                Title = "title1",
+                Content = "not empty content",
+                CheckedOutBy = userName
+            };
+
+            var db = Simple.Data.Database.OpenNamedConnection("DocumentsDBConnectionString");
+            db.Documents.Insert(dbDocument);
+
+            var updatedDocument = new
+            {
+                title = newTitle,
+                content = newContent,
+            };
+
+            using (var client = TestServerHttpClientFactory.Create(userName))
+            {
+                client.PutAsJsonAsync("/api/documents/" + docId, updatedDocument).Wait();
+            }
+
+            var dbDocuments = db.Documents.All();
+
+            Assert.Equal(1, dbDocuments.Count());
+            Assert.Equal(newTitle, dbDocuments.First().Title.ToString());
+            Assert.Equal(newContent, dbDocuments.First().Content.ToString());
+        }
     }
 }

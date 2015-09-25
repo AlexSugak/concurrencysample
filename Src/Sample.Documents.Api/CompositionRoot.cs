@@ -19,6 +19,7 @@ namespace Sample.Documents.Api
     {
         private readonly IGetAllDocumentsQuery _getAllDocuments;
         private readonly ISubmitNewDocumentCommand _submitDocumentCmd;
+        private readonly IUpdateDocumentCommand _updateDocumentCmd;
         private readonly IUserNameQuery _userNameQuery;
         private readonly IPutLockOnDocumentCommand _putLockCmd;
         private readonly IRemoveLockFromDocumentCommand _removeLockCmd;
@@ -26,12 +27,14 @@ namespace Sample.Documents.Api
         public CompositionRoot(
             IGetAllDocumentsQuery getAllDocuments,
             ISubmitNewDocumentCommand submitDocumentCmd,
+            IUpdateDocumentCommand updateDocumentCmd,
             IUserNameQuery userNameQuery,
             IPutLockOnDocumentCommand putLockCmd,
             IRemoveLockFromDocumentCommand removeLockCmd)
         {
             _getAllDocuments = getAllDocuments;
             _submitDocumentCmd = submitDocumentCmd;
+            _updateDocumentCmd = updateDocumentCmd;
             _userNameQuery = userNameQuery;
             _putLockCmd = putLockCmd;
             _removeLockCmd = removeLockCmd;
@@ -49,7 +52,7 @@ namespace Sample.Documents.Api
 
             if(controllerType == typeof(DocumentsController))
             {
-                return new DocumentsController(_userNameQuery, _getAllDocuments, _submitDocumentCmd);
+                return new DocumentsController(_userNameQuery, _getAllDocuments, _submitDocumentCmd, _updateDocumentCmd);
             }
 
             if (controllerType == typeof(LocksController))

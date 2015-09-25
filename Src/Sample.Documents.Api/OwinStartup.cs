@@ -22,6 +22,7 @@ namespace Sample.Documents.Api
             var getAllDocumentsQuery = new GetAllDocumentsSqlQuery(connectionString);
             var submitDocCmd = new SubmitNewDocumentValidator(
                                     new SubmitNewDocumentSqlCommand(connectionString));
+            var updateDocCmd = new UpdateDocumentSqlCommand(connectionString);
             var userNameQuery = new SimppleTokenUserNameQuery();
             var putLockCmd = new PutLockCommandValidator(
                                     new PutLockOnDocumentSqlCommand(connectionString),
@@ -32,6 +33,7 @@ namespace Sample.Documents.Api
             var compositon = new CompositionRoot(
                                     getAllDocumentsQuery, 
                                     submitDocCmd, 
+                                    updateDocCmd,
                                     userNameQuery, 
                                     putLockCmd, 
                                     removeLockCmd);

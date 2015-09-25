@@ -11,7 +11,7 @@ namespace Sample.Documents.Api.Commands
 {
     public interface ISubmitNewDocumentCommand
     {
-        void Execute(NewDocument input);
+        void Execute(NewDocument document);
     }
 
     public class NewDocument
@@ -39,15 +39,15 @@ namespace Sample.Documents.Api.Commands
             _validator = new Validator();
         }
 
-        public void Execute(NewDocument input)
+        public void Execute(NewDocument document)
         {
-            var result = _validator.Validate(input);
+            var result = _validator.Validate(document);
             if(!result.IsValid)
             {
                 throw new ValidationException(BuildMessage(result.Errors));
             }
             
-            _implementation.Execute(input);
+            _implementation.Execute(document);
         }
 
         private static string BuildMessage(IList<ValidationFailure> errors)
@@ -76,19 +76,19 @@ namespace Sample.Documents.Api.Commands
             _connectionString = connectionString;
         }
 
-        public void Execute(NewDocument input)
+        public void Execute(NewDocument document)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
                 connection.Open();
                 using (var transaction = connection.BeginTransaction())
                 {
-                    string cmdText = "INSERT INTO dbo.Documents ([Id], [Title], [Content]) VALUES (@id, @title, @content)";
+                    string cmdText = "INSERT INTO [dbo].[Documents] ([Id], [Title], [Content]) VALUES (@id, @title, @content)";
                     using (var cmd = new SqlCommand(cmdText, transaction.Connection, transaction))
                     {
-                        cmd.Parameters.Add(new SqlParameter("@id", input.Id));
-                        cmd.Parameters.Add(new SqlParameter("@title", input.Title));
-                        cmd.Parameters.Add(new SqlParameter("@content", input.Content));
+                        cmd.Parameters.Add(new SqlParameter("@id", document.Id));
+                        cmd.Parameters.Add(new SqlParameter("@title", document.Title));
+                        cmd.Parameters.Add(new SqlParameter("@content", document.Content));
 
                         cmd.ExecuteNonQuery();
                     }
