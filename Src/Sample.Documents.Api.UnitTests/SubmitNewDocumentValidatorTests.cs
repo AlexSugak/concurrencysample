@@ -1,12 +1,12 @@
-﻿using Moq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Xunit.Extensions;
 using FluentAssertions;
+using Moq;
 using Sample.Documents.Api.Commands;
+using Xunit.Extensions;
 
 namespace Sample.Documents.Api.UnitTests
 {
@@ -70,6 +70,18 @@ namespace Sample.Documents.Api.UnitTests
             var sut = new SubmitNewDocumentValidator(impl.Object);
 
             sut.Invoking(s => s.Execute(doc)).ShouldThrow<ValidationException>("because id is required");
+        }
+
+        [Theory]
+        [MoqAutoData]
+        public void execute_calls_inner_command_when_doc_is_valid(
+            NewDocument doc,
+            Mock<ISubmitNewDocumentCommand> impl)
+        {
+            var sut = new SubmitNewDocumentValidator(impl.Object);
+            sut.Execute(doc);
+
+            impl.Verify(cmd => cmd.Execute(doc), Times.Once);
         }
     }
 }

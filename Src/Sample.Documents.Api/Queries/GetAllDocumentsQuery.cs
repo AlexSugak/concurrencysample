@@ -20,10 +20,10 @@ namespace Sample.Documents.Api.Queries
         public string CheckedOutBy { get; set; }
     }
 
-    public class SqlGetAllDocumentsQuery : IGetAllDocumentsQuery
+    public class GetAllDocumentsSqlQuery : IGetAllDocumentsQuery
     {
         private readonly string _connectionString;
-        public SqlGetAllDocumentsQuery(string connectionString)
+        public GetAllDocumentsSqlQuery(string connectionString)
         {
             _connectionString = connectionString;
         }

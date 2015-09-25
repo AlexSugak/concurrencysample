@@ -87,6 +87,7 @@
     <Compile Include="ClaimComparer.cs" />
     <Compile Include="DocumentsControllerTests.cs" />
     <Compile Include="LocksControllerTests.cs" />
+    <Compile Include="PutLockCommandValidatorTests.cs" />
     <Compile Include="SimpleTokenTests.cs" />
     <Compile Include="SimppleTokenUserNameQueryTests.cs" />
     <Compile Include="SubmitNewDocumentValidatorTests.cs" />

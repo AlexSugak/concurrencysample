@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Sample.Documents.Api.Exceptions;
+using Sample.Documents.Api.Queries;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
@@ -10,6 +12,40 @@ namespace Sample.Documents.Api.Commands
     public interface IPutLockOnDocumentCommand
     {
         void Execute(string userName, Guid documentId);
+    }
+
+    public class PutLockCommandValidator : IPutLockOnDocumentCommand
+    {
+        private readonly IPutLockOnDocumentCommand _implementation;
+        private readonly IGetDocumentQuery _docQuery;
+
+        public PutLockCommandValidator(IPutLockOnDocumentCommand implementation, IGetDocumentQuery docQuery)
+        {
+            _implementation = implementation;
+            _docQuery = docQuery;
+        }
+
+        public void Execute(string userName, Guid documentId)
+        {
+            var doc = _docQuery.Execute(documentId);
+
+            if(doc.CheckedOutBy == userName)
+            {
+                return;
+            }
+
+            if(!string.IsNullOrEmpty(doc.CheckedOutBy) && doc.CheckedOutBy != userName)
+            {
+                throw new CannotLockAlreadyLockedDocumentException(
+                            string.Format(
+                                    "Cannot put a lock on document {0} for user {1} because it is already locked by user {2}",
+                                    documentId,
+                                    userName,
+                                    doc.CheckedOutBy));
+            }
+
+            _implementation.Execute(userName, documentId);
+        }
     }
 
     public class PutLockOnDocumentSqlCommand : IPutLockOnDocumentCommand

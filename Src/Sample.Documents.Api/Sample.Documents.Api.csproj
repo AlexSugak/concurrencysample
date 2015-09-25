@@ -77,11 +77,13 @@
     <Compile Include="Controllers\SecuredApiController.cs" />
     <Compile Include="Exceptions\CannotLockAlreadyLockedDocumentException.cs" />
     <Compile Include="Exceptions\CannotRemoveAnotherUsersLockException.cs" />
+    <Compile Include="Exceptions\DocumentNotFoundException.cs" />
     <Compile Include="HttpConfigurator.cs" />
     <Compile Include="Queries\GetAllDocumentsQuery.cs" />
     <Compile Include="Controllers\LocksController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="OwinStartup.cs" />
+    <Compile Include="Queries\GetDocumentQuery.cs" />
     <Compile Include="Queries\UserNameQuery.cs" />
     <Compile Include="SimpleToken.cs" />
     <Compile Include="Commands\SubmitNewDocumentCommand.cs" />
