@@ -1,10 +1,31 @@
 {
-  "name": "Sample.UI",
-  "version": "0.0.1",
-  "description": "Sample.UI",
-  "main": "server.js",
-  "author": {
-    "name": "Alex Sugak",
-    "email": "aleksandr.sugak@gmail.com"
-  }
+    "name": "Sample.UI",
+    "version": "0.0.1",
+    "description": "Sample.UI",
+    "main": "server.js",
+    "author": {
+        "name": "Alex Sugak",
+        "email": "aleksandr.sugak@gmail.com"
+    },
+    "dependencies": {
+        "body-parser": "^1.9.2",
+        "debug": "^2.1.0",
+        "express": "^4.10.2",
+        "express-state": "^1.2.0",
+        "eyes": "^0.1.8",
+        "fluxible": "^0.5.0",
+        "fluxible-addons-react": "^0.1.8",
+        "fluxible-router": "^0.2.2",
+        "jsx-loader": "^0.12.2",
+        "node-jsx": "^0.12.0",
+        "react": "^0.13.0",
+        "bootstrap": "~3.3.0",
+        "react-bootstrap":  "~0.23.0",
+        "request": "^2.51.0",
+        "serve-favicon": "^2.1.7",
+        "superagent": "0.21.0",
+        "webpack": "^1.4.13",
+        "xml2js": "^0.4.4"
+    },
+    "devDependencies": { }
 }
