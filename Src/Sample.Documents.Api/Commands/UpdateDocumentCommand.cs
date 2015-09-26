@@ -15,7 +15,7 @@ namespace Sample.Documents.Api.Commands
             _connectionString = connectionString;
         }
 
-        public void Execute(Document document)
+        public void Execute(Envelope<Document> document)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -25,9 +25,9 @@ namespace Sample.Documents.Api.Commands
                     string cmdText = "UPDATE [dbo].[Documents] SET [Title] = @title, [Content] = @content WHERE [Id] = @id";
                     using (var cmd = new SqlCommand(cmdText, transaction.Connection, transaction))
                     {
-                        cmd.Parameters.Add(new SqlParameter("@id", document.Id));
-                        cmd.Parameters.Add(new SqlParameter("@title", document.Title));
-                        cmd.Parameters.Add(new SqlParameter("@content", document.Content));
+                        cmd.Parameters.Add(new SqlParameter("@id", document.Item.DocumentId));
+                        cmd.Parameters.Add(new SqlParameter("@title", document.Item.Title));
+                        cmd.Parameters.Add(new SqlParameter("@content", document.Item.Content));
 
                         cmd.ExecuteNonQuery();
                     }

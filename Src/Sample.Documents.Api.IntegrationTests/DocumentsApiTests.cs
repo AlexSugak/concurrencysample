@@ -8,6 +8,7 @@ using Microsoft.Owin.Testing;
 using Xunit;
 using Xunit.Extensions;
 using Ploeh.AutoFixture.Xunit;
+using System.Net;
 
 namespace Sample.Documents.Api.IntegrationTests
 {
@@ -94,14 +95,18 @@ namespace Sample.Documents.Api.IntegrationTests
         [Theory]
         [AutoData]
         [UseDatabase]
-        public void GET_documents_resouce_returns_document_stored_in_database(string userName)
+        public void GET_documents_resouce_returns_document_stored_in_database(
+            string userName, 
+            string title, 
+            string content,
+            string checkedOutBy)
         {
             var document = new
             {
                 Id = Guid.NewGuid(),
-                Title = "title1",
-                Content = "not empty content",
-                CheckedOutBy = "bob"
+                Title = title,
+                Content = content,
+                CheckedOutBy = checkedOutBy
             };
 
             var expected = document.ToJObject();
@@ -121,12 +126,12 @@ namespace Sample.Documents.Api.IntegrationTests
         [Theory]
         [AutoData]
         [UseDatabase]
-        public void POSTed_document_saved_to_database(string userName)
+        public void POSTed_document_saved_to_database(string userName, string title, string content)
         {
             var document = new
             {
-                title = "title1",
-                content = "not empty content",
+                title = title,
+                content = content,
             };
 
             using (var client = TestServerHttpClientFactory.Create(userName))
@@ -138,24 +143,26 @@ namespace Sample.Documents.Api.IntegrationTests
             var dbDocuments = db.Documents.All();
 
             Assert.Equal(1, dbDocuments.Count());
-            Assert.Equal(document.title.ToString(), dbDocuments.First().Title.ToString());
-            Assert.Equal(document.content.ToString(), dbDocuments.First().Content.ToString());
+            Assert.Equal(title, dbDocuments.First().Title.ToString());
+            Assert.Equal(content, dbDocuments.First().Content.ToString());
         }
 
         [Theory]
         [AutoData]
         [UseDatabase]
-        public void PUT_updates_document_in_the_database(
+        public void PUT_updates_document_in_the_database_when_it_is_checked_out_by_user(
             Guid docId,
             string userName,
+            string oldTitle,
+            string oldContent,
             string newTitle,
             string newContent)
         {
             var dbDocument = new
             {
                 Id = docId,
-                Title = "title1",
-                Content = "not empty content",
+                Title = oldTitle,
+                Content = oldContent,
                 CheckedOutBy = userName
             };
 
@@ -178,6 +185,48 @@ namespace Sample.Documents.Api.IntegrationTests
             Assert.Equal(1, dbDocuments.Count());
             Assert.Equal(newTitle, dbDocuments.First().Title.ToString());
             Assert.Equal(newContent, dbDocuments.First().Content.ToString());
+        }
+
+        [Theory]
+        [AutoData]
+        [UseDatabase]
+        public void PUT_returns_conflict_and_does_not_update_document_when_document_checked_out_by_another_user(
+            Guid docId,
+            string userName,
+            string anotherUserName,
+            string oldTitle,
+            string oldContent,
+            string newTitle,
+            string newContent)
+        {
+            var dbDocument = new
+            {
+                Id = docId,
+                Title = oldTitle,
+                Content = oldContent,
+                CheckedOutBy = anotherUserName
+            };
+
+            var db = Simple.Data.Database.OpenNamedConnection("DocumentsDBConnectionString");
+            db.Documents.Insert(dbDocument);
+
+            var updatedDocument = new
+            {
+                title = newTitle,
+                content = newContent,
+            };
+
+            using (var client = TestServerHttpClientFactory.Create(userName))
+            {
+                var response = client.PutAsJsonAsync("/api/documents/" + docId, updatedDocument).Result;
+
+                Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+
+                var dbDocuments = db.Documents.All();
+                Assert.Equal(1, dbDocuments.Count());
+                Assert.Equal(oldTitle, dbDocuments.First().Title.ToString());
+                Assert.Equal(oldContent, dbDocuments.First().Content.ToString());
+            }
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sample.Documents.Api
+namespace Sample.Documents.Api.Exceptions
 {
     [Serializable]
     public class ValidationException : Exception

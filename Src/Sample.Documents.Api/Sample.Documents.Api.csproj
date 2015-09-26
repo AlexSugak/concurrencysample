@@ -73,6 +73,7 @@
     <Compile Include="Commands\RemoveLockFromDocumentCommand.cs" />
     <Compile Include="Commands\UpdateDocumentCommand.cs" />
     <Compile Include="CompositionRoot.cs" />
+    <Compile Include="Controllers\ApiControllerWithEnvelope.cs" />
     <Compile Include="Controllers\DocumentsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\SecuredApiController.cs" />

@@ -23,13 +23,15 @@ namespace Sample.Documents.Api
             var getDocumentQuery = new GetDocumentSqlQuery(connectionString);
             var submitDocCmd = new DocumentValidator(
                                     new SubmitNewDocumentSqlCommand(connectionString));
-            var updateDocCmd = new DocumentValidator(
-                                    new UpdateDocumentSqlCommand(connectionString));
+            var updateDocCmd = new LockCommandValidator<Document>(
+                                    new DocumentValidator(
+                                        new UpdateDocumentSqlCommand(connectionString)),
+                                    getDocumentQuery);
             var userNameQuery = new SimppleTokenUserNameQuery();
-            var putLockCmd = new LockCommandValidator(
+            var putLockCmd = new LockCommandValidator<Lock>(
                                     new PutLockOnDocumentSqlCommand(connectionString),
                                     getDocumentQuery);
-            var removeLockCmd = new LockCommandValidator(
+            var removeLockCmd = new LockCommandValidator<Lock>(
                                     new RemoveLockFromDocumentSqlCommand(connectionString),
                                     getDocumentQuery);
 

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
 using Sample.Documents.Api.Commands;
+using Sample.Documents.Api.Exceptions;
 using Xunit.Extensions;
 
 namespace Sample.Documents.Api.UnitTests
@@ -15,10 +16,10 @@ namespace Sample.Documents.Api.UnitTests
         [Theory]
         [MoqAutoData]
         public void execute_throws_exception_on_null_title(
-            Document doc,
+            Envelope<Document> doc,
             Mock<ICommand<Document>> impl)
         {
-            doc.Title = null;
+            doc.Item.Title = null;
             var sut = new DocumentValidator(impl.Object);
 
             sut.Invoking(s => s.Execute(doc)).ShouldThrow<ValidationException>("because title is required");
@@ -27,10 +28,10 @@ namespace Sample.Documents.Api.UnitTests
         [Theory]
         [MoqAutoData]
         public void execute_throws_exception_on_empty_title(
-            Document doc,
+            Envelope<Document> doc,
             Mock<ICommand<Document>> impl)
         {
-            doc.Title = "";
+            doc.Item.Title = "";
             var sut = new DocumentValidator(impl.Object);
 
             sut.Invoking(s => s.Execute(doc)).ShouldThrow<ValidationException>("because title is required");
@@ -39,10 +40,10 @@ namespace Sample.Documents.Api.UnitTests
         [Theory]
         [MoqAutoData]
         public void execute_throws_exception_on_null_content(
-            Document doc,
+            Envelope<Document> doc,
             Mock<ICommand<Document>> impl)
         {
-            doc.Content = null;
+            doc.Item.Content = null;
             var sut = new DocumentValidator(impl.Object);
 
             sut.Invoking(s => s.Execute(doc)).ShouldThrow<ValidationException>("because content is required");
@@ -51,10 +52,10 @@ namespace Sample.Documents.Api.UnitTests
         [Theory]
         [MoqAutoData]
         public void execute_throws_exception_on_empty_content(
-            Document doc,
+            Envelope<Document> doc,
             Mock<ICommand<Document>> impl)
         {
-            doc.Content = "";
+            doc.Item.Content = "";
             var sut = new DocumentValidator(impl.Object);
 
             sut.Invoking(s => s.Execute(doc)).ShouldThrow<ValidationException>("because content is required");
@@ -63,10 +64,10 @@ namespace Sample.Documents.Api.UnitTests
         [Theory]
         [MoqAutoData]
         public void execute_throws_exception_on_empty_id(
-            Document doc,
+            Envelope<Document> doc,
             Mock<ICommand<Document>> impl)
         {
-            doc.Id = Guid.Empty;
+            doc.Item.DocumentId = Guid.Empty;
             var sut = new DocumentValidator(impl.Object);
 
             sut.Invoking(s => s.Execute(doc)).ShouldThrow<ValidationException>("because id is required");
@@ -75,7 +76,7 @@ namespace Sample.Documents.Api.UnitTests
         [Theory]
         [MoqAutoData]
         public void execute_calls_inner_command_when_doc_is_valid(
-            Document doc,
+            Envelope<Document> doc,
             Mock<ICommand<Document>> impl)
         {
             var sut = new DocumentValidator(impl.Object);

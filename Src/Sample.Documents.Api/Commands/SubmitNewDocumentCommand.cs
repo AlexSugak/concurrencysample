@@ -9,21 +9,39 @@ using System.Threading.Tasks;
 
 namespace Sample.Documents.Api.Commands
 {
-    public interface ICommand<T>
+    public class Envelope<T>
     {
-        void Execute(T input);
+        public Envelope(T item, string userName)
+        {
+            Item = item;
+            UserName = userName;
+        }
+
+        public T Item { get; private set; }
+        public string UserName { get; private set; }
     }
 
-    public class Document
+    public interface ICommand<T>
+    {
+        //TODO: implement EnvelopCommand: ICommand<T> -> ICommand<Envelope<T>>
+        void Execute(Envelope<T> input);
+    }
+
+    public interface IDocumentReference
+    {
+        Guid DocumentId { get; set; }
+    }
+
+    public class Document : IDocumentReference
     {
         public Document(Guid id, string title, string content)
         {
-            Id = id;
+            DocumentId = id;
             Title = title;
             Content = content;
         }
 
-        public Guid Id { get; set; }
+        public Guid DocumentId { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
     }
@@ -39,12 +57,12 @@ namespace Sample.Documents.Api.Commands
             _validator = new Validator();
         }
 
-        public void Execute(Document document)
+        public void Execute(Envelope<Document> document)
         {
-            var result = _validator.Validate(document);
+            var result = _validator.Validate(document.Item);
             if(!result.IsValid)
             {
-                throw new ValidationException(BuildMessage(result.Errors));
+                throw new Sample.Documents.Api.Exceptions.ValidationException(BuildMessage(result.Errors));
             }
             
             _implementation.Execute(document);
@@ -61,7 +79,7 @@ namespace Sample.Documents.Api.Commands
         {
             public Validator()
             {
-                RuleFor(d => d.Id).NotEmpty();
+                RuleFor(d => d.DocumentId).NotEmpty();
                 RuleFor(d => d.Title).NotEmpty();
                 RuleFor(d => d.Content).NotEmpty();
             }
@@ -76,7 +94,7 @@ namespace Sample.Documents.Api.Commands
             _connectionString = connectionString;
         }
 
-        public void Execute(Document document)
+        public void Execute(Envelope<Document> document)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -86,9 +104,9 @@ namespace Sample.Documents.Api.Commands
                     string cmdText = "INSERT INTO [dbo].[Documents] ([Id], [Title], [Content]) VALUES (@id, @title, @content)";
                     using (var cmd = new SqlCommand(cmdText, transaction.Connection, transaction))
                     {
-                        cmd.Parameters.Add(new SqlParameter("@id", document.Id));
-                        cmd.Parameters.Add(new SqlParameter("@title", document.Title));
-                        cmd.Parameters.Add(new SqlParameter("@content", document.Content));
+                        cmd.Parameters.Add(new SqlParameter("@id", document.Item.DocumentId));
+                        cmd.Parameters.Add(new SqlParameter("@title", document.Item.Title));
+                        cmd.Parameters.Add(new SqlParameter("@content", document.Item.Content));
 
                         cmd.ExecuteNonQuery();
                     }

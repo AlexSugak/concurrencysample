@@ -9,27 +9,28 @@ using System.Threading.Tasks;
 
 namespace Sample.Documents.Api.Commands
 {
-    public class LockCommandValidator : ICommand<Lock>
+    public class LockCommandValidator<T> : ICommand<T>
+        where T : IDocumentReference
     {
-        private readonly ICommand<Lock> _implementation;
+        private readonly ICommand<T> _implementation;
         private readonly IGetDocumentQuery _docQuery;
 
-        public LockCommandValidator(ICommand<Lock> implementation, IGetDocumentQuery docQuery)
+        public LockCommandValidator(ICommand<T> implementation, IGetDocumentQuery docQuery)
         {
             _implementation = implementation;
             _docQuery = docQuery;
         }
 
-        public void Execute(Lock lockInfo)
+        public void Execute(Envelope<T> lockInfo)
         {
-            var doc = _docQuery.Execute(lockInfo.DocumentId);
+            var doc = _docQuery.Execute(lockInfo.Item.DocumentId);
 
             if (!string.IsNullOrEmpty(doc.CheckedOutBy) && doc.CheckedOutBy != lockInfo.UserName)
             {
                 throw new DocumentLockedException(
                             string.Format(
                                     "Cannot change lock on document {0} for user {1} because it is locked by user {2}",
-                                    lockInfo.DocumentId,
+                                    lockInfo.Item.DocumentId,
                                     lockInfo.UserName,
                                     doc.CheckedOutBy));
             }
@@ -47,7 +48,7 @@ namespace Sample.Documents.Api.Commands
             _connectionString = connectionString;
         }
 
-        public void Execute(Lock lockInfo)
+        public void Execute(Envelope<Lock> lockInfo)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -57,7 +58,7 @@ namespace Sample.Documents.Api.Commands
                     string cmdText = "UPDATE [dbo].[Documents] SET [CheckedOutBy] = @user WHERE [Id] = @id";
                     using (var cmd = new SqlCommand(cmdText, transaction.Connection, transaction))
                     {
-                        cmd.Parameters.Add(new SqlParameter("@id", lockInfo.DocumentId));
+                        cmd.Parameters.Add(new SqlParameter("@id", lockInfo.Item.DocumentId));
                         cmd.Parameters.Add(new SqlParameter("@user", lockInfo.UserName));
 
                         cmd.ExecuteNonQuery();

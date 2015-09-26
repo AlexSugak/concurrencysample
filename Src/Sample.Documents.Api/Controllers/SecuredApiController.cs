@@ -8,7 +8,7 @@ using System.Web.Http;
 
 namespace Sample.Documents.Api.Controllers
 {
-    public abstract class SecuredApiController : ApiController
+    public abstract class SecuredApiController : ApiControllerWithEnvelope
     {
         private readonly IUserNameQuery _userQuery;
 

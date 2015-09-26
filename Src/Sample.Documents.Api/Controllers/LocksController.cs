@@ -39,7 +39,7 @@ namespace Sample.Documents.Api.Controllers
             {
                 try
                 {
-                    _putLockCmd.Execute(new Lock(userName, documentId));
+                    _putLockCmd.Execute(Envelop(new Lock(documentId), userName));
                 }
                 catch(DocumentLockedException)
                 {
@@ -57,7 +57,7 @@ namespace Sample.Documents.Api.Controllers
             {
                 try
                 {
-                    _removeLockCmd.Execute(new Lock(userName, documentId));
+                    _removeLockCmd.Execute(Envelop(new Lock(documentId), userName));
                 }
                 catch (DocumentLockedException)
                 {

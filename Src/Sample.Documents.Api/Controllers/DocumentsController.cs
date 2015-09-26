@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Sample.Documents.Api.Commands;
 using Sample.Documents.Api.Queries;
+using Sample.Documents.Api.Exceptions;
 
 namespace Sample.Documents.Api.Controllers
 {
@@ -50,7 +51,7 @@ namespace Sample.Documents.Api.Controllers
                 var id = Guid.NewGuid();
                 try
                 {
-                    _submitDocumentCmd.Execute(new Document(id, model.Title, model.Content));
+                    _submitDocumentCmd.Execute(Envelop(new Document(id, model.Title, model.Content), userName));
                 }
                 catch(ValidationException e)
                 {
@@ -71,7 +72,14 @@ namespace Sample.Documents.Api.Controllers
         {
             return InvokeWhenUserExists(userName =>
             {
-                _updateDocumentCmd.Execute(new Document(documentId, model.Title, model.Content));
+                try
+                {
+                    _updateDocumentCmd.Execute(Envelop(new Document(documentId, model.Title, model.Content), userName));
+                }
+                catch(DocumentLockedException)
+                {
+                    return this.Conflict();
+                }
 
                 return this.Ok<DocumentResponseModel>(new DocumentResponseModel()
                 {
