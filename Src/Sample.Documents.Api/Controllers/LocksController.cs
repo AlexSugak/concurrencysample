@@ -41,7 +41,7 @@ namespace Sample.Documents.Api.Controllers
                 {
                     _putLockCmd.Execute(new Lock(userName, documentId));
                 }
-                catch(CannotLockAlreadyLockedDocumentException)
+                catch(DocumentLockedException)
                 {
                     return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.PreconditionFailed));
                 }
@@ -59,7 +59,7 @@ namespace Sample.Documents.Api.Controllers
                 {
                     _removeLockCmd.Execute(new Lock(userName, documentId));
                 }
-                catch (CannotRemoveAnotherUsersLockException)
+                catch (DocumentLockedException)
                 {
                     return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.PreconditionFailed));
                 }

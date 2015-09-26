@@ -12,7 +12,7 @@ using Sample.Documents.Api.Exceptions;
 
 namespace Sample.Documents.Api.UnitTests
 {
-    public class PutLockCommandValidatorTests
+    public class LockCommandValidatorTests
     {
         [Theory]
         [MoqAutoData]
@@ -26,7 +26,7 @@ namespace Sample.Documents.Api.UnitTests
             document.CheckedOutBy = null;
             docQuery.Setup(q => q.Execute(documentId)).Returns(document);
 
-            var sut = new PutLockCommandValidator(inner.Object, docQuery.Object);
+            var sut = new LockCommandValidator(inner.Object, docQuery.Object);
 
             var l = new Lock(userName, documentId);
             sut.Execute(l);
@@ -36,7 +36,7 @@ namespace Sample.Documents.Api.UnitTests
 
         [Theory]
         [MoqAutoData]
-        public void execute_does_nothing_when_document_is_already_locked_by_the_same_user(
+        public void execute_calls_innder_implementation_when_document_is_already_locked_by_the_same_user(
             string userName,
             Guid documentId,
             DocumentDetails document,
@@ -46,12 +46,12 @@ namespace Sample.Documents.Api.UnitTests
             document.CheckedOutBy = userName;
             docQuery.Setup(q => q.Execute(documentId)).Returns(document);
 
-            var sut = new PutLockCommandValidator(inner.Object, docQuery.Object);
+            var sut = new LockCommandValidator(inner.Object, docQuery.Object);
 
             var l = new Lock(userName, documentId);
             sut.Execute(l);
 
-            inner.Verify(cmd => cmd.Execute(l), Times.Never);
+            inner.Verify(cmd => cmd.Execute(l), Times.Once);
         }
 
         [Theory]
@@ -67,10 +67,10 @@ namespace Sample.Documents.Api.UnitTests
             document.CheckedOutBy = anotherUserName;
             docQuery.Setup(q => q.Execute(documentId)).Returns(document);
 
-            var sut = new PutLockCommandValidator(inner.Object, docQuery.Object);
+            var sut = new LockCommandValidator(inner.Object, docQuery.Object);
 
             sut.Invoking(cmd => cmd.Execute(new Lock(userName, documentId)))
-               .ShouldThrow<CannotLockAlreadyLockedDocumentException>();
+               .ShouldThrow<DocumentLockedException>();
         }
     }
 }

@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace Sample.Documents.Api.Commands
 {
-    public class PutLockCommandValidator : ICommand<Lock>
+    public class LockCommandValidator : ICommand<Lock>
     {
         private readonly ICommand<Lock> _implementation;
         private readonly IGetDocumentQuery _docQuery;
 
-        public PutLockCommandValidator(ICommand<Lock> implementation, IGetDocumentQuery docQuery)
+        public LockCommandValidator(ICommand<Lock> implementation, IGetDocumentQuery docQuery)
         {
             _implementation = implementation;
             _docQuery = docQuery;
@@ -24,16 +24,11 @@ namespace Sample.Documents.Api.Commands
         {
             var doc = _docQuery.Execute(lockInfo.DocumentId);
 
-            if(doc.CheckedOutBy == lockInfo.UserName)
-            {
-                return;
-            }
-
             if (!string.IsNullOrEmpty(doc.CheckedOutBy) && doc.CheckedOutBy != lockInfo.UserName)
             {
-                throw new CannotLockAlreadyLockedDocumentException(
+                throw new DocumentLockedException(
                             string.Format(
-                                    "Cannot put a lock on document {0} for user {1} because it is already locked by user {2}",
+                                    "Cannot change lock on document {0} for user {1} because it is locked by user {2}",
                                     lockInfo.DocumentId,
                                     lockInfo.UserName,
                                     doc.CheckedOutBy));

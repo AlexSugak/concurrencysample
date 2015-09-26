@@ -20,15 +20,18 @@ namespace Sample.Documents.Api
             var connectionString = ConfigurationManager.ConnectionStrings["DocumentsDBConnectionString"].ConnectionString;
 
             var getAllDocumentsQuery = new GetAllDocumentsSqlQuery(connectionString);
+            var getDocumentQuery = new GetDocumentSqlQuery(connectionString);
             var submitDocCmd = new DocumentValidator(
                                     new SubmitNewDocumentSqlCommand(connectionString));
             var updateDocCmd = new DocumentValidator(
                                     new UpdateDocumentSqlCommand(connectionString));
             var userNameQuery = new SimppleTokenUserNameQuery();
-            var putLockCmd = new PutLockCommandValidator(
+            var putLockCmd = new LockCommandValidator(
                                     new PutLockOnDocumentSqlCommand(connectionString),
-                                    new GetDocumentSqlQuery(connectionString));
-            var removeLockCmd = new RemoveLockFromDocumentSqlCommand(connectionString);
+                                    getDocumentQuery);
+            var removeLockCmd = new LockCommandValidator(
+                                    new RemoveLockFromDocumentSqlCommand(connectionString),
+                                    getDocumentQuery);
 
             var config = new HttpConfiguration();
             var compositon = new CompositionRoot(

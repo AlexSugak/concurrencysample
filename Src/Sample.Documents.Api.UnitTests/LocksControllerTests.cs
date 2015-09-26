@@ -44,7 +44,7 @@ namespace Sample.Documents.Api.UnitTests
             Mock<ICommand<Lock>> removeLockCmd)
         {
             putLockCmd.Setup(cmd => cmd.Execute(It.IsAny<Lock>()))
-                      .Throws<CannotLockAlreadyLockedDocumentException>();
+                      .Throws<DocumentLockedException>();
             userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
                      .Returns(userName);
 
@@ -101,7 +101,7 @@ namespace Sample.Documents.Api.UnitTests
             Mock<ICommand<Lock>> removeLockCmd)
         {
             removeLockCmd.Setup(cmd => cmd.Execute(It.IsAny<Lock>()))
-                      .Throws<CannotRemoveAnotherUsersLockException>();
+                      .Throws<DocumentLockedException>();
             userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
                      .Returns(userName);
 
