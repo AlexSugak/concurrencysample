@@ -20,12 +20,18 @@ namespace Sample.Documents.Api.UnitTests
         [Theory]
         [MoqAutoData]
         public void get_returns_correct_result_when_no_auth_header_in_request(  
-            Mock<IUserNameQuery> userQuery, 
+            Mock<IUserNameQuery> userQuery,
             Mock<IGetAllDocumentsQuery> getAllQuery,
+            Mock<IGetDocumentQuery> getDocQuery,
             Mock<ICommand<Document>> submitNewCmd,
             Mock<ICommand<Document>> updateCmd)
         {
-            var sut = new DocumentsController(userQuery.Object, getAllQuery.Object, submitNewCmd.Object, updateCmd.Object);
+            var sut = new DocumentsController(
+                userQuery.Object, 
+                getAllQuery.Object, 
+                getDocQuery.Object,
+                submitNewCmd.Object, 
+                updateCmd.Object);
 
             var response = sut.Get();
 
@@ -37,13 +43,20 @@ namespace Sample.Documents.Api.UnitTests
         public void get_returns_200_OK_Result(
             string userName,
             Mock<IUserNameQuery> userQuery, 
-            Mock<IGetAllDocumentsQuery> getAllQuery, 
+            Mock<IGetAllDocumentsQuery> getAllQuery,
+            Mock<IGetDocumentQuery> getDocQuery,
             Mock<ICommand<Document>> submitNewCmd,
             Mock<ICommand<Document>> updateCmd)
         {
             userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
                      .Returns(userName);
-            var sut = new DocumentsController(userQuery.Object, getAllQuery.Object, submitNewCmd.Object, updateCmd.Object);
+
+            var sut = new DocumentsController(
+                userQuery.Object, 
+                getAllQuery.Object,
+                getDocQuery.Object,
+                submitNewCmd.Object, 
+                updateCmd.Object);
 
             var result = sut.Get();
 
@@ -60,6 +73,7 @@ namespace Sample.Documents.Api.UnitTests
             string userName,
             Mock<IUserNameQuery> userQuery, 
             Mock<IGetAllDocumentsQuery> getAllQuery,
+            Mock<IGetDocumentQuery> getDocQuery,
             Mock<ICommand<Document>> submitNewCmd,
             Mock<ICommand<Document>> updateCmd)
         {
@@ -67,7 +81,13 @@ namespace Sample.Documents.Api.UnitTests
                        .Returns(documents);
             userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
                      .Returns(userName);
-            var sut = new DocumentsController(userQuery.Object, getAllQuery.Object, submitNewCmd.Object, updateCmd.Object);
+
+            var sut = new DocumentsController(
+                userQuery.Object, 
+                getAllQuery.Object,
+                getDocQuery.Object,
+                submitNewCmd.Object, 
+                updateCmd.Object);
 
             var result = sut.Get();
 
@@ -83,10 +103,16 @@ namespace Sample.Documents.Api.UnitTests
             DocumentModel document,
             Mock<IUserNameQuery> userQuery,
             Mock<IGetAllDocumentsQuery> getAllQuery,
+            Mock<IGetDocumentQuery> getDocQuery,
             Mock<ICommand<Document>> submitNewCmd,
             Mock<ICommand<Document>> updateCmd)
         {
-            var sut = new DocumentsController(userQuery.Object, getAllQuery.Object, submitNewCmd.Object, updateCmd.Object);
+            var sut = new DocumentsController(
+                userQuery.Object, 
+                getAllQuery.Object,
+                getDocQuery.Object,
+                submitNewCmd.Object, 
+                updateCmd.Object);
 
             var response = sut.Post(document);
 
@@ -100,12 +126,19 @@ namespace Sample.Documents.Api.UnitTests
             string userName,
             Mock<IUserNameQuery> userQuery, 
             Mock<IGetAllDocumentsQuery> getAllQuery,
+            Mock<IGetDocumentQuery> getDocQuery,
             Mock<ICommand<Document>> submitNewCmd,
             Mock<ICommand<Document>> updateCmd)
         {
             userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
                      .Returns(userName);
-            var sut = new DocumentsController(userQuery.Object, getAllQuery.Object, submitNewCmd.Object, updateCmd.Object);
+
+            var sut = new DocumentsController(
+                userQuery.Object, 
+                getAllQuery.Object,
+                getDocQuery.Object,
+                submitNewCmd.Object, 
+                updateCmd.Object);
 
             var result = sut.Post(document);
 
@@ -121,6 +154,7 @@ namespace Sample.Documents.Api.UnitTests
             string userName,
             Mock<IUserNameQuery> userQuery, 
             Mock<IGetAllDocumentsQuery> getAllQuery,
+            Mock<IGetDocumentQuery> getDocQuery,
             Mock<ICommand<Document>> submitNewCmd,
             Mock<ICommand<Document>> updateCmd)
         {
@@ -128,7 +162,13 @@ namespace Sample.Documents.Api.UnitTests
                         .Throws(exception);
             userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
                      .Returns(userName);
-            var sut = new DocumentsController(userQuery.Object, getAllQuery.Object, submitNewCmd.Object, updateCmd.Object);
+
+            var sut = new DocumentsController(
+                userQuery.Object, 
+                getAllQuery.Object,
+                getDocQuery.Object,
+                submitNewCmd.Object, 
+                updateCmd.Object);
 
             var result = sut.Post(document);
 
@@ -145,6 +185,7 @@ namespace Sample.Documents.Api.UnitTests
             string userName,
             Mock<IUserNameQuery> userQuery,
             Mock<IGetAllDocumentsQuery> getAllQuery,
+            Mock<IGetDocumentQuery> getDocQuery,
             Mock<ICommand<Document>> submitNewCmd,
             Mock<ICommand<Document>> updateCmd)
         {
@@ -152,11 +193,75 @@ namespace Sample.Documents.Api.UnitTests
                      .Throws(exception);
             userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
                      .Returns(userName);
-            var sut = new DocumentsController(userQuery.Object, getAllQuery.Object, submitNewCmd.Object, updateCmd.Object);
+
+            var sut = new DocumentsController(
+                userQuery.Object, 
+                getAllQuery.Object,
+                getDocQuery.Object,
+                submitNewCmd.Object, 
+                updateCmd.Object);
 
             var result = sut.Put(document, documentId);
 
             result.Should().BeOfType<ConflictResult>("because document lock exception was thrown");
+        }
+
+        [Theory]
+        [MoqAutoData]
+        public void getById_returns_document_returned_by_query(
+            DocumentDetails document,
+            string userName,
+            Mock<IUserNameQuery> userQuery,
+            Mock<IGetAllDocumentsQuery> getAllQuery,
+            Mock<IGetDocumentQuery> getDocQuery,
+            Mock<ICommand<Document>> submitNewCmd,
+            Mock<ICommand<Document>> updateCmd)
+        {
+            getDocQuery.Setup(q => q.Execute(document.Id))
+                       .Returns(document);
+            userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
+                     .Returns(userName);
+
+            var sut = new DocumentsController(
+                userQuery.Object,
+                getAllQuery.Object,
+                getDocQuery.Object,
+                submitNewCmd.Object,
+                updateCmd.Object);
+
+            var result = sut.GetById(document.Id);
+
+            result
+                .Should().BeOfType<OkNegotiatedContentResult<DocumentResponseModel>>()
+                .Which.Content.Should().ShouldBeEquivalentTo(document, options => options.ExcludingMissingMembers());
+        }
+
+        [Theory]
+        [MoqAutoData]
+        public void getById_returns_404_NotFound_when_document_not_found(
+            DocumentDetails document,
+            string userName,
+            Mock<IUserNameQuery> userQuery,
+            Mock<IGetAllDocumentsQuery> getAllQuery,
+            Mock<IGetDocumentQuery> getDocQuery,
+            Mock<ICommand<Document>> submitNewCmd,
+            Mock<ICommand<Document>> updateCmd)
+        {
+            getDocQuery.Setup(q => q.Execute(document.Id))
+                       .Throws<DocumentNotFoundException>();
+            userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
+                     .Returns(userName);
+
+            var sut = new DocumentsController(
+                userQuery.Object,
+                getAllQuery.Object,
+                getDocQuery.Object,
+                submitNewCmd.Object,
+                updateCmd.Object);
+
+            var result = sut.GetById(document.Id);
+
+            result.Should().BeOfType<NotFoundResult>("because document not found exception is thrown");
         }
     }
 }

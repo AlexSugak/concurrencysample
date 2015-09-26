@@ -228,5 +228,39 @@ namespace Sample.Documents.Api.IntegrationTests
                 Assert.Equal(oldContent, dbDocuments.First().Content.ToString());
             }
         }
+
+        [Theory]
+        [AutoData]
+        [UseDatabase]
+        public void GET_by_id_returns_document_in_db(
+            Guid docId,
+            string userName,
+            string title,
+            string content)
+        {
+            var dbDocument = new
+            {
+                Id = docId,
+                Title = title,
+                Content = content,
+                CheckedOutBy = userName
+            };
+
+            var db = Simple.Data.Database.OpenNamedConnection("DocumentsDBConnectionString");
+            db.Documents.Insert(dbDocument);
+
+            using (var client = TestServerHttpClientFactory.Create(userName))
+            {
+                var response = client.GetAsync("/api/documents/" + docId).Result;
+
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+                var actual = response.Content.ReadAsJsonAsync().Result;
+
+                Assert.Equal(title, actual.title.ToString());
+                Assert.Equal(content, actual.content.ToString());
+                Assert.Equal(userName, actual.checkedOutBy.ToString());
+            }
+        }
     }
 }

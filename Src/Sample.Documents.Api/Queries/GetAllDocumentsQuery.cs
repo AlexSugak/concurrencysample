@@ -14,7 +14,7 @@ namespace Sample.Documents.Api.Queries
 
     public class DocumentDetails
     {
-        public string Id { get; set; }
+        public Guid Id { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
         public string CheckedOutBy { get; set; }
@@ -43,7 +43,7 @@ namespace Sample.Documents.Api.Queries
                         {
                             yield return new DocumentDetails()
                             {
-                                Id = reader["Id"].ToString(),
+                                Id = (Guid)reader["Id"],
                                 Title = (string)reader["Title"],
                                 Content = (string)reader["Content"],
                                 CheckedOutBy = reader["CheckedOutBy"] as string

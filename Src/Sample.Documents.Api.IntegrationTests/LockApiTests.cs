@@ -13,7 +13,7 @@ namespace Sample.Documents.Api.IntegrationTests
 {
     public class LockApiTests
     {
-        //we've already broke the ice, so lets do the spiking for this api from the start
+        //we've already broke the ice, so let's do the spiking for this api from the start
 
         [Theory]
         [AutoData]

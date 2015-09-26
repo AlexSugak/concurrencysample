@@ -18,6 +18,7 @@ namespace Sample.Documents.Api
     public class CompositionRoot : IHttpControllerActivator
     {
         private readonly IGetAllDocumentsQuery _getAllDocuments;
+        private readonly IGetDocumentQuery _getDocument;
         private readonly ICommand<Document> _submitDocumentCmd;
         private readonly ICommand<Document> _updateDocumentCmd;
         private readonly IUserNameQuery _userNameQuery;
@@ -26,6 +27,7 @@ namespace Sample.Documents.Api
 
         public CompositionRoot(
             IGetAllDocumentsQuery getAllDocuments,
+            IGetDocumentQuery getDocument,
             ICommand<Document> submitDocumentCmd,
             ICommand<Document> updateDocumentCmd,
             IUserNameQuery userNameQuery,
@@ -33,6 +35,7 @@ namespace Sample.Documents.Api
             ICommand<Lock> removeLockCmd)
         {
             _getAllDocuments = getAllDocuments;
+            _getDocument = getDocument;
             _submitDocumentCmd = submitDocumentCmd;
             _updateDocumentCmd = updateDocumentCmd;
             _userNameQuery = userNameQuery;
@@ -52,7 +55,12 @@ namespace Sample.Documents.Api
 
             if(controllerType == typeof(DocumentsController))
             {
-                return new DocumentsController(_userNameQuery, _getAllDocuments, _submitDocumentCmd, _updateDocumentCmd);
+                return new DocumentsController(
+                    _userNameQuery, 
+                    _getAllDocuments, 
+                    _getDocument,
+                    _submitDocumentCmd, 
+                    _updateDocumentCmd);
             }
 
             if (controllerType == typeof(LocksController))

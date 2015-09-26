@@ -18,17 +18,20 @@ namespace Sample.Documents.Api.Controllers
     public class DocumentsController : SecuredApiController
     {
         private readonly IGetAllDocumentsQuery _getAllDocuments;
+        private readonly IGetDocumentQuery _getDocument;
         private readonly ICommand<Document> _submitDocumentCmd;
         private readonly ICommand<Document> _updateDocumentCmd;
 
         public DocumentsController(
             IUserNameQuery userQuery,
             IGetAllDocumentsQuery getAllDocuments,
+            IGetDocumentQuery getDocument,
             ICommand<Document> submitDocumentCmd,
             ICommand<Document> updateDocumentCmd)
             : base(userQuery)
         {
             _getAllDocuments = getAllDocuments;
+            _getDocument = getDocument;
             _submitDocumentCmd = submitDocumentCmd;
             _updateDocumentCmd = updateDocumentCmd;
         }
@@ -42,6 +45,33 @@ namespace Sample.Documents.Api.Controllers
                                                                 Documents = ReadDocuments().ToArray()
                                                             }));
         }
+
+        [Route("{documentId}")]
+        public IHttpActionResult GetById(Guid documentId)
+        {
+            return InvokeWhenUserExists(userName =>
+            {
+                DocumentDetails doc;
+                try
+                {
+                    doc = _getDocument.Execute(documentId);
+                }
+                catch(DocumentNotFoundException)
+                {
+                    return this.NotFound();
+                }
+
+                return this.Ok<DocumentResponseModel>(
+                                                        new DocumentResponseModel()
+                                                        {
+                                                            Id = doc.Id.ToString(),
+                                                            Title = doc.Title,
+                                                            Content = doc.Content,
+                                                            CheckedOutBy = doc.CheckedOutBy
+                                                        });
+            });
+        }
+            
 
         [Route("")]
         public IHttpActionResult Post(DocumentModel model)

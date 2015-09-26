@@ -43,7 +43,7 @@ namespace Sample.Documents.Api.Queries
                         reader.Read();
                         return new DocumentDetails()
                         {
-                            Id = reader["Id"].ToString(),
+                            Id = (Guid)reader["Id"],
                             Title = (string)reader["Title"],
                             Content = (string)reader["Content"],
                             CheckedOutBy = reader["CheckedOutBy"] as string

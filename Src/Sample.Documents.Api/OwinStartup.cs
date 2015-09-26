@@ -37,7 +37,8 @@ namespace Sample.Documents.Api
 
             var config = new HttpConfiguration();
             var compositon = new CompositionRoot(
-                                    getAllDocumentsQuery, 
+                                    getAllDocumentsQuery,
+                                    getDocumentQuery,
                                     submitDocCmd, 
                                     updateDocCmd,
                                     userNameQuery, 
