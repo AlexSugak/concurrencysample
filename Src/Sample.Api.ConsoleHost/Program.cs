@@ -21,14 +21,11 @@ namespace Sample.Api.ConsoleHost
 
             string baseAddress = "http://localhost:8051/";
             Console.WriteLine("Starting API server at " + baseAddress);
-
-            // Start OWIN host 
             using (WebApp.Start<OwinStartup>(url: baseAddress))
             {
                 Console.WriteLine("Server started");
                 Console.ReadLine(); 
             }
-
         }
     }
 }

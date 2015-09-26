@@ -1,0 +1,10 @@
+{
+  "name": "Sample.UI",
+  "version": "0.0.1",
+  "description": "Sample.UI",
+  "main": "server.js",
+  "author": {
+    "name": "Alex Sugak",
+    "email": "aleksandr.sugak@gmail.com"
+  }
+}
