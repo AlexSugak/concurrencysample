@@ -21,16 +21,17 @@ namespace Sample.Documents.Api.UnitTests
             Guid documentId,
             DocumentDetails document,
             Mock<IGetDocumentQuery> docQuery,
-            Mock<IPutLockOnDocumentCommand> inner)
+            Mock<ICommand<Lock>> inner)
         {
             document.CheckedOutBy = null;
             docQuery.Setup(q => q.Execute(documentId)).Returns(document);
 
             var sut = new PutLockCommandValidator(inner.Object, docQuery.Object);
 
-            sut.Execute(userName, documentId);
+            var l = new Lock(userName, documentId);
+            sut.Execute(l);
 
-            inner.Verify(cmd => cmd.Execute(userName, documentId), Times.Once);
+            inner.Verify(cmd => cmd.Execute(l), Times.Once);
         }
 
         [Theory]
@@ -40,16 +41,17 @@ namespace Sample.Documents.Api.UnitTests
             Guid documentId,
             DocumentDetails document,
             Mock<IGetDocumentQuery> docQuery,
-            Mock<IPutLockOnDocumentCommand> inner)
+            Mock<ICommand<Lock>> inner)
         {
             document.CheckedOutBy = userName;
             docQuery.Setup(q => q.Execute(documentId)).Returns(document);
 
             var sut = new PutLockCommandValidator(inner.Object, docQuery.Object);
 
-            sut.Execute(userName, documentId);
+            var l = new Lock(userName, documentId);
+            sut.Execute(l);
 
-            inner.Verify(cmd => cmd.Execute(userName, documentId), Times.Never);
+            inner.Verify(cmd => cmd.Execute(l), Times.Never);
         }
 
         [Theory]
@@ -60,14 +62,14 @@ namespace Sample.Documents.Api.UnitTests
             Guid documentId,
             DocumentDetails document,
             Mock<IGetDocumentQuery> docQuery,
-            Mock<IPutLockOnDocumentCommand> inner)
+            Mock<ICommand<Lock>> inner)
         {
             document.CheckedOutBy = anotherUserName;
             docQuery.Setup(q => q.Execute(documentId)).Returns(document);
 
             var sut = new PutLockCommandValidator(inner.Object, docQuery.Object);
 
-            sut.Invoking(cmd => cmd.Execute(userName, documentId))
+            sut.Invoking(cmd => cmd.Execute(new Lock(userName, documentId)))
                .ShouldThrow<CannotLockAlreadyLockedDocumentException>();
         }
     }

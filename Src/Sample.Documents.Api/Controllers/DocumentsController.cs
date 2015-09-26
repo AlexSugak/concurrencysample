@@ -17,14 +17,14 @@ namespace Sample.Documents.Api.Controllers
     public class DocumentsController : SecuredApiController
     {
         private readonly IGetAllDocumentsQuery _getAllDocuments;
-        private readonly ISubmitNewDocumentCommand _submitDocumentCmd;
-        private readonly IUpdateDocumentCommand _updateDocumentCmd;
+        private readonly ICommand<Document> _submitDocumentCmd;
+        private readonly ICommand<Document> _updateDocumentCmd;
 
         public DocumentsController(
             IUserNameQuery userQuery,
             IGetAllDocumentsQuery getAllDocuments,
-            ISubmitNewDocumentCommand submitDocumentCmd,
-            IUpdateDocumentCommand updateDocumentCmd)
+            ICommand<Document> submitDocumentCmd,
+            ICommand<Document> updateDocumentCmd)
             : base(userQuery)
         {
             _getAllDocuments = getAllDocuments;
@@ -50,7 +50,7 @@ namespace Sample.Documents.Api.Controllers
                 var id = Guid.NewGuid();
                 try
                 {
-                    _submitDocumentCmd.Execute(new NewDocument(id, model.Title, model.Content));
+                    _submitDocumentCmd.Execute(new Document(id, model.Title, model.Content));
                 }
                 catch(ValidationException e)
                 {
@@ -71,7 +71,7 @@ namespace Sample.Documents.Api.Controllers
         {
             return InvokeWhenUserExists(userName =>
             {
-                _updateDocumentCmd.Execute(new UpdatedDocument(documentId, model.Title, model.Content));
+                _updateDocumentCmd.Execute(new Document(documentId, model.Title, model.Content));
 
                 return this.Ok<DocumentResponseModel>(new DocumentResponseModel()
                 {

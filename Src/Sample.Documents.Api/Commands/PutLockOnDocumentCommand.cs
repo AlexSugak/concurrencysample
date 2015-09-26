@@ -9,46 +9,41 @@ using System.Threading.Tasks;
 
 namespace Sample.Documents.Api.Commands
 {
-    public interface IPutLockOnDocumentCommand
+    public class PutLockCommandValidator : ICommand<Lock>
     {
-        void Execute(string userName, Guid documentId);
-    }
-
-    public class PutLockCommandValidator : IPutLockOnDocumentCommand
-    {
-        private readonly IPutLockOnDocumentCommand _implementation;
+        private readonly ICommand<Lock> _implementation;
         private readonly IGetDocumentQuery _docQuery;
 
-        public PutLockCommandValidator(IPutLockOnDocumentCommand implementation, IGetDocumentQuery docQuery)
+        public PutLockCommandValidator(ICommand<Lock> implementation, IGetDocumentQuery docQuery)
         {
             _implementation = implementation;
             _docQuery = docQuery;
         }
 
-        public void Execute(string userName, Guid documentId)
+        public void Execute(Lock lockInfo)
         {
-            var doc = _docQuery.Execute(documentId);
+            var doc = _docQuery.Execute(lockInfo.DocumentId);
 
-            if(doc.CheckedOutBy == userName)
+            if(doc.CheckedOutBy == lockInfo.UserName)
             {
                 return;
             }
 
-            if(!string.IsNullOrEmpty(doc.CheckedOutBy) && doc.CheckedOutBy != userName)
+            if (!string.IsNullOrEmpty(doc.CheckedOutBy) && doc.CheckedOutBy != lockInfo.UserName)
             {
                 throw new CannotLockAlreadyLockedDocumentException(
                             string.Format(
                                     "Cannot put a lock on document {0} for user {1} because it is already locked by user {2}",
-                                    documentId,
-                                    userName,
+                                    lockInfo.DocumentId,
+                                    lockInfo.UserName,
                                     doc.CheckedOutBy));
             }
 
-            _implementation.Execute(userName, documentId);
+            _implementation.Execute(lockInfo);
         }
     }
 
-    public class PutLockOnDocumentSqlCommand : IPutLockOnDocumentCommand
+    public class PutLockOnDocumentSqlCommand : ICommand<Lock>
     {
         private readonly string _connectionString;
 
@@ -57,7 +52,7 @@ namespace Sample.Documents.Api.Commands
             _connectionString = connectionString;
         }
 
-        public void Execute(string userName, Guid documentId)
+        public void Execute(Lock lockInfo)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -67,8 +62,8 @@ namespace Sample.Documents.Api.Commands
                     string cmdText = "UPDATE [dbo].[Documents] SET [CheckedOutBy] = @user WHERE [Id] = @id";
                     using (var cmd = new SqlCommand(cmdText, transaction.Connection, transaction))
                     {
-                        cmd.Parameters.Add(new SqlParameter("@id", documentId));
-                        cmd.Parameters.Add(new SqlParameter("@user", userName));
+                        cmd.Parameters.Add(new SqlParameter("@id", lockInfo.DocumentId));
+                        cmd.Parameters.Add(new SqlParameter("@user", lockInfo.UserName));
 
                         cmd.ExecuteNonQuery();
                     }

@@ -7,12 +7,19 @@ using System.Threading.Tasks;
 
 namespace Sample.Documents.Api.Commands
 {
-    public interface IRemoveLockFromDocumentCommand
+    public class Lock
     {
-        void Execute(string userName, Guid documentId);
+        public Lock(string userName, Guid documentId)
+        {
+            UserName = userName;
+            DocumentId = documentId;
+        }
+
+        public string UserName { get; set; }
+        public Guid DocumentId { get; set; }
     }
 
-    public class RemoveLockFromDocumentSqlCommand : IRemoveLockFromDocumentCommand
+    public class RemoveLockFromDocumentSqlCommand : ICommand<Lock>
     {
         private readonly string _connectionString;
 
@@ -21,7 +28,7 @@ namespace Sample.Documents.Api.Commands
             _connectionString = connectionString;
         }
 
-        public void Execute(string userName, Guid documentId)
+        public void Execute(Lock lockInfo)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -31,7 +38,7 @@ namespace Sample.Documents.Api.Commands
                     string cmdText = "UPDATE [dbo].[Documents] SET [CheckedOutBy] = null WHERE [Id] = @id";
                     using (var cmd = new SqlCommand(cmdText, transaction.Connection, transaction))
                     {
-                        cmd.Parameters.Add(new SqlParameter("@id", documentId));
+                        cmd.Parameters.Add(new SqlParameter("@id", lockInfo.DocumentId));
                         cmd.ExecuteNonQuery();
                     }
 

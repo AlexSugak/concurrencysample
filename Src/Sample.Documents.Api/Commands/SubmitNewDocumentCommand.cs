@@ -9,14 +9,14 @@ using System.Threading.Tasks;
 
 namespace Sample.Documents.Api.Commands
 {
-    public interface ISubmitNewDocumentCommand
+    public interface ICommand<T>
     {
-        void Execute(NewDocument document);
+        void Execute(T input);
     }
 
-    public class NewDocument
+    public class Document
     {
-        public NewDocument(Guid id, string title, string content)
+        public Document(Guid id, string title, string content)
         {
             Id = id;
             Title = title;
@@ -28,18 +28,18 @@ namespace Sample.Documents.Api.Commands
         public string Content { get; set; }
     }
 
-    public class SubmitNewDocumentValidator : ISubmitNewDocumentCommand
+    public class DocumentValidator : ICommand<Document>
     {
-        private readonly ISubmitNewDocumentCommand _implementation;
-        private readonly AbstractValidator<NewDocument> _validator;
+        private readonly ICommand<Document> _implementation;
+        private readonly AbstractValidator<Document> _validator;
 
-        public SubmitNewDocumentValidator(ISubmitNewDocumentCommand implementation)
+        public DocumentValidator(ICommand<Document> implementation)
         {
             _implementation = implementation;
             _validator = new Validator();
         }
 
-        public void Execute(NewDocument document)
+        public void Execute(Document document)
         {
             var result = _validator.Validate(document);
             if(!result.IsValid)
@@ -57,7 +57,7 @@ namespace Sample.Documents.Api.Commands
                 string.Join("; ", errors.Select(e => e.ErrorMessage)));
         }
 
-        class Validator : AbstractValidator<NewDocument>
+        class Validator : AbstractValidator<Document>
         {
             public Validator()
             {
@@ -68,7 +68,7 @@ namespace Sample.Documents.Api.Commands
         }
     }
 
-    public class SubmitNewDocumentSqlCommand : ISubmitNewDocumentCommand
+    public class SubmitNewDocumentSqlCommand : ICommand<Document>
     {
         private readonly string _connectionString;
         public SubmitNewDocumentSqlCommand(string connectionString)
@@ -76,7 +76,7 @@ namespace Sample.Documents.Api.Commands
             _connectionString = connectionString;
         }
 
-        public void Execute(NewDocument document)
+        public void Execute(Document document)
         {
             using (var connection = new SqlConnection(_connectionString))
             {

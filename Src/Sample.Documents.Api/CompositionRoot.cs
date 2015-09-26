@@ -18,19 +18,19 @@ namespace Sample.Documents.Api
     public class CompositionRoot : IHttpControllerActivator
     {
         private readonly IGetAllDocumentsQuery _getAllDocuments;
-        private readonly ISubmitNewDocumentCommand _submitDocumentCmd;
-        private readonly IUpdateDocumentCommand _updateDocumentCmd;
+        private readonly ICommand<Document> _submitDocumentCmd;
+        private readonly ICommand<Document> _updateDocumentCmd;
         private readonly IUserNameQuery _userNameQuery;
-        private readonly IPutLockOnDocumentCommand _putLockCmd;
-        private readonly IRemoveLockFromDocumentCommand _removeLockCmd;
+        private readonly ICommand<Lock> _putLockCmd;
+        private readonly ICommand<Lock> _removeLockCmd;
 
         public CompositionRoot(
             IGetAllDocumentsQuery getAllDocuments,
-            ISubmitNewDocumentCommand submitDocumentCmd,
-            IUpdateDocumentCommand updateDocumentCmd,
+            ICommand<Document> submitDocumentCmd,
+            ICommand<Document> updateDocumentCmd,
             IUserNameQuery userNameQuery,
-            IPutLockOnDocumentCommand putLockCmd,
-            IRemoveLockFromDocumentCommand removeLockCmd)
+            ICommand<Lock> putLockCmd,
+            ICommand<Lock> removeLockCmd)
         {
             _getAllDocuments = getAllDocuments;
             _submitDocumentCmd = submitDocumentCmd;

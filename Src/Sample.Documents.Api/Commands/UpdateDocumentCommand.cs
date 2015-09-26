@@ -7,26 +7,7 @@ using System.Threading.Tasks;
 
 namespace Sample.Documents.Api.Commands
 {
-    public interface IUpdateDocumentCommand
-    {
-        void Execute(UpdatedDocument document);
-    }
-
-    public class UpdatedDocument
-    {
-        public UpdatedDocument(Guid id, string title, string content)
-        {
-            Id = id;
-            Title = title;
-            Content = content;
-        }
-
-        public Guid Id { get; set; }
-        public string Title { get; set; }
-        public string Content { get; set; }
-    }
-
-    public class UpdateDocumentSqlCommand : IUpdateDocumentCommand
+    public class UpdateDocumentSqlCommand : ICommand<Document>
     {
         private readonly string _connectionString;
         public UpdateDocumentSqlCommand(string connectionString)
@@ -34,7 +15,7 @@ namespace Sample.Documents.Api.Commands
             _connectionString = connectionString;
         }
 
-        public void Execute(UpdatedDocument document)
+        public void Execute(Document document)
         {
             using (var connection = new SqlConnection(_connectionString))
             {

@@ -90,7 +90,7 @@
     <Compile Include="PutLockCommandValidatorTests.cs" />
     <Compile Include="SimpleTokenTests.cs" />
     <Compile Include="SimppleTokenUserNameQueryTests.cs" />
-    <Compile Include="SubmitNewDocumentValidatorTests.cs" />
+    <Compile Include="DocumentValidatorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestConventions.cs" />
   </ItemGroup>

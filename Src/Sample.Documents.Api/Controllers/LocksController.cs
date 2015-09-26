@@ -13,16 +13,19 @@ using System.Web.Http;
 
 namespace Sample.Documents.Api.Controllers
 {
+    /// <summary>
+    /// Controller for lock resource
+    /// </summary>
     [RoutePrefix("api/documents/{documentId}/lock")]
     public class LocksController : SecuredApiController
     {
-        private readonly IPutLockOnDocumentCommand _putLockCmd;
-        private readonly IRemoveLockFromDocumentCommand _removeLockCmd;
+        private readonly ICommand<Lock> _putLockCmd;
+        private readonly ICommand<Lock> _removeLockCmd;
 
         public LocksController(
             IUserNameQuery userQuery,
-            IPutLockOnDocumentCommand putLockCmd,
-            IRemoveLockFromDocumentCommand removeLockCmd)
+            ICommand<Lock> putLockCmd,
+            ICommand<Lock> removeLockCmd)
             : base(userQuery)
         {
             _putLockCmd = putLockCmd;
@@ -36,7 +39,7 @@ namespace Sample.Documents.Api.Controllers
             {
                 try
                 {
-                    _putLockCmd.Execute(userName, documentId);
+                    _putLockCmd.Execute(new Lock(userName, documentId));
                 }
                 catch(CannotLockAlreadyLockedDocumentException)
                 {
@@ -54,7 +57,7 @@ namespace Sample.Documents.Api.Controllers
             {
                 try
                 {
-                    _removeLockCmd.Execute(userName, documentId);
+                    _removeLockCmd.Execute(new Lock(userName, documentId));
                 }
                 catch (CannotRemoveAnotherUsersLockException)
                 {

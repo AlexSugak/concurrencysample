@@ -24,8 +24,8 @@ namespace Sample.Documents.Api.UnitTests
         public void PUT_returns_correct_result_when_no_auth_header_in_request(
             Guid documentId,
             Mock<IUserNameQuery> userQuery,
-            Mock<IPutLockOnDocumentCommand> putLockCmd,
-            Mock<IRemoveLockFromDocumentCommand> removeLockCmd)
+            Mock<ICommand<Lock>> putLockCmd,
+            Mock<ICommand<Lock>> removeLockCmd)
         {
             var sut = new LocksController(userQuery.Object, putLockCmd.Object, removeLockCmd.Object);
 
@@ -40,10 +40,10 @@ namespace Sample.Documents.Api.UnitTests
             Guid documentId,
             string userName,
             Mock<IUserNameQuery> userQuery,
-            Mock<IPutLockOnDocumentCommand> putLockCmd,
-            Mock<IRemoveLockFromDocumentCommand> removeLockCmd)
+            Mock<ICommand<Lock>> putLockCmd,
+            Mock<ICommand<Lock>> removeLockCmd)
         {
-            putLockCmd.Setup(cmd => cmd.Execute(It.IsAny<string>(), It.IsAny<Guid>()))
+            putLockCmd.Setup(cmd => cmd.Execute(It.IsAny<Lock>()))
                       .Throws<CannotLockAlreadyLockedDocumentException>();
             userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
                      .Returns(userName);
@@ -63,8 +63,8 @@ namespace Sample.Documents.Api.UnitTests
             Guid documentId,
             string userName,
             Mock<IUserNameQuery> userQuery,
-            Mock<IPutLockOnDocumentCommand> putLockCmd,
-            Mock<IRemoveLockFromDocumentCommand> removeLockCmd)
+            Mock<ICommand<Lock>> putLockCmd,
+            Mock<ICommand<Lock>> removeLockCmd)
         {
             userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
                      .Returns(userName);
@@ -81,8 +81,8 @@ namespace Sample.Documents.Api.UnitTests
         public void DELETE_returns_correct_result_when_no_auth_header_in_request(
             Guid documentId,
             Mock<IUserNameQuery> userQuery,
-            Mock<IPutLockOnDocumentCommand> putLockCmd,
-            Mock<IRemoveLockFromDocumentCommand> removeLockCmd)
+            Mock<ICommand<Lock>> putLockCmd,
+            Mock<ICommand<Lock>> removeLockCmd)
         {
             var sut = new LocksController(userQuery.Object, putLockCmd.Object, removeLockCmd.Object);
 
@@ -97,10 +97,10 @@ namespace Sample.Documents.Api.UnitTests
             Guid documentId,
             string userName,
             Mock<IUserNameQuery> userQuery,
-            Mock<IPutLockOnDocumentCommand> putLockCmd,
-            Mock<IRemoveLockFromDocumentCommand> removeLockCmd)
+            Mock<ICommand<Lock>> putLockCmd,
+            Mock<ICommand<Lock>> removeLockCmd)
         {
-            removeLockCmd.Setup(cmd => cmd.Execute(It.IsAny<string>(), It.IsAny<Guid>()))
+            removeLockCmd.Setup(cmd => cmd.Execute(It.IsAny<Lock>()))
                       .Throws<CannotRemoveAnotherUsersLockException>();
             userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
                      .Returns(userName);
@@ -120,8 +120,8 @@ namespace Sample.Documents.Api.UnitTests
             Guid documentId,
             string userName,
             Mock<IUserNameQuery> userQuery,
-            Mock<IPutLockOnDocumentCommand> putLockCmd,
-            Mock<IRemoveLockFromDocumentCommand> removeLockCmd)
+            Mock<ICommand<Lock>> putLockCmd,
+            Mock<ICommand<Lock>> removeLockCmd)
         {
             userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
                      .Returns(userName);
