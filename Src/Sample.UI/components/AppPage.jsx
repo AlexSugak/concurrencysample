@@ -5,6 +5,9 @@ var React = require("react");
 var StoreMixin = require("fluxible").StoreMixin;
 var handleHistory = require('fluxible-router').handleHistory;
 var provideContext = require('fluxible-addons-react').provideContext;
+
+var TopNav = require("./TopNav");
+
 var debug = require("debug")("app");
 
 var AppPage = React.createClass({
@@ -12,9 +15,11 @@ var AppPage = React.createClass({
 
 	render: function render() {
 		var Handler = this.props.currentRoute.get('handler');
+		var currentRoute = this.props.currentRoute.name;
 
 		return (
 			<div className="container">
+				<TopNav projectName="Concurrency Samples" route={currentRoute} />
 				<div>
 					<Handler />
 				</div>
