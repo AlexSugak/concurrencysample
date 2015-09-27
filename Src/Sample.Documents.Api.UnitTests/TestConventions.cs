@@ -33,7 +33,8 @@ namespace Sample.Documents.Api.UnitTests
                     fixture.Create<Mock<IGetAllDocumentsQuery>>().Object,
                     fixture.Create<Mock<IGetDocumentQuery>>().Object,
                     fixture.Create<Mock<ICommand<Document>>>().Object,
-                    fixture.Create<Mock<ICommand<Document>>>().Object
+                    fixture.Create<Mock<ICommand<Document>>>().Object,
+                    fixture.Create<Mock<ICommand<DocumentReference>>>().Object
                     ));
         }
     }

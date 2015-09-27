@@ -13,6 +13,7 @@ using System.Net.Http;
 using Sample.Documents.Api.Controllers;
 using Sample.Documents.Api.Exceptions;
 using Ploeh.AutoFixture.Xunit;
+using System.Net;
 
 namespace Sample.Documents.Api.UnitTests
 {
@@ -187,6 +188,46 @@ namespace Sample.Documents.Api.UnitTests
             var response = sut.GetById(documentId);
 
             response.Should().BeOfType<UnauthorizedResult>("because auth header was not specified");
+        }
+
+        [Theory]
+        [MoqAutoData]
+        public void delete_returns_409_Conflict_on_lock_exception(
+            Guid documentId,
+            DocumentModel document,
+            DocumentLockedException exception,
+            string userName,
+            [Frozen]Mock<IUserNameQuery> userQuery,
+            [Frozen]Mock<ICommand<DocumentReference>> deleteCmd,
+            DocumentsController sut)
+        {
+            deleteCmd.Setup(c => c.Execute(It.IsAny<Envelope<DocumentReference>>()))
+                     .Throws(exception);
+            userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
+                     .Returns(userName);
+
+            var result = sut.Delete(documentId);
+
+            result.Should().BeOfType<ConflictResult>("because document lock exception was thrown");
+        }
+
+        [Theory]
+        [MoqAutoData]
+        public void delete_returns_409_NoContent_whend_document_deleted(
+            Guid documentId,
+            DocumentModel document,
+            DocumentLockedException exception,
+            string userName,
+            [Frozen]Mock<IUserNameQuery> userQuery,
+            DocumentsController sut)
+        {
+            userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
+                     .Returns(userName);
+
+            var result = sut.Delete(documentId);
+
+            result.Should().BeOfType<ResponseMessageResult>()
+                  .Which.Response.StatusCode.Should().Be(HttpStatusCode.NoContent);
         }
     }
 }

@@ -262,5 +262,34 @@ namespace Sample.Documents.Api.IntegrationTests
                 Assert.Equal(userName, actual.checkedOutBy.ToString());
             }
         }
+
+        [Theory]
+        [AutoData]
+        [UseDatabase]
+        public void DELETE_by_id_deletes_document_in_db(
+            Guid docId,
+            string userName,
+            string title,
+            string content)
+        {
+            var dbDocument = new
+            {
+                Id = docId,
+                Title = title,
+                Content = content,
+                CheckedOutBy = userName
+            };
+
+            var db = Simple.Data.Database.OpenNamedConnection("DocumentsDBConnectionString");
+            db.Documents.Insert(dbDocument);
+
+            using (var client = TestServerHttpClientFactory.Create(userName))
+            {
+                client.DeleteAsync("/api/documents/" + docId).Wait();
+
+                var dbDocuments = db.Documents.All();
+                Assert.Equal(0, dbDocuments.Count());
+            }
+        }
     }
 }

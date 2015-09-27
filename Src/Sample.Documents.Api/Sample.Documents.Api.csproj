@@ -77,6 +77,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\DeleteDocumentCommand.cs" />
     <Compile Include="Commands\PutLockOnDocumentCommand.cs" />
     <Compile Include="Commands\RemoveLockFromDocumentCommand.cs" />
     <Compile Include="Commands\UpdateDocumentCommand.cs" />

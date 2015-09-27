@@ -24,6 +24,7 @@ namespace Sample.Documents.Api
         private readonly IUserNameQuery _userNameQuery;
         private readonly ICommand<Lock> _putLockCmd;
         private readonly ICommand<Lock> _removeLockCmd;
+        private readonly ICommand<DocumentReference> _deleteDocument;
 
         public CompositionRoot(
             IGetAllDocumentsQuery getAllDocuments,
@@ -32,7 +33,8 @@ namespace Sample.Documents.Api
             ICommand<Document> updateDocumentCmd,
             IUserNameQuery userNameQuery,
             ICommand<Lock> putLockCmd,
-            ICommand<Lock> removeLockCmd)
+            ICommand<Lock> removeLockCmd,
+            ICommand<DocumentReference> deleteDocument)
         {
             _getAllDocuments = getAllDocuments;
             _getDocument = getDocument;
@@ -41,6 +43,7 @@ namespace Sample.Documents.Api
             _userNameQuery = userNameQuery;
             _putLockCmd = putLockCmd;
             _removeLockCmd = removeLockCmd;
+            _deleteDocument = deleteDocument;
         }
 
         public IHttpController Create(
@@ -60,7 +63,8 @@ namespace Sample.Documents.Api
                     _getAllDocuments, 
                     _getDocument,
                     _submitDocumentCmd, 
-                    _updateDocumentCmd);
+                    _updateDocumentCmd,
+                    _deleteDocument);
             }
 
             if (controllerType == typeof(LocksController))

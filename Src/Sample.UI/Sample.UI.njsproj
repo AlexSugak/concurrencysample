@@ -30,6 +30,8 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="actions\deleteDocument.js" />
+    <Compile Include="actions\addDocument.js" />
     <Compile Include="actions\loginUser.js" />
     <Compile Include="actions\loadData.js" />
     <Compile Include="Api.js" />
@@ -44,6 +46,7 @@
     <Compile Include="stores\SyncStore.js" />
     <Compile Include="webpack.config.js" />
     <Content Include="components\AppPage.jsx" />
+    <Content Include="components\NewDocumentView.jsx" />
     <Content Include="components\ErrorView.jsx" />
     <Content Include="components\Html.jsx" />
     <Content Include="components\DocumentsView.jsx" />
@@ -53,6 +56,7 @@
     <Content Include="components\IndexView.jsx" />
     <Content Include="components\TopNav.jsx" />
     <Content Include="components\TopNavLink.jsx" />
+    <Content Include="css\custom.css" />
     <Content Include="package.json" />
     <Content Include="README.md" />
   </ItemGroup>

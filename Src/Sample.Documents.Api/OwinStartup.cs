@@ -35,6 +35,9 @@ namespace Sample.Documents.Api
             var removeLockCmd = new LockCommandValidator<Lock>(
                                     new RemoveLockFromDocumentSqlCommand(connectionString),
                                     getDocumentQuery);
+            var deleteDocCmd = new LockCommandValidator<DocumentReference>(
+                                    new DeleteDocumentSqlCommand(connectionString),
+                                    getDocumentQuery);
 
             var config = new HttpConfiguration();
             var compositon = new CompositionRoot(
@@ -44,7 +47,8 @@ namespace Sample.Documents.Api
                                     updateDocCmd,
                                     userNameQuery, 
                                     putLockCmd, 
-                                    removeLockCmd);
+                                    removeLockCmd,
+                                    deleteDocCmd);
 
             HttpConfigurator.Configure(config, compositon);
             app.UseCors(CorsOptions.AllowAll);

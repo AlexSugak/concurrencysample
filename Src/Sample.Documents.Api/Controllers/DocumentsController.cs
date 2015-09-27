@@ -21,19 +21,22 @@ namespace Sample.Documents.Api.Controllers
         private readonly IGetDocumentQuery _getDocument;
         private readonly ICommand<Document> _submitDocumentCmd;
         private readonly ICommand<Document> _updateDocumentCmd;
+        private readonly ICommand<DocumentReference> _deleteDocument;
 
         public DocumentsController(
             IUserNameQuery userQuery,
             IGetAllDocumentsQuery getAllDocuments,
             IGetDocumentQuery getDocument,
             ICommand<Document> submitDocumentCmd,
-            ICommand<Document> updateDocumentCmd)
+            ICommand<Document> updateDocumentCmd,
+            ICommand<DocumentReference> deleteDocument)
             : base(userQuery)
         {
             _getAllDocuments = getAllDocuments;
             _getDocument = getDocument;
             _submitDocumentCmd = submitDocumentCmd;
             _updateDocumentCmd = updateDocumentCmd;
+            _deleteDocument = deleteDocument;
         }
 
         [Route("")]
@@ -118,6 +121,24 @@ namespace Sample.Documents.Api.Controllers
                     Content = model.Content,
                     CheckedOutBy = userName
                 });
+            });
+        }
+
+        [Route("{documentId}")]
+        public IHttpActionResult Delete(Guid documentId)
+        {
+            return InvokeWhenUserExists(userName =>
+            {
+                try
+                {
+                    _deleteDocument.Execute(Envelop(new DocumentReference(documentId), userName));
+                }
+                catch(DocumentLockedException)
+                {
+                    return this.Conflict();
+                }
+
+                return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.NoContent));
             });
         }
 

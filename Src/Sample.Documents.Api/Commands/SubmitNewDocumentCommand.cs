@@ -29,7 +29,17 @@ namespace Sample.Documents.Api.Commands
 
     public interface IDocumentReference
     {
-        Guid DocumentId { get; set; }
+        Guid DocumentId { get; }
+    }
+
+    public class DocumentReference : IDocumentReference
+    {
+        public DocumentReference(Guid id)
+        {
+            DocumentId = id;
+        }
+
+        public Guid DocumentId { get; private set; }
     }
 
     public class Document : IDocumentReference
