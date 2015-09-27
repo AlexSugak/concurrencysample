@@ -114,6 +114,7 @@
     <Compile Include="LockApiTests.cs" />
     <Compile Include="TestServerHttpClientFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TransactedCommandTests.cs" />
     <Compile Include="UseDatabaseAttribute.cs" />
   </ItemGroup>
   <ItemGroup>

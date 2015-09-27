@@ -52,18 +52,13 @@ namespace Sample.Documents.Api.Commands
             using (var connection = new SqlConnection(_connectionString))
             {
                 connection.Open();
-                using (var transaction = connection.BeginTransaction())
+                string cmdText = "UPDATE [dbo].[Documents] SET [CheckedOutBy] = @user WHERE [Id] = @id";
+                using (var cmd = new SqlCommand(cmdText, connection))
                 {
-                    string cmdText = "UPDATE [dbo].[Documents] SET [CheckedOutBy] = @user WHERE [Id] = @id";
-                    using (var cmd = new SqlCommand(cmdText, transaction.Connection, transaction))
-                    {
-                        cmd.Parameters.Add(new SqlParameter("@id", lockInfo.Item.DocumentId));
-                        cmd.Parameters.Add(new SqlParameter("@user", lockInfo.UserName));
+                    cmd.Parameters.Add(new SqlParameter("@id", lockInfo.Item.DocumentId));
+                    cmd.Parameters.Add(new SqlParameter("@user", lockInfo.UserName));
 
-                        cmd.ExecuteNonQuery();
-                    }
-
-                    transaction.Commit();
+                    cmd.ExecuteNonQuery();
                 }
             }
         }

@@ -85,6 +85,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClaimComparer.cs" />
+    <Compile Include="ComposedCommandTests.cs" />
     <Compile Include="DocumentsControllerTests.cs" />
     <Compile Include="LocksControllerTests.cs" />
     <Compile Include="LockCommandValidatorTests.cs" />
@@ -93,6 +94,7 @@
     <Compile Include="DocumentValidatorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestConventions.cs" />
+    <Compile Include="TransactedCommandTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
