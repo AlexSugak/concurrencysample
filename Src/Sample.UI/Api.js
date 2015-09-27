@@ -93,4 +93,19 @@ Api.prototype.checkinDocument = function (userName, documentId, callback) {
     });
 };
 
+Api.prototype.editDocument = function (userName, documentId, document, callback) {
+    debug('editDocument using api host: ' + this._getHost());
+    superagent
+        .put(this._getHost() + '/documents/' + documentId)
+        .set('Content-Type', 'application/json')
+        .set('Authorization', 'Bearer userName=' + userName)
+        .send(document)
+        .end(function (err, res) {
+        if (err) {
+            debug('error', err);
+        }
+        callback(err, res);
+    });
+};
+
 module.exports = Api;

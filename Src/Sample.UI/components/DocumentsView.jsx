@@ -36,6 +36,7 @@ var DocumentRow = React.createClass({
 		event.preventDefault();
     },
 	render: function render() {
+		var docId = this.props.document.id;
 		var isCheckedOut = !(this.props.document.checkedOutBy === null);
 		var checkedOutText = isCheckedOut ? this.props.document.checkedOutBy : 'N/A';
 		var rowClass = isCheckedOut ? 'danger' : '';
@@ -43,15 +44,21 @@ var DocumentRow = React.createClass({
 		var actions = [];
 		if(!isCheckedOut)
 		{
-			actions.push(<a key={'checkout_'+ this.props.document.id} className="btn btn-link" onClick={this.checkoutClicked}>check out</a>);
+			actions.push(<a key={'checkout_'+ docId} className="btn btn-link" onClick={this.checkoutClicked}>check out</a>);
 		}
 		if(isCheckedOut && this.props.userName === this.props.document.checkedOutBy)
 		{
-			actions.push(<a key={'checkin_'+ this.props.document.id} className="btn btn-link" onClick={this.checkinClicked}>check in</a>);
+			actions.push(<a key={'checkin_'+ docId} className="btn btn-link" onClick={this.checkinClicked}>check in</a>);
+		}
+		if(isCheckedOut && this.props.userName === this.props.document.checkedOutBy)
+		{
+			actions.push(<NavLink routeName="editDocument" navParams={{id: docId}} key={'edit_' + docId} className="btn btn-link">
+							edit
+						 </NavLink>);
 		}
 		if(!isCheckedOut || this.props.userName === this.props.document.checkedOutBy)
 		{
-			actions.push(<a key={'delete_'+ this.props.document.id} className="btn btn-link" onClick={this.deleteClicked}>delete</a>);
+			actions.push(<a key={'delete_'+ docId} className="btn btn-link" onClick={this.deleteClicked}>delete</a>);
 		}
 
 		return (

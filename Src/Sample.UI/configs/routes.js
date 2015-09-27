@@ -23,6 +23,12 @@ module.exports = {
         action: nothing,
         handler: require('../components/NewDocumentView')
     },
+    editDocument: {
+        path: "/documents/:id",
+        method: "GET",
+        action: nothing,
+        handler: require('../components/EditDocumentView')
+    },
     tickets: {
         path: "/tickets",
         method: "GET",
