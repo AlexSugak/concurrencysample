@@ -21,7 +21,7 @@ module.exports = function (context, payload, done) {
         
         if (!res.ok) {
             debug('error', res);
-            context.dispatch("event:AddDocumentFailure", res.body);
+            context.dispatch("event:AddDocumentFailure", res.text);
             done();
             return;
         }

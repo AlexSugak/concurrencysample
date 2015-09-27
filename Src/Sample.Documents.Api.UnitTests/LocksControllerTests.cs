@@ -36,7 +36,7 @@ namespace Sample.Documents.Api.UnitTests
 
         [Theory]
         [MoqAutoData]
-        public void PUT_returns_correct_result_when_document_already_locked(
+        public void PUT_returns_correct_result_on_lock_exception(
             Guid documentId,
             string userName,
             Mock<IUserNameQuery> userQuery,
@@ -55,6 +55,10 @@ namespace Sample.Documents.Api.UnitTests
             response.Should().BeOfType<ResponseMessageResult>()
                     .Which.Response.StatusCode
                     .Should().Be(HttpStatusCode.PreconditionFailed, "because document already locked");
+
+            response.Should().BeOfType<ResponseMessageResult>()
+                    .Which.Response.Content.ReadAsStringAsync().Result
+                    .Should().NotBeNullOrEmpty("becase error message should be provided");
         }
 
         [Theory]
@@ -112,6 +116,10 @@ namespace Sample.Documents.Api.UnitTests
             response.Should().BeOfType<ResponseMessageResult>()
                     .Which.Response.StatusCode
                     .Should().Be(HttpStatusCode.PreconditionFailed, "because document locked by another user");
+
+            response.Should().BeOfType<ResponseMessageResult>()
+                    .Which.Response.Content.ReadAsStringAsync().Result
+                    .Should().NotBeNullOrEmpty("becase error message should be provided");
         }
 
         [Theory]

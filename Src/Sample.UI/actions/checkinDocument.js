@@ -21,7 +21,7 @@ module.exports = function (context, payload, done) {
         
         if (!res.ok) {
             debug('error', res);
-            context.dispatch("event:CheckinDocumentFailure", res.body);
+            context.dispatch("event:CheckinDocumentFailure", res.text);
             done();
             return;
         }

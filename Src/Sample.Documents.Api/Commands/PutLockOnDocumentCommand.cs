@@ -29,9 +29,8 @@ namespace Sample.Documents.Api.Commands
             {
                 throw new DocumentLockedException(
                             string.Format(
-                                    "Cannot change lock on document {0} for user {1} because it is locked by user {2}",
+                                    "Document '{0}' is locked by user '{1}'",
                                     lockInfo.Item.DocumentId,
-                                    lockInfo.UserName,
                                     doc.CheckedOutBy));
             }
 

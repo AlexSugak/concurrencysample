@@ -30,6 +30,9 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="actions\editDocument.js" />
+    <Compile Include="actions\checkinDocument.js" />
+    <Compile Include="actions\checkoutDocument.js" />
     <Compile Include="actions\deleteDocument.js" />
     <Compile Include="actions\addDocument.js" />
     <Compile Include="actions\loginUser.js" />
@@ -41,11 +44,14 @@
     <Compile Include="configs\routes.js" />
     <Compile Include="plugins\apiPlugin.js" />
     <Compile Include="server.js" />
+    <Compile Include="stores\ErrorMessagesStore.js" />
     <Compile Include="stores\AuthStore.js" />
     <Compile Include="stores\DocumentsStore.js" />
     <Compile Include="stores\SyncStore.js" />
     <Compile Include="webpack.config.js" />
     <Content Include="components\AppPage.jsx" />
+    <Content Include="components\EditDocumentView.jsx" />
+    <Content Include="components\ErrorMessage.jsx" />
     <Content Include="components\NewDocumentView.jsx" />
     <Content Include="components\ErrorView.jsx" />
     <Content Include="components\Html.jsx" />

@@ -6,6 +6,7 @@ var debug = require("debug")("DocumentsView");
 var DocumentsStore = require('../stores/DocumentsStore');
 var AuthStore = require("../stores/AuthStore");
 var NavLink = require("fluxible-router").NavLink;
+var ErrorMessage = require("./ErrorMessage");
 
 var navigateAction = require('fluxible-router').navigateAction;
 var deleteDocument = require('../actions/deleteDocument');
@@ -37,26 +38,32 @@ var DocumentRow = React.createClass({
     },
 	render: function render() {
 		var docId = this.props.document.id;
-		var isCheckedOut = !(this.props.document.checkedOutBy === null);
-		var checkedOutText = isCheckedOut ? this.props.document.checkedOutBy : 'N/A';
-		var rowClass = isCheckedOut ? 'danger' : '';
+		var currentUser = this.props.userName;
+		var checkedOutBy = this.props.document.checkedOutBy;
+		var isCheckedOut = !(checkedOutBy === null);
+		var checkedOutText = isCheckedOut ? checkedOutBy : 'N/A';
+		var rowClass = isCheckedOut 
+							? currentUser === checkedOutBy 
+								? 'warning'
+								: 'danger' 
+							: '';
 
 		var actions = [];
 		if(!isCheckedOut)
 		{
 			actions.push(<a key={'checkout_'+ docId} className="btn btn-link" onClick={this.checkoutClicked}>check out</a>);
 		}
-		if(isCheckedOut && this.props.userName === this.props.document.checkedOutBy)
+		if(isCheckedOut && currentUser === checkedOutBy)
 		{
 			actions.push(<a key={'checkin_'+ docId} className="btn btn-link" onClick={this.checkinClicked}>check in</a>);
 		}
-		if(isCheckedOut && this.props.userName === this.props.document.checkedOutBy)
+		if(isCheckedOut && currentUser === checkedOutBy)
 		{
 			actions.push(<NavLink routeName="editDocument" navParams={{id: docId}} key={'edit_' + docId} className="btn btn-link">
 							edit
 						 </NavLink>);
 		}
-		if(!isCheckedOut || this.props.userName === this.props.document.checkedOutBy)
+		if(!isCheckedOut || currentUser === checkedOutBy)
 		{
 			actions.push(<a key={'delete_'+ docId} className="btn btn-link" onClick={this.deleteClicked}>delete</a>);
 		}
@@ -88,6 +95,7 @@ var DocumentsView = React.createClass({
 
 		return (
 			<div>
+				<ErrorMessage />
 				<h3>Documents</h3>
 				<div className="row">
 					<div className="col-md-6">

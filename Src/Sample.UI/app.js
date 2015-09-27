@@ -17,5 +17,6 @@ app.registerStore(AppRouteStore);
 app.registerStore(require("./stores/SyncStore"));
 app.registerStore(require("./stores/DocumentsStore"));
 app.registerStore(require("./stores/AuthStore"));
+app.registerStore(require("./stores/ErrorMessagesStore"));
 
 module.exports = app;

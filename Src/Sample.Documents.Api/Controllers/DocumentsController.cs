@@ -109,9 +109,12 @@ namespace Sample.Documents.Api.Controllers
                 {
                     _updateDocumentCmd.Execute(Envelop(new Document(documentId, model.Title, model.Content), userName));
                 }
-                catch(DocumentLockedException)
+                catch(DocumentLockedException e)
                 {
-                    return this.Conflict();
+                    return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.Conflict) 
+                    { 
+                        Content = new StringContent(e.Message) 
+                    });
                 }
 
                 return this.Ok<DocumentResponseModel>(new DocumentResponseModel()
@@ -133,9 +136,12 @@ namespace Sample.Documents.Api.Controllers
                 {
                     _deleteDocument.Execute(Envelop(new DocumentReference(documentId), userName));
                 }
-                catch(DocumentLockedException)
+                catch(DocumentLockedException e)
                 {
-                    return this.Conflict();
+                    return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.Conflict)
+                    {
+                        Content = new StringContent(e.Message)
+                    });
                 }
 
                 return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.NoContent));

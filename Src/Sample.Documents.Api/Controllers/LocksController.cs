@@ -41,9 +41,12 @@ namespace Sample.Documents.Api.Controllers
                 {
                     _putLockCmd.Execute(Envelop(new Lock(documentId), userName));
                 }
-                catch(DocumentLockedException)
+                catch(DocumentLockedException e)
                 {
-                    return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.PreconditionFailed));
+                    return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.PreconditionFailed) 
+                    {
+                        Content = new StringContent(e.Message)
+                    });
                 }
 
                 return this.Ok();
@@ -59,9 +62,12 @@ namespace Sample.Documents.Api.Controllers
                 {
                     _removeLockCmd.Execute(Envelop(new Lock(documentId), userName));
                 }
-                catch (DocumentLockedException)
+                catch (DocumentLockedException e)
                 {
-                    return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.PreconditionFailed));
+                    return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.PreconditionFailed)
+                    {
+                        Content = new StringContent(e.Message)
+                    });
                 }
 
                 return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.NoContent));

@@ -5,12 +5,6 @@ var AuthStore = require("../stores/AuthStore");
 var debug = require("debug")("loadData");
 
 module.exports = function(context, payload, done) {
-	var store = context.getStore(SyncStore);
-	if (store.wasDataLoaded()) {
-		debug("data was already loaded");
-		done();
-		return;
-    }
     
     var authStore = context.getStore(AuthStore);
     var userName = authStore.getCurrentUser();

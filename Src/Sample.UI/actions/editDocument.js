@@ -23,7 +23,7 @@ module.exports = function (context, payload, done) {
         
         if (!res.ok) {
             debug('error', res);
-            context.dispatch("event:EditDocumentFailure", res.body);
+            context.dispatch("event:EditDocumentFailure", res.text);
             done();
             return;
         }

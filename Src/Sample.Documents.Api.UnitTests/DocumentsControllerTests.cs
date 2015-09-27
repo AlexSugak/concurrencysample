@@ -136,7 +136,11 @@ namespace Sample.Documents.Api.UnitTests
 
             var result = sut.Put(document, documentId);
 
-            result.Should().BeOfType<ConflictResult>("because document lock exception was thrown");
+            result.Should().BeOfType<ResponseMessageResult>()
+                  .Which.Response.StatusCode.Should().Be(HttpStatusCode.Conflict, "because document lock exception was thrown");
+
+            result.Should().BeOfType<ResponseMessageResult>()
+                  .Which.Response.Content.ReadAsStringAsync().Result.Should().NotBeNullOrEmpty();
         }
 
         [Theory]
@@ -208,7 +212,11 @@ namespace Sample.Documents.Api.UnitTests
 
             var result = sut.Delete(documentId);
 
-            result.Should().BeOfType<ConflictResult>("because document lock exception was thrown");
+            result.Should().BeOfType<ResponseMessageResult>()
+                  .Which.Response.StatusCode.Should().Be(HttpStatusCode.Conflict, "because document lock exception was thrown");
+
+            result.Should().BeOfType<ResponseMessageResult>()
+                  .Which.Response.Content.ReadAsStringAsync().Result.Should().NotBeNullOrEmpty();
         }
 
         [Theory]
