@@ -9,13 +9,13 @@ using System.Threading.Tasks;
 
 namespace Sample.Documents.Api.Commands
 {
-    public class LockCommandValidator<T> : ICommand<T>
+    public class DocumentLockValidator<T> : ICommand<T>
         where T : IDocumentReference
     {
         private readonly ICommand<T> _implementation;
         private readonly IGetDocumentQuery _docQuery;
 
-        public LockCommandValidator(ICommand<T> implementation, IGetDocumentQuery docQuery)
+        public DocumentLockValidator(ICommand<T> implementation, IGetDocumentQuery docQuery)
         {
             _implementation = implementation;
             _docQuery = docQuery;

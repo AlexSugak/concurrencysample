@@ -88,7 +88,7 @@
     <Compile Include="ComposedCommandTests.cs" />
     <Compile Include="DocumentsControllerTests.cs" />
     <Compile Include="LocksControllerTests.cs" />
-    <Compile Include="LockCommandValidatorTests.cs" />
+    <Compile Include="DocumentLockValidatorTests.cs" />
     <Compile Include="SimpleTokenTests.cs" />
     <Compile Include="SimppleTokenUserNameQueryTests.cs" />
     <Compile Include="DocumentValidatorTests.cs" />

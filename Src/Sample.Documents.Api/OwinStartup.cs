@@ -29,19 +29,19 @@ namespace Sample.Documents.Api
                                         new SubmitNewDocumentSqlCommand(connectionString)));
             var updateDocCmd = new TransactedCommand<Document>(
                                     new DocumentValidator(
-                                        new LockCommandValidator<Document>(
+                                        new DocumentLockValidator<Document>(
                                             new UpdateDocumentSqlCommand(connectionString),
                                             getDocumentQuery)));
             var putLockCmd = new TransactedCommand<Lock>(
-                                    new LockCommandValidator<Lock>(
+                                    new DocumentLockValidator<Lock>(
                                         new PutLockOnDocumentSqlCommand(connectionString),
                                         getDocumentQuery));
             var removeLockCmd = new TransactedCommand<Lock>(
-                                    new LockCommandValidator<Lock>(
+                                    new DocumentLockValidator<Lock>(
                                         new RemoveLockFromDocumentSqlCommand(connectionString),
                                         getDocumentQuery));
             var deleteDocCmd = new TransactedCommand<DocumentReference>(
-                                    new LockCommandValidator<DocumentReference>(
+                                    new DocumentLockValidator<DocumentReference>(
                                         new DeleteDocumentSqlCommand(connectionString),
                                         getDocumentQuery));
 

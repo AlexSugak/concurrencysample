@@ -12,7 +12,7 @@ using Sample.Documents.Api.Exceptions;
 
 namespace Sample.Documents.Api.UnitTests
 {
-    public class LockCommandValidatorTests
+    public class DocumentLockValidatorTests
     {
         [Theory]
         [MoqAutoData]
@@ -27,7 +27,7 @@ namespace Sample.Documents.Api.UnitTests
             document.CheckedOutBy = null;
             docQuery.Setup(q => q.Execute(documentId)).Returns(document);
 
-            var sut = new LockCommandValidator<Lock>(inner.Object, docQuery.Object);
+            var sut = new DocumentLockValidator<Lock>(inner.Object, docQuery.Object);
 
             sut.Execute(lockInfo);
 
@@ -47,7 +47,7 @@ namespace Sample.Documents.Api.UnitTests
             document.CheckedOutBy = userName;
             docQuery.Setup(q => q.Execute(documentId)).Returns(document);
 
-            var sut = new LockCommandValidator<Lock>(inner.Object, docQuery.Object);
+            var sut = new DocumentLockValidator<Lock>(inner.Object, docQuery.Object);
 
             sut.Execute(lockInfo);
 
@@ -68,7 +68,7 @@ namespace Sample.Documents.Api.UnitTests
             document.CheckedOutBy = anotherUserName;
             docQuery.Setup(q => q.Execute(documentId)).Returns(document);
 
-            var sut = new LockCommandValidator<Lock>(inner.Object, docQuery.Object);
+            var sut = new DocumentLockValidator<Lock>(inner.Object, docQuery.Object);
 
             sut.Invoking(cmd => cmd.Execute(lockInfo))
                .ShouldThrow<DocumentLockedException>();
