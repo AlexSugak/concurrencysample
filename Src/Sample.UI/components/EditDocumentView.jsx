@@ -42,14 +42,18 @@ var EditDocumentView = React.createClass({
 
 	render: function render() {
 		return (
-			<div>
-				<h3>Edit Document</h3>
+			<div className="row">
+				<div className="col-md-6">
+					<h3>Edit Document</h3>
 
-				<Formsy.Form onValidSubmit={this.submit} onValid={this.enableButton} onInvalid={this.disableButton}>
-					<FormInput name="title" validationError="Title required" value={this.props.document.title} required/>
-					<FormInput name="content" validationError="Content required" value={this.props.document.content} required/>
-					<button className="btn btn-lg btn-primary btn-block" type="submit" disabled={!this.state.canSubmit}>Save</button>
-				</Formsy.Form>
+					<Formsy.Form onValidSubmit={this.submit} onValid={this.enableButton} onInvalid={this.disableButton}>
+						<label htmlFor="title">Title</label>
+						<FormInput name="title" validationError="Title required" value={this.props.document.title} required/>
+						<label htmlFor="content">Content</label>
+						<FormInput name="content" inputType="textarea" validationError="Content required" value={this.props.document.content} required/>
+						<button className="btn btn-primary" type="submit" disabled={!this.state.canSubmit}>Save</button>
+					</Formsy.Form>
+				</div>
 		    </div>
 		);
 	}
