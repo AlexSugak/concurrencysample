@@ -1,19 +1,19 @@
-﻿using Moq;
-using Sample.Documents.Api.Queries;
+﻿using Sample.Documents.Api.Queries;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Xunit;
-using Xunit.Extensions;
-using FluentAssertions;
-using System.Web.Http.Results;
-using Sample.Documents.Api.Commands;
-using Sample.Documents.Api.Exceptions;
 using System.Net;
 using System.Net.Http;
+using System.Web.Http.Results;
+using FluentAssertions;
+using Moq;
+using Sample.Api.Shared;
+using Sample.Api.Shared.Tests;
+using Sample.Documents.Api.Commands;
+using Sample.Documents.Api.Exceptions;
 using Sample.Documents.Api.Controllers;
+using Xunit;
+using Xunit.Extensions;
 
 namespace Sample.Documents.Api.UnitTests
 {
@@ -24,8 +24,8 @@ namespace Sample.Documents.Api.UnitTests
         public void PUT_returns_correct_result_when_no_auth_header_in_request(
             Guid documentId,
             Mock<IUserNameQuery> userQuery,
-            Mock<ICommand<Lock>> putLockCmd,
-            Mock<ICommand<Lock>> removeLockCmd)
+            Mock<ICommand<LockInfo>> putLockCmd,
+            Mock<ICommand<LockInfo>> removeLockCmd)
         {
             var sut = new LocksController(userQuery.Object, putLockCmd.Object, removeLockCmd.Object);
 
@@ -40,10 +40,10 @@ namespace Sample.Documents.Api.UnitTests
             Guid documentId,
             string userName,
             Mock<IUserNameQuery> userQuery,
-            Mock<ICommand<Lock>> putLockCmd,
-            Mock<ICommand<Lock>> removeLockCmd)
+            Mock<ICommand<LockInfo>> putLockCmd,
+            Mock<ICommand<LockInfo>> removeLockCmd)
         {
-            putLockCmd.Setup(cmd => cmd.Execute(It.IsAny<Envelope<Lock>>()))
+            putLockCmd.Setup(cmd => cmd.Execute(It.IsAny<Envelope<LockInfo>>()))
                       .Throws<DocumentLockedException>();
             userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
                      .Returns(userName);
@@ -67,8 +67,8 @@ namespace Sample.Documents.Api.UnitTests
             Guid documentId,
             string userName,
             Mock<IUserNameQuery> userQuery,
-            Mock<ICommand<Lock>> putLockCmd,
-            Mock<ICommand<Lock>> removeLockCmd)
+            Mock<ICommand<LockInfo>> putLockCmd,
+            Mock<ICommand<LockInfo>> removeLockCmd)
         {
             userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
                      .Returns(userName);
@@ -85,8 +85,8 @@ namespace Sample.Documents.Api.UnitTests
         public void DELETE_returns_correct_result_when_no_auth_header_in_request(
             Guid documentId,
             Mock<IUserNameQuery> userQuery,
-            Mock<ICommand<Lock>> putLockCmd,
-            Mock<ICommand<Lock>> removeLockCmd)
+            Mock<ICommand<LockInfo>> putLockCmd,
+            Mock<ICommand<LockInfo>> removeLockCmd)
         {
             var sut = new LocksController(userQuery.Object, putLockCmd.Object, removeLockCmd.Object);
 
@@ -101,10 +101,10 @@ namespace Sample.Documents.Api.UnitTests
             Guid documentId,
             string userName,
             Mock<IUserNameQuery> userQuery,
-            Mock<ICommand<Lock>> putLockCmd,
-            Mock<ICommand<Lock>> removeLockCmd)
+            Mock<ICommand<LockInfo>> putLockCmd,
+            Mock<ICommand<LockInfo>> removeLockCmd)
         {
-            removeLockCmd.Setup(cmd => cmd.Execute(It.IsAny<Envelope<Lock>>()))
+            removeLockCmd.Setup(cmd => cmd.Execute(It.IsAny<Envelope<LockInfo>>()))
                       .Throws<DocumentLockedException>();
             userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
                      .Returns(userName);
@@ -128,8 +128,8 @@ namespace Sample.Documents.Api.UnitTests
             Guid documentId,
             string userName,
             Mock<IUserNameQuery> userQuery,
-            Mock<ICommand<Lock>> putLockCmd,
-            Mock<ICommand<Lock>> removeLockCmd)
+            Mock<ICommand<LockInfo>> putLockCmd,
+            Mock<ICommand<LockInfo>> removeLockCmd)
         {
             userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
                      .Returns(userName);

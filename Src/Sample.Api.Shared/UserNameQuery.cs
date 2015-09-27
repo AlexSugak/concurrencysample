@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Sample.Documents.Api.Queries
+namespace Sample.Api.Shared
 {
     /// <summary>
     /// Gets user name from http request
@@ -22,12 +20,12 @@ namespace Sample.Documents.Api.Queries
     {
         public string Execute(HttpRequestMessage request)
         {
-            if(request.Headers.Authorization == null)
+            if (request.Headers.Authorization == null)
             {
                 return null;
             }
 
-            if(request.Headers.Authorization.Scheme != "Bearer")
+            if (request.Headers.Authorization.Scheme != "Bearer")
             {
                 return null;
             }

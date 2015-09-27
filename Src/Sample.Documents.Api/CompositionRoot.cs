@@ -6,6 +6,7 @@ using System.Text;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Dispatcher;
+using Sample.Api.Shared;
 using Sample.Documents.Api.Commands;
 using Sample.Documents.Api.Queries;
 using Sample.Documents.Api.Controllers;
@@ -22,8 +23,8 @@ namespace Sample.Documents.Api
         private readonly ICommand<Document> _submitDocumentCmd;
         private readonly ICommand<Document> _updateDocumentCmd;
         private readonly IUserNameQuery _userNameQuery;
-        private readonly ICommand<Lock> _putLockCmd;
-        private readonly ICommand<Lock> _removeLockCmd;
+        private readonly ICommand<LockInfo> _putLockCmd;
+        private readonly ICommand<LockInfo> _removeLockCmd;
         private readonly ICommand<DocumentReference> _deleteDocument;
 
         public CompositionRoot(
@@ -32,8 +33,8 @@ namespace Sample.Documents.Api
             ICommand<Document> submitDocumentCmd,
             ICommand<Document> updateDocumentCmd,
             IUserNameQuery userNameQuery,
-            ICommand<Lock> putLockCmd,
-            ICommand<Lock> removeLockCmd,
+            ICommand<LockInfo> putLockCmd,
+            ICommand<LockInfo> removeLockCmd,
             ICommand<DocumentReference> deleteDocument)
         {
             _getAllDocuments = getAllDocuments;

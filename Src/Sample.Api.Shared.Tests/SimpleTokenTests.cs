@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Security.Claims;
+using FluentAssertions;
+using Ploeh.AutoFixture.Xunit;
 using Xunit;
 using Xunit.Extensions;
-using FluentAssertions;
-using System.Security.Claims;
-using Ploeh.AutoFixture.Xunit;
 
-namespace Sample.Documents.Api.UnitTests
+namespace Sample.Api.Shared.Tests
 {
     public class SimpleTokenTests
     {

@@ -1,13 +1,9 @@
-﻿using Sample.Documents.Database;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Sample.Documents.Database;
 using Xunit;
 
-namespace Sample.Documents.Api.IntegrationTests
+namespace Sample.Api.Shared.Tests
 {
     /// <summary>
     /// Attribute which indicates a test that uses a database - creates DB before test run and then drops it after

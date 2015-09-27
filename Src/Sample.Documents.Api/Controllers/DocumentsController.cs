@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using Sample.Api.Shared;
 using Sample.Documents.Api.Commands;
 using Sample.Documents.Api.Queries;
 using Sample.Documents.Api.Exceptions;

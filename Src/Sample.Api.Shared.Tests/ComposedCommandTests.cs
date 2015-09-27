@@ -1,24 +1,27 @@
-﻿using Moq;
-using Sample.Documents.Api.Commands;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Moq;
+using Sample.Api.Shared;
 using Xunit;
 using Xunit.Extensions;
 
-namespace Sample.Documents.Api.UnitTests
+namespace Sample.Api.Shared.Tests
 {
     public class ComposedCommandTests
     {
+        public class TestDto
+        {
+            public string Something { get; set; }
+        }
+
         [Theory]
         [MoqAutoData]
         public void execute_calls_all_inner_commands(
-            Envelope<Document> doc,
-            List<Mock<ICommand<Document>>> commands)
+            Envelope<TestDto> doc,
+            List<Mock<ICommand<TestDto>>> commands)
         {
-            var sut = new ComposedCommand<Document>(commands.Select(cmd => cmd.Object).ToArray());
+            var sut = new ComposedCommand<TestDto>(commands.Select(cmd => cmd.Object).ToArray());
             sut.Execute(doc);
 
             Assert.True(commands.Count > 1);

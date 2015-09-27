@@ -84,23 +84,26 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ClaimComparer.cs" />
-    <Compile Include="ComposedCommandTests.cs" />
     <Compile Include="DocumentsControllerTests.cs" />
     <Compile Include="LocksControllerTests.cs" />
     <Compile Include="DocumentLockValidatorTests.cs" />
-    <Compile Include="SimpleTokenTests.cs" />
-    <Compile Include="SimppleTokenUserNameQueryTests.cs" />
     <Compile Include="DocumentValidatorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestConventions.cs" />
-    <Compile Include="TransactedCommandTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Sample.Api.Shared.Tests\Sample.Api.Shared.Tests.csproj">
+      <Project>{98d7a510-beff-48c8-9378-3263c2cfd011}</Project>
+      <Name>Sample.Api.Shared.Tests</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Sample.Api.Shared\Sample.Api.Shared.csproj">
+      <Project>{9d783ed9-7cc8-48f9-be61-d3101ae20df9}</Project>
+      <Name>Sample.Api.Shared</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Sample.Documents.Api\Sample.Documents.Api.csproj">
       <Project>{64b3862f-af7a-4bc5-a3dd-d568e81debc8}</Project>
       <Name>Sample.Documents.Api</Name>

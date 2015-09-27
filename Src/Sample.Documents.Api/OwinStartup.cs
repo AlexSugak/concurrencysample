@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Web.Http;
 using Owin;
+using Sample.Api.Shared;
 using Sample.Documents.Api.Commands;
 using Sample.Documents.Api.Queries;
 using Microsoft.Owin.Cors;
@@ -32,12 +33,12 @@ namespace Sample.Documents.Api
                                         new DocumentLockValidator<Document>(
                                             new UpdateDocumentSqlCommand(connectionString),
                                             getDocumentQuery)));
-            var putLockCmd = new TransactedCommand<Lock>(
-                                    new DocumentLockValidator<Lock>(
+            var putLockCmd = new TransactedCommand<LockInfo>(
+                                    new DocumentLockValidator<LockInfo>(
                                         new PutLockOnDocumentSqlCommand(connectionString),
                                         getDocumentQuery));
-            var removeLockCmd = new TransactedCommand<Lock>(
-                                    new DocumentLockValidator<Lock>(
+            var removeLockCmd = new TransactedCommand<LockInfo>(
+                                    new DocumentLockValidator<LockInfo>(
                                         new RemoveLockFromDocumentSqlCommand(connectionString),
                                         getDocumentQuery));
             var deleteDocCmd = new TransactedCommand<DocumentReference>(

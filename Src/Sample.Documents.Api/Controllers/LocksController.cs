@@ -1,15 +1,12 @@
-﻿using Sample.Documents.Api.Commands;
-using Sample.Documents.Api.Exceptions;
-using Sample.Documents.Api.Queries;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Configuration;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web.Http;
+using Sample.Api.Shared;
+using Sample.Documents.Api.Commands;
+using Sample.Documents.Api.Exceptions;
+using Sample.Documents.Api.Queries;
 
 namespace Sample.Documents.Api.Controllers
 {
@@ -19,13 +16,13 @@ namespace Sample.Documents.Api.Controllers
     [RoutePrefix("api/documents/{documentId}/lock")]
     public class LocksController : SecuredApiController
     {
-        private readonly ICommand<Lock> _putLockCmd;
-        private readonly ICommand<Lock> _removeLockCmd;
+        private readonly ICommand<LockInfo> _putLockCmd;
+        private readonly ICommand<LockInfo> _removeLockCmd;
 
         public LocksController(
             IUserNameQuery userQuery,
-            ICommand<Lock> putLockCmd,
-            ICommand<Lock> removeLockCmd)
+            ICommand<LockInfo> putLockCmd,
+            ICommand<LockInfo> removeLockCmd)
             : base(userQuery)
         {
             _putLockCmd = putLockCmd;
@@ -39,7 +36,7 @@ namespace Sample.Documents.Api.Controllers
             {
                 try
                 {
-                    _putLockCmd.Execute(Envelop(new Lock(documentId), userName));
+                    _putLockCmd.Execute(Envelop(new LockInfo(documentId), userName));
                 }
                 catch(DocumentLockedException e)
                 {
@@ -60,7 +57,7 @@ namespace Sample.Documents.Api.Controllers
             {
                 try
                 {
-                    _removeLockCmd.Execute(Envelop(new Lock(documentId), userName));
+                    _removeLockCmd.Execute(Envelop(new LockInfo(documentId), userName));
                 }
                 catch (DocumentLockedException e)
                 {

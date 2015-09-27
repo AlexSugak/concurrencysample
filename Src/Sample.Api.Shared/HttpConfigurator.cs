@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Dispatcher;
 
-namespace Sample.Documents.Api
+namespace Sample.Api.Shared
 {
     /// <summary>
     /// Configures required Http settings to setup web api

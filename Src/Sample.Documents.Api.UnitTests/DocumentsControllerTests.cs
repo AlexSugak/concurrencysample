@@ -1,26 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Xunit.Extensions;
+using System.Net;
+using System.Net.Http;
+using System.Web.Http.Results;
 using FluentAssertions;
 using Moq;
-using System.Web.Http.Results;
+using Ploeh.AutoFixture.Xunit;
+using Sample.Api.Shared;
 using Sample.Documents.Api.Queries;
 using Sample.Documents.Api.Commands;
-using System.Net.Http;
 using Sample.Documents.Api.Controllers;
 using Sample.Documents.Api.Exceptions;
-using Ploeh.AutoFixture.Xunit;
-using System.Net;
+using Xunit.Extensions;
 
 namespace Sample.Documents.Api.UnitTests
 {
     public class DocumentsControllerTests
     {
         [Theory]
-        [MoqAutoData]
+        [DocumentsControllerAutoData]
         public void get_returns_correct_result_when_no_auth_header_in_request(  
             DocumentsController sut)
         {
@@ -30,7 +29,7 @@ namespace Sample.Documents.Api.UnitTests
         }
 
         [Theory]
-        [MoqAutoData]
+        [DocumentsControllerAutoData]
         public void get_returns_200_OK_Result(
             string userName,
             [Frozen]Mock<IUserNameQuery> userQuery, 
@@ -48,7 +47,7 @@ namespace Sample.Documents.Api.UnitTests
         }
 
         [Theory]
-        [MoqAutoData]
+        [DocumentsControllerAutoData]
         public void get_returns_documents_returned_by_query(
             List<DocumentDetails> documents,
             string userName,
@@ -70,7 +69,7 @@ namespace Sample.Documents.Api.UnitTests
         }
 
         [Theory]
-        [MoqAutoData]
+        [DocumentsControllerAutoData]
         public void post_returns_correct_result_when_no_auth_header_in_request(
             DocumentModel document,
             DocumentsController sut)
@@ -81,7 +80,7 @@ namespace Sample.Documents.Api.UnitTests
         }
 
         [Theory]
-        [MoqAutoData]
+        [DocumentsControllerAutoData]
         public void post_returns_201_Created_when_command_succeeds(
             DocumentModel document,
             string userName,
@@ -98,7 +97,7 @@ namespace Sample.Documents.Api.UnitTests
         }
 
         [Theory]
-        [MoqAutoData]
+        [DocumentsControllerAutoData]
         public void post_returns_400_BadRequest_on_validation_exception(
             DocumentModel document,
             ValidationException exception,
@@ -119,7 +118,7 @@ namespace Sample.Documents.Api.UnitTests
         }
 
         [Theory]
-        [MoqAutoData]
+        [DocumentsControllerAutoData]
         public void put_returns_409_Conflict_on_lock_exception(
             Guid documentId,
             DocumentModel document,
@@ -144,7 +143,7 @@ namespace Sample.Documents.Api.UnitTests
         }
 
         [Theory]
-        [MoqAutoData]
+        [DocumentsControllerAutoData]
         public void getById_returns_document_returned_by_query(
             DocumentDetails document,
             string userName,
@@ -165,7 +164,7 @@ namespace Sample.Documents.Api.UnitTests
         }
 
         [Theory]
-        [MoqAutoData]
+        [DocumentsControllerAutoData]
         public void getById_returns_404_NotFound_when_document_not_found(
             DocumentDetails document,
             string userName,
@@ -184,7 +183,7 @@ namespace Sample.Documents.Api.UnitTests
         }
 
         [Theory]
-        [MoqAutoData]
+        [DocumentsControllerAutoData]
         public void getVyId_returns_correct_result_when_no_auth_header_in_request(
             Guid documentId,
             DocumentsController sut)
@@ -195,7 +194,7 @@ namespace Sample.Documents.Api.UnitTests
         }
 
         [Theory]
-        [MoqAutoData]
+        [DocumentsControllerAutoData]
         public void delete_returns_409_Conflict_on_lock_exception(
             Guid documentId,
             DocumentModel document,
@@ -220,7 +219,7 @@ namespace Sample.Documents.Api.UnitTests
         }
 
         [Theory]
-        [MoqAutoData]
+        [DocumentsControllerAutoData]
         public void delete_returns_409_NoContent_whend_document_deleted(
             Guid documentId,
             DocumentModel document,

@@ -1,11 +1,8 @@
-﻿using Sample.Documents.Api.Exceptions;
-using Sample.Documents.Api.Queries;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Sample.Api.Shared;
+using Sample.Documents.Api.Exceptions;
+using Sample.Documents.Api.Queries;
 
 namespace Sample.Documents.Api.Commands
 {
@@ -38,7 +35,7 @@ namespace Sample.Documents.Api.Commands
         }
     }
 
-    public class PutLockOnDocumentSqlCommand : ICommand<Lock>
+    public class PutLockOnDocumentSqlCommand : ICommand<LockInfo>
     {
         private readonly string _connectionString;
 
@@ -47,7 +44,7 @@ namespace Sample.Documents.Api.Commands
             _connectionString = connectionString;
         }
 
-        public void Execute(Envelope<Lock> lockInfo)
+        public void Execute(Envelope<LockInfo> lockInfo)
         {
             using (var connection = new SqlConnection(_connectionString))
             {

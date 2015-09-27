@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Owin.Testing;
+using Ploeh.AutoFixture.Xunit;
+using Sample.Api.Shared.Tests;
 using Xunit;
 using Xunit.Extensions;
-using Ploeh.AutoFixture.Xunit;
-using System.Net;
 
 namespace Sample.Documents.Api.IntegrationTests
 {

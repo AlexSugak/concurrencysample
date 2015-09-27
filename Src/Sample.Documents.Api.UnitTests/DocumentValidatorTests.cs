@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
+using Sample.Api.Shared;
+using Sample.Api.Shared.Tests;
 using Sample.Documents.Api.Commands;
 using Sample.Documents.Api.Exceptions;
 using Xunit.Extensions;

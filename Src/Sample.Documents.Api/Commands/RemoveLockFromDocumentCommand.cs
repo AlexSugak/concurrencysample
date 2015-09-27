@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Sample.Api.Shared;
 
 namespace Sample.Documents.Api.Commands
 {
-    public class Lock : IDocumentReference
+    public class LockInfo : IDocumentReference
     {
-        public Lock(Guid documentId)
+        public LockInfo(Guid documentId)
         {
             DocumentId = documentId;
         }
@@ -17,7 +14,7 @@ namespace Sample.Documents.Api.Commands
         public Guid DocumentId { get; set; }
     }
 
-    public class RemoveLockFromDocumentSqlCommand : ICommand<Lock>
+    public class RemoveLockFromDocumentSqlCommand : ICommand<LockInfo>
     {
         private readonly string _connectionString;
 
@@ -26,7 +23,7 @@ namespace Sample.Documents.Api.Commands
             _connectionString = connectionString;
         }
 
-        public void Execute(Envelope<Lock> lockInfo)
+        public void Execute(Envelope<LockInfo> lockInfo)
         {
             using (var connection = new SqlConnection(_connectionString))
             {

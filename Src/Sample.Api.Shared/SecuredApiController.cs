@@ -1,12 +1,7 @@
-﻿using Sample.Documents.Api.Queries;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 using System.Web.Http;
 
-namespace Sample.Documents.Api.Controllers
+namespace Sample.Api.Shared
 {
     public abstract class SecuredApiController : ApiControllerWithEnvelope
     {

@@ -5,7 +5,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sample.Documents.Api.UnitTests
+namespace Sample.Api.Shared.Tests
 {
     public class ClaimComparer : IEqualityComparer<Claim>
     {

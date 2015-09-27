@@ -1,32 +1,13 @@
-﻿using FluentValidation;
-using FluentValidation.Results;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Sample.Api.Shared;
+using FluentValidation;
+using FluentValidation.Results;
 
 namespace Sample.Documents.Api.Commands
 {
-    public class Envelope<T>
-    {
-        public Envelope(T item, string userName)
-        {
-            Item = item;
-            UserName = userName;
-        }
-
-        public T Item { get; private set; }
-        public string UserName { get; private set; }
-    }
-
-    public interface ICommand<T>
-    {
-        //TODO: implement EnvelopCommand: ICommand<T> -> ICommand<Envelope<T>>
-        void Execute(Envelope<T> input);
-    }
-
     public interface IDocumentReference
     {
         Guid DocumentId { get; }
@@ -72,7 +53,7 @@ namespace Sample.Documents.Api.Commands
             var result = _validator.Validate(document.Item);
             if(!result.IsValid)
             {
-                throw new Sample.Documents.Api.Exceptions.ValidationException(BuildMessage(result.Errors));
+                throw new Sample.Api.Shared.ValidationException(BuildMessage(result.Errors));
             }
             
             _implementation.Execute(document);

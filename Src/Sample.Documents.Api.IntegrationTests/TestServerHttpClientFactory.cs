@@ -1,12 +1,9 @@
-﻿using Microsoft.Owin.Testing;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Owin.Testing;
+using Sample.Api.Shared;
 
 namespace Sample.Documents.Api.IntegrationTests
 {

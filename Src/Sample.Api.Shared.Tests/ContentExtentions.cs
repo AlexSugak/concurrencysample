@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sample.Documents.Api.IntegrationTests
+namespace Sample.Api.Shared.Tests
 {
     public static class ContentExtentions
     {
