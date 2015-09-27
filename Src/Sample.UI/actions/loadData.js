@@ -31,7 +31,7 @@ module.exports = function(context, payload, done) {
         }
         
         debug('success');
-        var documents = res.body;
+        var documents = res.body.documents;
         context.dispatch("event:FetchAllDocumentsSuccess", documents);
 
         context.dispatch("DATA_LOADED");

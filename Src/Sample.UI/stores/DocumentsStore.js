@@ -7,11 +7,23 @@ var DocumentsStore = createStore({
     storeName: "DocumentsStore",
     
     handlers: {
-        "event:FetchAllDocumentsSuccess": "whenDocumentsFetched"
+        "event:FetchAllDocumentsSuccess": "whenDocumentsFetched",
+        "event:AddDocumentSuccess": "whenDocumentAdded",
+        "event:DeleteDocumentSuccess": "whenDocumentDeleted"
     },
     whenDocumentsFetched: function (documents) {
         debug("documents fetched");
         this.documents = documents;
+        this.emitChange();
+    },
+    whenDocumentAdded: function (document) {
+        debug("document added");
+        this.documents.push(document);
+        this.emitChange();
+    },
+    whenDocumentDeleted: function (documentId) {
+        debug("document deleted");
+        this.documents = this.documents.filter(function (doc) { return doc.id !== documentId; });
         this.emitChange();
     },
     initialize: function () {

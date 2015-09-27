@@ -17,6 +17,12 @@ module.exports = {
         action: nothing,
         handler: require('../components/DocumentsView')
     },
+    newDocument: {
+        path: "/documents/new",
+        method: "GET",
+        action: nothing,
+        handler: require('../components/NewDocumentView')
+    },
     tickets: {
         path: "/tickets",
         method: "GET",
