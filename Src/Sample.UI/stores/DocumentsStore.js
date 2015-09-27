@@ -9,7 +9,9 @@ var DocumentsStore = createStore({
     handlers: {
         "event:FetchAllDocumentsSuccess": "whenDocumentsFetched",
         "event:AddDocumentSuccess": "whenDocumentAdded",
-        "event:DeleteDocumentSuccess": "whenDocumentDeleted"
+        "event:DeleteDocumentSuccess": "whenDocumentDeleted",
+        "event:CheckoutDocumentSuccess": "whenDocumentCheckedOut",
+        "event:CheckinDocumentSuccess": "whenDocumentCheckedIn"
     },
     whenDocumentsFetched: function (documents) {
         debug("documents fetched");
@@ -24,6 +26,24 @@ var DocumentsStore = createStore({
     whenDocumentDeleted: function (documentId) {
         debug("document deleted");
         this.documents = this.documents.filter(function (doc) { return doc.id !== documentId; });
+        this.emitChange();
+    },
+    whenDocumentCheckedOut: function (lockInfo) {
+        debug("document checked out");
+        for (i = 0; i < this.documents.length; i++) {
+            if (this.documents[i].id === lockInfo.id) {
+                this.documents[i].checkedOutBy = lockInfo.checkedOutBy;
+            }
+        }
+        this.emitChange();
+    },
+    whenDocumentCheckedIn: function (documentId) {
+        debug("document checked in");
+        for (i = 0; i < this.documents.length; i++) {
+            if (this.documents[i].id === documentId) {
+                this.documents[i].checkedOutBy = null;
+            }
+        }
         this.emitChange();
     },
     initialize: function () {

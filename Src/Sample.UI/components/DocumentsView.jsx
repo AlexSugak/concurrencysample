@@ -9,6 +9,8 @@ var NavLink = require("fluxible-router").NavLink;
 
 var navigateAction = require('fluxible-router').navigateAction;
 var deleteDocument = require('../actions/deleteDocument');
+var checkoutDocument = require('../actions/checkoutDocument');
+var checkinDocument = require('../actions/checkinDocument');
 var connectToStores = require('fluxible-addons-react').connectToStores;
 
 var DocumentRow = React.createClass({
@@ -21,12 +23,32 @@ var DocumentRow = React.createClass({
 		this.context.executeAction(deleteDocument, data);
 		event.preventDefault();
     },
+	checkoutClicked: function (event) {
+		var data = { documentId: this.props.document.id};
+
+		this.context.executeAction(checkoutDocument, data);
+		event.preventDefault();
+    },
+	checkinClicked: function (event) {
+		var data = { documentId: this.props.document.id};
+
+		this.context.executeAction(checkinDocument, data);
+		event.preventDefault();
+    },
 	render: function render() {
 		var isCheckedOut = !(this.props.document.checkedOutBy === null);
 		var checkedOutText = isCheckedOut ? this.props.document.checkedOutBy : 'N/A';
 		var rowClass = isCheckedOut ? 'danger' : '';
 
 		var actions = [];
+		if(!isCheckedOut)
+		{
+			actions.push(<a key={'checkout_'+ this.props.document.id} className="btn btn-link" onClick={this.checkoutClicked}>check out</a>);
+		}
+		if(isCheckedOut && this.props.userName === this.props.document.checkedOutBy)
+		{
+			actions.push(<a key={'checkin_'+ this.props.document.id} className="btn btn-link" onClick={this.checkinClicked}>check in</a>);
+		}
 		if(!isCheckedOut || this.props.userName === this.props.document.checkedOutBy)
 		{
 			actions.push(<a key={'delete_'+ this.props.document.id} className="btn btn-link" onClick={this.deleteClicked}>delete</a>);

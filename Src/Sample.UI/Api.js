@@ -54,9 +54,37 @@ Api.prototype.addDocument = function (userName, document, callback) {
 };
 
 Api.prototype.deleteDocument = function (userName, documentId, callback) {
-    debug('addDocument using api host: ' + this._getHost());
+    debug('deleteDocument using api host: ' + this._getHost());
     superagent
         .del(this._getHost() + '/documents/' + documentId)
+        .set('Authorization', 'Bearer userName=' + userName)
+        .end(function (err, res) {
+        if (err) {
+            debug('error', err);
+        }
+        callback(err, res);
+    });
+};
+
+Api.prototype.checkoutDocument = function (userName, documentId, callback) {
+    debug('checkoutDocument using api host: ' + this._getHost());
+    superagent
+        .put(this._getHost() + '/documents/' + documentId + '/lock')
+        .set('Authorization', 'Bearer userName=' + userName)
+        .set('Content-Type', 'application/json')
+        .end(function (err, res) {
+        if (err) {
+            debug('error', err);
+        }
+        callback(err, res);
+    });
+};
+
+Api.prototype.checkinDocument = function (userName, documentId, callback) {
+    debug('checkinDocument using api host: ' + this._getHost());
+    superagent
+        .del(this._getHost() + '/documents/' + documentId + '/lock')
+        .set('Authorization', 'Bearer userName=' + userName)
         .end(function (err, res) {
         if (err) {
             debug('error', err);
