@@ -7,8 +7,7 @@ var TopNavLink = React.createClass({
 	propTypes: {
 		route: React.PropTypes.string.isRequired,
 		currentRoute: React.PropTypes.string.isRequired,
-		title: React.PropTypes.string.isRequired,
-		context: React.PropTypes.object.isRequired
+		title: React.PropTypes.string.isRequired
 	},
 
 	render: function render() {
@@ -22,6 +21,5 @@ var TopNavLink = React.createClass({
 		);
 	}
 });
-
 
 module.exports = TopNavLink;

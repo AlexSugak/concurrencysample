@@ -30,9 +30,42 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="actions\loginUser.js" />
+    <Compile Include="actions\loadData.js" />
+    <Compile Include="Api.js" />
+    <Compile Include="app.js" />
+    <Compile Include="client.js" />
+    <Compile Include="configs\config.js" />
+    <Compile Include="configs\routes.js" />
+    <Compile Include="plugins\apiPlugin.js" />
     <Compile Include="server.js" />
+    <Compile Include="stores\AuthStore.js" />
+    <Compile Include="stores\DocumentsStore.js" />
+    <Compile Include="stores\SyncStore.js" />
+    <Compile Include="webpack.config.js" />
+    <Content Include="components\AppPage.jsx" />
+    <Content Include="components\ErrorView.jsx" />
+    <Content Include="components\Html.jsx" />
+    <Content Include="components\DocumentsView.jsx" />
+    <Content Include="components\LoginView.jsx" />
+    <Content Include="components\FormInput.jsx" />
+    <Content Include="components\TicketsView.jsx" />
+    <Content Include="components\IndexView.jsx" />
+    <Content Include="components\TopNav.jsx" />
+    <Content Include="components\TopNavLink.jsx" />
     <Content Include="package.json" />
     <Content Include="README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="build\" />
+    <Folder Include="build\js\" />
+    <Folder Include="configs\" />
+    <Folder Include="components\" />
+    <Folder Include="actions\" />
+    <Folder Include="css\" />
+    <Folder Include="images\" />
+    <Folder Include="plugins\" />
+    <Folder Include="stores\" />
   </ItemGroup>
   <!-- Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them. -->
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="False" />

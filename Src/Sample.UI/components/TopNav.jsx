@@ -3,17 +3,18 @@
 var React = require("react");
 var TopNavLink = require("./TopNavLink");
 
+var connectToStores = require('fluxible-addons-react').connectToStores;
+var AuthStore = require("../stores/AuthStore");
+
 var TopNav = React.createClass({
 	propTypes: {
 		projectName: React.PropTypes.string.isRequired,
 		route: React.PropTypes.string.isRequired,
-		context: React.PropTypes.object.isRequired
 	},
 
 	render: function render() {
 		var projectName = this.props.projectName;
 		var route = this.props.route;
-		var context = this.props.context;
 		return (
 			<nav className="navbar navbar-default">
 				<div className="container-fluid">
@@ -28,9 +29,16 @@ var TopNav = React.createClass({
 				  </div>
 				  <div id="navbar" className="navbar-collapse collapse">
 					<ul className="nav navbar-nav">
-						<TopNavLink title="Home" route="index" currentRoute={route} context={context} />
-						<TopNavLink title="Documents" route="documents" currentRoute={route} context={context} />
-						<TopNavLink title="Tickets" route="tickets" currentRoute={route} context={context} />
+						<TopNavLink title="Home" route="index" currentRoute={route} />
+						<TopNavLink title="Documents" route="documents" currentRoute={route} />
+						<TopNavLink title="Tickets" route="tickets" currentRoute={route} />
+					</ul>
+					<ul className="nav navbar-nav navbar-right">
+						<li>
+							<p className="navbar-text">
+								Welcome, {this.props.userName}
+							</p>
+						</li>
 					</ul>
 				  </div>
 				</div>
@@ -39,5 +47,10 @@ var TopNav = React.createClass({
 	}
 });
 
+TopNav = connectToStores(TopNav, [AuthStore], function(context, props) {
+	return {
+		userName: context.getStore(AuthStore).getCurrentUser()
+	}
+});
 
 module.exports = TopNav;

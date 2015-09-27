@@ -9,7 +9,6 @@ var createElementWithContext = require('fluxible-addons-react').createElementWit
 
 var bodyParser = require("body-parser");
 var navigateAction = require('fluxible-router').navigateAction;
-var loadDataAction = require("./actions/loadData");
 
 var HtmlComponent = react.createFactory(require("./components/Html.jsx"));
 
@@ -45,37 +44,28 @@ server.use(function (req, res, next) {
     
     debug("Executing navigate action");
     
-    ac.executeAction(loadDataAction, {
-        force: true
+    ac.executeAction(navigateAction, {
+        url: req.url
     }, function (err) {
         if (err) {
             handleError(err, next);
             return;
         }
+        debug("Exposing context state");
+        res.expose(app.dehydrate(context), "App");
         
-        ac.executeAction(navigateAction, {
-            url: req.url
-        }, function (err) {
-            if (err) {
-                handleError(err, next);
-                return;
-            }
-            debug("Exposing context state");
-            res.expose(app.dehydrate(context), "App");
-            
-            debug("Rendering Application component into html");
-            
-            var element = createElementWithContext(context);
-            var html = react.renderToStaticMarkup(HtmlComponent({
-                state: res.locals.state,
-                context: context.getComponentContext(),
-                markup: react.renderToString(element)
-            }));
-            
-            debug("Sending markup");
-            res.write('<!DOCTYPE html>' + html);
-            res.end();
-        });
+        debug("Rendering Application component into html");
+        
+        var element = createElementWithContext(context);
+        var html = react.renderToStaticMarkup(HtmlComponent({
+            state: res.locals.state,
+            context: context.getComponentContext(),
+            markup: react.renderToString(element)
+        }));
+        
+        debug("Sending markup");
+        res.write('<!DOCTYPE html>' + html);
+        res.end();
     });
 });
 

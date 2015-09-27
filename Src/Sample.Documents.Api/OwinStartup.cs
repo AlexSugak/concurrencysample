@@ -7,6 +7,7 @@ using System.Web.Http;
 using Owin;
 using Sample.Documents.Api.Commands;
 using Sample.Documents.Api.Queries;
+using Microsoft.Owin.Cors;
 
 namespace Sample.Documents.Api
 {
@@ -46,6 +47,7 @@ namespace Sample.Documents.Api
                                     removeLockCmd);
 
             HttpConfigurator.Configure(config, compositon);
+            app.UseCors(CorsOptions.AllowAll);
             app.UseWebApi(config);
         }
     }
