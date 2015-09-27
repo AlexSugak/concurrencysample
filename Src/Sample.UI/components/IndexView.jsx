@@ -22,13 +22,13 @@ var IndexView = React.createClass({
 				</p>
 				<p>
 					Here, <mark>Documents</mark> demostrate <mark>Pessimistic</mark> concurrency control.
-					Users are required to <mark>check out</mark> (lock) the document before making any changes to it.
+					Users are required to <mark>check out</mark> (i.e. lock) the document before making any changes to it.
 					If the document is locked by a user, no other user can edit it.
 				</p>
 				<p>
 					<mark>Tickets</mark> demostrate <mark>Optimistic</mark> concurrency control.
-					Users can edit any ticket. However, the changes made to ticket will only apply if no other user made any changes not seen by the first user.
-					If this is not true, user will have to resolve the <mark>Conflict</mark> by choosing which changes to apply.
+					Users can edit any ticket. However, the changes made to ticket will only apply if no other user has made changes not seen by the first user.
+					If this is not true, user will have to resolve the <mark>Conflict</mark> by choosing which changes (his or server's) to apply.
 				</p>
 		    </div>
 		);
