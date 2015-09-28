@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Sample.Api.Shared;
 using Sample.Tickets.Api.Commands;
+using Sample.Tickets.Api.Exceptions;
 using Sample.Tickets.Api.Queries;
 using System;
 using System.Collections.Concurrent;
@@ -46,18 +47,34 @@ namespace Sample.Tickets.Api.Controllers
         [Route]
         public IHttpActionResult Get()
         {
-            return this.Ok(new TicketsModel() 
+            return InvokeWhenUserExists(userName => this.Ok(new TicketsModel() 
             { 
                 Tickets = _allTicketsQuery.Execute().Select(t => Mapper.Map<TicketResponseModel>(t)).ToList() 
-            });
+            }));
         }
 
         [Route("{ticketId}")]
         public IHttpActionResult Get(Guid ticketId)
         {
-            return this.Ok(
-                Mapper.Map<TicketResponseModel>(_getTicketQuery.Execute(ticketId))
-            );
+            return InvokeWhenUserExists(userName => 
+            {
+                TicketDetails ticket;
+                try
+                {
+                    ticket = _getTicketQuery.Execute(ticketId);
+                }
+                catch(TicketNotFoundException)
+                {
+                    return this.NotFound();
+                }
+
+                return new OkResultWithETag<TicketResponseModel>(
+                        Mapper.Map<TicketResponseModel>(ticket),
+                        this)
+                    {
+                        ETagValue = ticket.Version.ToString()
+                    };
+            });
         }
 
         [Route]

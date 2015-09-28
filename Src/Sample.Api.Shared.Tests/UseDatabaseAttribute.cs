@@ -27,7 +27,7 @@ namespace Sample.Api.Shared.Tests
 
         public override void After(System.Reflection.MethodInfo methodUnderTest)
         {
-            Runner.MigrateDown(_connString);
+            Runner.MigrateDownToCleanDb(_connString);
 
             base.After(methodUnderTest);
         }

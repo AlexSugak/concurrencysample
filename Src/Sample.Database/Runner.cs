@@ -39,7 +39,7 @@ namespace Sample.Database
             }
         }
 
-        public static void MigrateDown(string connectionString)
+        public static void MigrateDownToCleanDb(string connectionString)
         {
             var announcer = GetAnnouncer();
             var assembly = Assembly.GetExecutingAssembly();
