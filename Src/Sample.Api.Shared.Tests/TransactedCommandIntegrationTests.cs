@@ -42,7 +42,7 @@ namespace Sample.Api.Shared.Tests
                 CheckedOutBy = userName
             };
 
-            var db = Simple.Data.Database.OpenNamedConnection("DocumentsDBConnectionString");
+            var db = Simple.Data.Database.OpenNamedConnection("DBConnectionString");
             db.Documents.Insert(dbDocument);
 
             var changeTitle = new SimpleDataCommand(id => db.Documents.UpdateById(Id: id, Title: anotherTitle));
@@ -83,7 +83,7 @@ namespace Sample.Api.Shared.Tests
                 CheckedOutBy = userName
             };
 
-            var db = Simple.Data.Database.OpenNamedConnection("DocumentsDBConnectionString");
+            var db = Simple.Data.Database.OpenNamedConnection("DBConnectionString");
             db.Documents.Insert(dbDocument);
 
             var changeTitle = new SimpleDataCommand(id => db.Documents.UpdateById(Id: docId, Title: anotherTitle));

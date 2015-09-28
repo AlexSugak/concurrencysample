@@ -14,6 +14,8 @@ namespace Sample.Documents.Api.IntegrationTests
     {
         //we've already broke the ice, so let's do the spiking for this api from the start
 
+        private const string ConnectionStringName = "DBConnectionString";
+
         [Theory]
         [AutoData]
         [UseDatabase]
@@ -25,7 +27,7 @@ namespace Sample.Documents.Api.IntegrationTests
                 Title = "title1",
                 Content = "not empty content1",
             };
-            var db = Simple.Data.Database.OpenNamedConnection("DocumentsDBConnectionString");
+            var db = Simple.Data.Database.OpenNamedConnection(ConnectionStringName);
             db.Documents.Insert(document);
 
             using (var client = TestServerHttpClientFactory.Create(userName))
@@ -53,7 +55,7 @@ namespace Sample.Documents.Api.IntegrationTests
                 Content = "not empty content1",
                 CheckedOutBy = anotherUserName
             };
-            var db = Simple.Data.Database.OpenNamedConnection("DocumentsDBConnectionString");
+            var db = Simple.Data.Database.OpenNamedConnection(ConnectionStringName);
             db.Documents.Insert(document);
 
             using (var client = TestServerHttpClientFactory.Create(userName))
@@ -70,7 +72,7 @@ namespace Sample.Documents.Api.IntegrationTests
         [Theory]
         [AutoData]
         [UseDatabase]
-        public void DELETE_lock_on_document_clears_checked_out_by_db_column(
+        public void DELETE_lock_on_document_clears_checkedOutBy_db_column(
             Guid documentId,
             string userName)
         {
@@ -81,7 +83,7 @@ namespace Sample.Documents.Api.IntegrationTests
                 Content = "not empty content1",
                 CheckedOutBy = userName
             };
-            var db = Simple.Data.Database.OpenNamedConnection("DocumentsDBConnectionString");
+            var db = Simple.Data.Database.OpenNamedConnection(ConnectionStringName);
             db.Documents.Insert(document);
 
             using (var client = TestServerHttpClientFactory.Create(userName))
@@ -98,7 +100,7 @@ namespace Sample.Documents.Api.IntegrationTests
         [Theory]
         [AutoData]
         [UseDatabase]
-        public void DELETE_lock_put_by_another_user_returns_conflict_and_does_not_change_the_db(
+        public void DELETE_lock_put_by_another_user_returns_conflict_and_does_not_change_data_in_db(
             Guid documentId,
             string userName,
             string anotherUser)
@@ -110,7 +112,7 @@ namespace Sample.Documents.Api.IntegrationTests
                 Content = "not empty content1",
                 CheckedOutBy = anotherUser
             };
-            var db = Simple.Data.Database.OpenNamedConnection("DocumentsDBConnectionString");
+            var db = Simple.Data.Database.OpenNamedConnection(ConnectionStringName);
             db.Documents.Insert(document);
 
             using (var client = TestServerHttpClientFactory.Create(userName))

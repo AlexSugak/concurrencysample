@@ -19,6 +19,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.Api.Shared", "Sample
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.Api.Shared.Tests", "Sample.Api.Shared.Tests\Sample.Api.Shared.Tests.csproj", "{98D7A510-BEFF-48C8-9378-3263C2CFD011}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.Tickets.Api.IntegrationTests", "Sample.Tickets.Api.IntegrationTests\Sample.Tickets.Api.IntegrationTests.csproj", "{BD7290B8-0822-439C-9A6C-97CD5C553757}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.Tickets.Api", "Sample.Tickets.Api\Sample.Tickets.Api.csproj", "{AB39441C-6866-4CE0-A178-77FE8BC978BA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -56,6 +60,14 @@ Global
 		{98D7A510-BEFF-48C8-9378-3263C2CFD011}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{98D7A510-BEFF-48C8-9378-3263C2CFD011}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{98D7A510-BEFF-48C8-9378-3263C2CFD011}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD7290B8-0822-439C-9A6C-97CD5C553757}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD7290B8-0822-439C-9A6C-97CD5C553757}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD7290B8-0822-439C-9A6C-97CD5C553757}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD7290B8-0822-439C-9A6C-97CD5C553757}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB39441C-6866-4CE0-A178-77FE8BC978BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB39441C-6866-4CE0-A178-77FE8BC978BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB39441C-6866-4CE0-A178-77FE8BC978BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB39441C-6866-4CE0-A178-77FE8BC978BA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

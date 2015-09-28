@@ -14,7 +14,7 @@ namespace Sample.Api.Shared.Tests
 
         public UseDatabaseAttribute()
         {
-            _connString = ConfigurationManager.ConnectionStrings["DocumentsDBConnectionString"].ConnectionString;
+            _connString = ConfigurationManager.ConnectionStrings["DBConnectionString"].ConnectionString;
         }
 
         public override void Before(System.Reflection.MethodInfo methodUnderTest)

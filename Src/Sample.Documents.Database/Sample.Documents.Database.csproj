@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Mig_201509282021_AddTicketsTable.cs" />
     <Compile Include="Runner.cs" />
     <Compile Include="Mig_201509222320_CreateInitialSchema.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

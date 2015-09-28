@@ -91,6 +91,8 @@ namespace Sample.Documents.Api.IntegrationTests
 
         // now we do the "spike", i.e. tests that force us to implement everything down to the database
 
+        private const string ConnectionStringName = "DBConnectionString";
+
         [Theory]
         [AutoData]
         [UseDatabase]
@@ -110,7 +112,7 @@ namespace Sample.Documents.Api.IntegrationTests
 
             var expected = document.ToJObject();
 
-            var db = Simple.Data.Database.OpenNamedConnection("DocumentsDBConnectionString");
+            var db = Simple.Data.Database.OpenNamedConnection(ConnectionStringName);
             db.Documents.Insert(document);
 
             using (var client = TestServerHttpClientFactory.Create(userName))
@@ -138,7 +140,7 @@ namespace Sample.Documents.Api.IntegrationTests
                 client.PostAsJsonAsync("/api/documents", document).Wait();
             }
 
-            var db = Simple.Data.Database.OpenNamedConnection("DocumentsDBConnectionString");
+            var db = Simple.Data.Database.OpenNamedConnection(ConnectionStringName);
             var dbDocuments = db.Documents.All();
 
             Assert.Equal(1, dbDocuments.Count());
@@ -165,7 +167,7 @@ namespace Sample.Documents.Api.IntegrationTests
                 CheckedOutBy = userName
             };
 
-            var db = Simple.Data.Database.OpenNamedConnection("DocumentsDBConnectionString");
+            var db = Simple.Data.Database.OpenNamedConnection(ConnectionStringName);
             db.Documents.Insert(dbDocument);
 
             var updatedDocument = new
@@ -206,7 +208,7 @@ namespace Sample.Documents.Api.IntegrationTests
                 CheckedOutBy = anotherUserName
             };
 
-            var db = Simple.Data.Database.OpenNamedConnection("DocumentsDBConnectionString");
+            var db = Simple.Data.Database.OpenNamedConnection(ConnectionStringName);
             db.Documents.Insert(dbDocument);
 
             var updatedDocument = new
@@ -245,7 +247,7 @@ namespace Sample.Documents.Api.IntegrationTests
                 CheckedOutBy = userName
             };
 
-            var db = Simple.Data.Database.OpenNamedConnection("DocumentsDBConnectionString");
+            var db = Simple.Data.Database.OpenNamedConnection(ConnectionStringName);
             db.Documents.Insert(dbDocument);
 
             using (var client = TestServerHttpClientFactory.Create(userName))
@@ -279,7 +281,7 @@ namespace Sample.Documents.Api.IntegrationTests
                 CheckedOutBy = userName
             };
 
-            var db = Simple.Data.Database.OpenNamedConnection("DocumentsDBConnectionString");
+            var db = Simple.Data.Database.OpenNamedConnection(ConnectionStringName);
             db.Documents.Insert(dbDocument);
 
             using (var client = TestServerHttpClientFactory.Create(userName))

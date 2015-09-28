@@ -19,7 +19,7 @@ namespace Sample.Documents.Api
     {
         public void Configuration(IAppBuilder app)
         {
-            var connectionString = ConfigurationManager.ConnectionStrings["DocumentsDBConnectionString"].ConnectionString;
+            var connectionString = ConfigurationManager.ConnectionStrings["DBConnectionString"].ConnectionString;
 
             var getAllDocumentsQuery = new GetAllDocumentsSqlQuery(connectionString);
             var getDocumentQuery = new GetDocumentSqlQuery(connectionString);
