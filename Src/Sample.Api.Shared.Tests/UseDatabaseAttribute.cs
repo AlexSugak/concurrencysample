@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Configuration;
-using Sample.Documents.Database;
+using Sample.Database;
 using Xunit;
+using System.Data.SqlClient;
 
 namespace Sample.Api.Shared.Tests
 {

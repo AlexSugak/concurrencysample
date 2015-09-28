@@ -9,7 +9,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sample.Documents.Database
+namespace Sample.Database
 {
     public class MigrationOptions : IMigrationProcessorOptions
     {
@@ -27,7 +27,7 @@ namespace Sample.Documents.Database
 
             var migrationContext = new RunnerContext(announcer)
             {
-                Namespace = "Sample.Documents.Database"
+                Namespace = typeof(Runner).Namespace
             };
 
             var options = new MigrationOptions { PreviewOnly = false, Timeout = 60 };
@@ -46,7 +46,7 @@ namespace Sample.Documents.Database
 
             var migrationContext = new RunnerContext(announcer)
             {
-                Namespace = "Sample.Documents.Database"
+                Namespace = typeof(Runner).Namespace
             };
 
             var options = new MigrationOptions { PreviewOnly = false, Timeout = 60 };
@@ -54,7 +54,7 @@ namespace Sample.Documents.Database
             using (var processor = factory.Create(connectionString, announcer, options))
             {
                 var runner = new MigrationRunner(assembly, migrationContext, processor);
-                runner.Rollback(1);
+                runner.Rollback(Int32.MaxValue);
             }
         }
 

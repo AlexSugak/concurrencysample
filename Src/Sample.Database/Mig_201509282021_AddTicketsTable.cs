@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sample.Documents.Database
+namespace Sample.Database
 {
     [Migration(201509282021)]
     public class Mig_201509282021_AddTicketsTable : Migration

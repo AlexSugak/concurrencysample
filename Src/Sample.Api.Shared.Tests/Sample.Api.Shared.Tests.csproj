@@ -132,9 +132,9 @@
       <Project>{9d783ed9-7cc8-48f9-be61-d3101ae20df9}</Project>
       <Name>Sample.Api.Shared</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Sample.Documents.Database\Sample.Documents.Database.csproj">
+    <ProjectReference Include="..\Sample.Database\Sample.Database.csproj">
       <Project>{a9af4508-571d-44f2-845b-0280547fa5a5}</Project>
-      <Name>Sample.Documents.Database</Name>
+      <Name>Sample.Database</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -1,12 +1,9 @@
-﻿using Microsoft.Owin.Hosting;
-using Sample.Documents.Api;
-using Sample.Documents.Database;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Configuration;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Owin.Hosting;
+using Sample.Database;
+using Sample.Documents.Api;
 
 namespace Sample.Api.ConsoleHost
 {

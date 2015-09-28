@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sample.Documents.Database
+namespace Sample.Database
 {
     [Migration(201509222320)]
     public class Mig_201509222320_CreateInitialSchema : Migration
