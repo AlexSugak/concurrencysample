@@ -87,6 +87,7 @@
     <Compile Include="CompositionRoot.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\TicketsController.cs" />
+    <Compile Include="CreatedResultWithETag.cs" />
     <Compile Include="Exceptions\TicketNotFoundException.cs" />
     <Compile Include="OkResultWithETag.cs" />
     <Compile Include="OwinStartup.cs" />

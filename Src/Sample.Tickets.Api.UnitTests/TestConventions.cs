@@ -12,6 +12,7 @@ using Sample.Api.Shared.Tests;
 using Sample.Tickets.Api.Controllers;
 using Sample.Tickets.Api.Queries;
 using Sample.Tickets.Api.Commands;
+using System.Web.Http.Routing;
 
 namespace Sample.Tickets.Api.UnitTests
 {
@@ -36,7 +37,7 @@ namespace Sample.Tickets.Api.UnitTests
                     fixture.Create<Mock<ICommand<Ticket>>>().Object,
                     fixture.Create<Mock<ICommand<Ticket>>>().Object,
                     fixture.Create<Mock<ICommand<Guid>>>().Object
-                    ));
+                    ) { Url = fixture.Create<Mock<UrlHelper>>().Object });
         }
     }
 }

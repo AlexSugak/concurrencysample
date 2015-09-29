@@ -53,7 +53,7 @@ namespace Sample.Tickets.Api.Controllers
             }));
         }
 
-        [Route("{ticketId}")]
+        [Route("{ticketId}", Name="GetTicketById")]
         public IHttpActionResult Get(Guid ticketId)
         {
             return InvokeWhenUserExists(userName => 
@@ -81,15 +81,23 @@ namespace Sample.Tickets.Api.Controllers
         [Route]
         public IHttpActionResult Post(TicketModel model)
         {
-            var id = Guid.NewGuid();
-            var newTicket = Mapper.Map<Ticket>(model);
-            newTicket.TicketId = id;
+            return InvokeWhenUserExists(userName =>
+            {
+                var id = Guid.NewGuid();
+                var newTicket = Mapper.Map<Ticket>(model);
+                newTicket.TicketId = id;
 
-            _addTicketCmd.Execute(new Envelope<Ticket>(
-                                                    newTicket, 
-                                                    "bob"));
+                _addTicketCmd.Execute(new Envelope<Ticket>(newTicket, "bob"));
 
-            return this.Created("", model);
+                var ticket = _getTicketQuery.Execute(id);
+                var response = Mapper.Map<TicketResponseModel>(ticket);
+
+                var uri = this.Url.Link("GetTicketById", new { ticketId = id });
+                return new CreatedResultWithETag<TicketResponseModel>(new Uri(uri), response, this)
+                {
+                    ETagValue = ticket.Version.ToString()
+                };
+            });
         }
 
         [Route("{ticketId}")]

@@ -11,6 +11,7 @@ using Sample.Tickets.Api.Queries;
 using Sample.Api.Shared;
 using System.Net.Http;
 using Sample.Tickets.Api.Exceptions;
+using System.Web.Http.Routing;
 
 namespace Sample.Tickets.Api.UnitTests
 {
@@ -109,6 +110,84 @@ namespace Sample.Tickets.Api.UnitTests
             var actual = sut.Get(ticketId);
 
             actual.Should().BeOfType<NotFoundResult>("because TicketNotFoundException was thrown by query");
+        }
+
+        [Theory]
+        [TicketsControllerAutoData]
+        public void post_returns_403_unauthorized_if_no_auth_header(
+            TicketModel ticket,
+            TicketsController sut)
+        {
+            var actual = sut.Post(ticket);
+
+            actual.Should().BeOfType<UnauthorizedResult>("because user name query returned nothing");
+        }
+
+        [Theory]
+        [TicketsControllerAutoData]
+        public void post_returns_201_created_with_correct_location_on_success(
+            string userName,
+            TicketModel ticket,
+            [Frozen]Mock<IUserNameQuery> userQuery,
+            [Frozen]Mock<UrlHelper> url,
+            TicketsController sut)
+        {
+            var createdUri = "http://localhost:8051/api/tickets/123";
+            url.Setup(u => u.Link(It.IsAny<string>(), It.IsAny<object>()))
+                            .Returns(createdUri);
+            userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>())).Returns(userName);
+
+            var actual = sut.Post(ticket);
+
+            actual.Should().BeOfType<CreatedResultWithETag<TicketResponseModel>>()
+                  .Which.Location.OriginalString.Should().Be(createdUri);
+        }
+
+        [Theory]
+        [TicketsControllerAutoData]
+        public void post_returns_created_ticket_on_success(
+            string userName,
+            TicketModel ticket,
+            TicketDetails ticketDetails,
+            [Frozen]Mock<IUserNameQuery> userQuery,
+            [Frozen]Mock<IGetTicketByIdQuery> ticketQuery,
+            [Frozen]Mock<UrlHelper> url,
+            TicketsController sut)
+        {
+            var createdUri = "http://localhost:8051/api/tickets/123";
+            url.Setup(u => u.Link(It.IsAny<string>(), It.IsAny<object>()))
+                            .Returns(createdUri);
+            userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>())).Returns(userName);
+            ticketQuery.Setup(q => q.Execute(It.IsAny<Guid>())).Returns(ticketDetails);
+
+            var actual = sut.Post(ticket);
+
+            actual.Should().BeOfType<CreatedResultWithETag<TicketResponseModel>>()
+                  .Which.Content.ShouldBeEquivalentTo(ticketDetails, options => options.ExcludingMissingMembers());
+        }
+
+        [Theory]
+        [TicketsControllerAutoData]
+        public void post_returns_ticket_etag_on_success(
+            string userName,
+            TicketModel ticket,
+            TicketDetails ticketDetails,
+            [Frozen]Mock<IUserNameQuery> userQuery,
+            [Frozen]Mock<IGetTicketByIdQuery> ticketQuery,
+            [Frozen]Mock<UrlHelper> url,
+            TicketsController sut)
+        {
+            var createdUri = "http://localhost:8051/api/tickets/123";
+            url.Setup(u => u.Link(It.IsAny<string>(), It.IsAny<object>()))
+                            .Returns(createdUri);
+            userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>())).Returns(userName);
+            ticketQuery.Setup(q => q.Execute(It.IsAny<Guid>())).Returns(ticketDetails);
+
+            var actual = sut.Post(ticket);
+
+
+            actual.Should().BeOfType<CreatedResultWithETag<TicketResponseModel>>()
+                  .Which.ETagValue.Should().Be(ticketDetails.Version.ToString());
         }
     }
 }
