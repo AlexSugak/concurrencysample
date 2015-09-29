@@ -41,7 +41,7 @@ namespace Sample.Tickets.Api.UnitTests
             var actual = sut.Get();
 
             actual.Should().BeOfType<OkNegotiatedContentResult<TicketsModel>>()
-                .Which.Content.Tickets.Select(t => t.Title).Should().Equal(tickets.Select(t => t.Title));
+                  .Which.Content.Tickets.Select(t => t.Title).Should().Equal(tickets.Select(t => t.Title));
         }
 
         [Theory]
@@ -71,7 +71,7 @@ namespace Sample.Tickets.Api.UnitTests
             var actual = sut.Get(ticketId);
 
             actual.Should().BeOfType<OkResultWithETag<TicketResponseModel>>()
-                .Which.Content.Should().ShouldBeEquivalentTo(ticket, options => options.ExcludingMissingMembers());
+                  .Which.Content.Should().ShouldBeEquivalentTo(ticket, options => options.ExcludingMissingMembers());
         }
 
         [Theory]
@@ -90,7 +90,7 @@ namespace Sample.Tickets.Api.UnitTests
             var actual = sut.Get(ticketId);
 
             actual.Should().BeOfType<OkResultWithETag<TicketResponseModel>>()
-                .Which.ETagValue.Should().Be(ticket.Version.ToString());
+                  .Which.ETagValue.Should().Be(ticket.Version.ToString());
         }
 
         [Theory]

@@ -68,8 +68,9 @@ namespace Sample.Tickets.Api.Controllers
                     return this.NotFound();
                 }
 
+                var ticketResponse = Mapper.Map<TicketResponseModel>(ticket);
                 return new OkResultWithETag<TicketResponseModel>(
-                        Mapper.Map<TicketResponseModel>(ticket),
+                        ticketResponse,
                         this)
                     {
                         ETagValue = ticket.Version.ToString()
@@ -83,7 +84,6 @@ namespace Sample.Tickets.Api.Controllers
             var id = Guid.NewGuid();
             var newTicket = Mapper.Map<Ticket>(model);
             newTicket.TicketId = id;
-            newTicket.Version = Guid.NewGuid();
 
             _addTicketCmd.Execute(new Envelope<Ticket>(
                                                     newTicket, 
@@ -97,7 +97,6 @@ namespace Sample.Tickets.Api.Controllers
         {
             var newTicket = Mapper.Map<Ticket>(model);
             newTicket.TicketId = ticketId;
-            newTicket.Version = Guid.NewGuid();
 
             _updateTicketCmd.Execute(new Envelope<Ticket>(
                                                     newTicket,

@@ -16,7 +16,6 @@ namespace Sample.Tickets.Api.Commands
         public string AssignedTo { get; set; }
         public string Severity { get; set; }
         public string Status { get; set; }
-        public Guid Version { get; set; }
     }
 
     public class SubmitNewTicketSqlCommand : ICommand<Ticket>
@@ -34,9 +33,9 @@ namespace Sample.Tickets.Api.Commands
             {
                 connection.Open();
                 string cmdText = @"INSERT INTO [dbo].[Tickets] 
-                                   ([Id], [Title], [Description], [Severity], [Status], [AssignedTo], [Version]) 
+                                   ([Id], [Title], [Description], [Severity], [Status], [AssignedTo]) 
                                    VALUES 
-                                   (@id, @title, @description, @severity, @status, @assignedTo, @version)";
+                                   (@id, @title, @description, @severity, @status, @assignedTo)";
                 using (var cmd = new SqlCommand(cmdText, connection))
                 {
                     cmd.Parameters.Add(new SqlParameter("@id", ticket.Item.TicketId));
@@ -45,7 +44,6 @@ namespace Sample.Tickets.Api.Commands
                     cmd.Parameters.Add(new SqlParameter("@severity", ticket.Item.Severity));
                     cmd.Parameters.Add(new SqlParameter("@status", ticket.Item.Status));
                     cmd.Parameters.Add(new SqlParameter("@assignedTo", ticket.Item.AssignedTo));
-                    cmd.Parameters.Add(new SqlParameter("@version", ticket.Item.Version));
 
                     cmd.ExecuteNonQuery();
                 }

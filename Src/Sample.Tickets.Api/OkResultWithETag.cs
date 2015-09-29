@@ -29,7 +29,14 @@ namespace Sample.Tickets.Api
         {
             HttpResponseMessage response = await base.ExecuteAsync(cancellationToken);
 
-            response.Headers.ETag = new EntityTagHeaderValue(this.ETagValue);
+            try
+            {
+                response.Headers.ETag = new EntityTagHeaderValue("\"" + this.ETagValue + "\"");
+            }
+            catch(Exception e)
+            {
+                throw e;
+            }
 
             return response;
         }

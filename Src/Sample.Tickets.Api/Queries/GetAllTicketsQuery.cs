@@ -15,7 +15,7 @@ namespace Sample.Tickets.Api.Queries
         public string AssignedTo { get; set; }
         public string Severity { get; set; }
         public string Status { get; set; }
-        public Guid Version { get; set; }
+        public ulong Version { get; set; }
     }
 
     public interface IGetAllTicketsQuery
@@ -52,7 +52,7 @@ namespace Sample.Tickets.Api.Queries
                                 Severity = (string)reader["Severity"],
                                 Status = (string)reader["Status"],
                                 AssignedTo = reader["AssignedTo"] as string,
-                                Version = (Guid)reader["Version"]
+                                Version = BitConverter.ToUInt64(((byte[])reader["Version"]).Reverse().ToArray(), 0)
                             };
                         }
                     }

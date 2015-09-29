@@ -48,7 +48,7 @@ namespace Sample.Tickets.Api.Queries
                             Severity = (string)reader["Severity"],
                             Status = (string)reader["Status"],
                             AssignedTo = reader["AssignedTo"] as string,
-                            Version = (Guid)reader["Version"]
+                            Version = BitConverter.ToUInt64(((byte[])reader["Version"]).Reverse().ToArray(), 0)
                         };
                     }
                 }

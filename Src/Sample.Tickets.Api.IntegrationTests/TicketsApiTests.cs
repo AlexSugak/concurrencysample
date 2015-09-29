@@ -144,8 +144,7 @@ namespace Sample.Tickets.Api.IntegrationTests
             string description,
             string severity,
             string assignedTo,
-            string status,
-            Guid version
+            string status
             )
         {
             using (var client = TestServerHttpClientFactory.Create(userName))
@@ -157,8 +156,7 @@ namespace Sample.Tickets.Api.IntegrationTests
                     Description = description,
                     AssignedTo = assignedTo,
                     Severity = severity,
-                    Status = status,
-                    Version = version
+                    Status = status
                 };
 
                 var db = Simple.Data.Database.OpenNamedConnection(ConnectionStringName);
@@ -192,8 +190,7 @@ namespace Sample.Tickets.Api.IntegrationTests
             string newDescription,
             string newSeverity,
             string newAssignedTo,
-            string newStatus,
-            Guid version
+            string newStatus
             )
         {
             using (var client = TestServerHttpClientFactory.Create(userName))
@@ -205,8 +202,7 @@ namespace Sample.Tickets.Api.IntegrationTests
                     Description = description,
                     AssignedTo = assignedTo,
                     Severity = severity,
-                    Status = status,
-                    Version = version
+                    Status = status
                 };
 
                 var db = Simple.Data.Database.OpenNamedConnection(ConnectionStringName);
@@ -245,8 +241,7 @@ namespace Sample.Tickets.Api.IntegrationTests
             string description,
             string severity,
             string assignedTo,
-            string status,
-            Guid version
+            string status
             )
         {
             using (var client = TestServerHttpClientFactory.Create(userName))
@@ -258,8 +253,7 @@ namespace Sample.Tickets.Api.IntegrationTests
                     Description = description,
                     AssignedTo = assignedTo,
                     Severity = severity,
-                    Status = status,
-                    Version = version
+                    Status = status
                 };
 
                 var db = Simple.Data.Database.OpenNamedConnection(ConnectionStringName);

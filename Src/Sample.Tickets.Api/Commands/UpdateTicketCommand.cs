@@ -28,8 +28,7 @@ namespace Sample.Tickets.Api.Commands
                                     [Description] = @description, 
                                     [Severity] = @severity,
                                     [Status] = @status,
-                                    [AssignedTo] = @assignedTo,
-                                    [Version] = @version
+                                    [AssignedTo] = @assignedTo
                                    WHERE [Id] = @id";
                 using (var cmd = new SqlCommand(cmdText, connection))
                 {
@@ -39,7 +38,6 @@ namespace Sample.Tickets.Api.Commands
                     cmd.Parameters.Add(new SqlParameter("@severity", ticket.Item.Severity));
                     cmd.Parameters.Add(new SqlParameter("@status", ticket.Item.Status));
                     cmd.Parameters.Add(new SqlParameter("@assignedTo", ticket.Item.AssignedTo));
-                    cmd.Parameters.Add(new SqlParameter("@version", ticket.Item.Version));
 
                     cmd.ExecuteNonQuery();
                 }
