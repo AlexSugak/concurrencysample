@@ -83,17 +83,21 @@
   <ItemGroup>
     <Compile Include="Commands\DeleteTicketCommand.cs" />
     <Compile Include="Commands\SubmitNewTicketCommand.cs" />
+    <Compile Include="Commands\TicketConcurrentUpdatesDetector.cs" />
+    <Compile Include="Commands\TicketValidator.cs" />
     <Compile Include="Commands\UpdateTicketCommand.cs" />
     <Compile Include="CompositionRoot.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\TicketsController.cs" />
     <Compile Include="CreatedResultWithETag.cs" />
+    <Compile Include="Exceptions\OptimisticConcurrencyException.cs" />
     <Compile Include="Exceptions\TicketNotFoundException.cs" />
     <Compile Include="OkResultWithETag.cs" />
     <Compile Include="OwinStartup.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Queries\GetAllTicketsQuery.cs" />
     <Compile Include="Queries\GetTicketByIdQuery.cs" />
+    <Compile Include="Queries\GetTicketVersionQuery.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

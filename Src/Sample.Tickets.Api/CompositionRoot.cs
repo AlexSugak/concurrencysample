@@ -20,7 +20,8 @@ namespace Sample.Tickets.Api
         private readonly IGetTicketByIdQuery _getTicketQuery;
         private readonly ICommand<Ticket> _addTicketCmd;
         private readonly ICommand<Ticket> _updateTicketCmd;
-        private readonly ICommand<Guid> _deleteTicketCmd;
+        private readonly ICommand<TicketReference> _deleteTicketCmd;
+        private readonly IGetTicketVersionQuery _getVersionQuery;
 
         public CompositionRoot(
             IUserNameQuery userQuery,
@@ -28,7 +29,8 @@ namespace Sample.Tickets.Api
             IGetTicketByIdQuery getTicketQuery,
             ICommand<Ticket> addTicketCmd,
             ICommand<Ticket> updateTicketCmd,
-            ICommand<Guid> deleteTicketCmd)
+            ICommand<TicketReference> deleteTicketCmd,
+            IGetTicketVersionQuery getVersionQuery)
         {
             _userQuery = userQuery;
             _allTicketsQuery = allTicketsQuery;
@@ -36,6 +38,7 @@ namespace Sample.Tickets.Api
             _addTicketCmd = addTicketCmd;
             _updateTicketCmd = updateTicketCmd;
             _deleteTicketCmd = deleteTicketCmd;
+            _getVersionQuery = getVersionQuery;
         }
 
         public IHttpController Create(HttpRequestMessage request, HttpControllerDescriptor controllerDescriptor, Type controllerType)
@@ -53,7 +56,8 @@ namespace Sample.Tickets.Api
                     _getTicketQuery, 
                     _addTicketCmd, 
                     _updateTicketCmd,
-                    _deleteTicketCmd);
+                    _deleteTicketCmd,
+                    _getVersionQuery);
             }
 
             throw new NotSupportedException(string.Format("Controller type {0} not supported", controllerType.FullName));

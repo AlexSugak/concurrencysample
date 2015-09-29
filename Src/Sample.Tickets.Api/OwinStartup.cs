@@ -23,9 +23,18 @@ namespace Sample.Tickets.Api
             var userNameQuery = new SimppleTokenUserNameQuery();
             var allTicketsQuery = new GetAllTicketsSqlQuery(connectionString);
             var getTicketQuery = new GetTicketByIdQuerySqlQuery(connectionString);
-            var addTicketCmd = new SubmitNewTicketSqlCommand(connectionString);
-            var updateTicketCmd = new UpdateTicketSqlCommand(connectionString);
-            var deleteTicketCmd = new DeleteTicketSqlCommand(connectionString);
+            var getVersionQuery = new IfMatchHttpHeaderTicketVersionQuery();
+            var addTicketCmd = new TicketValidator(
+                                    new SubmitNewTicketSqlCommand(connectionString));
+            var updateTicketCmd = new TransactedCommand<Ticket>(
+                                    new TicketConcurrentUpdatesDetector<Ticket>(
+                                        new TicketValidator(
+                                            new UpdateTicketSqlCommand(connectionString)),
+                                        getTicketQuery));
+            var deleteTicketCmd = new TransactedCommand<TicketReference>(
+                                    new TicketConcurrentUpdatesDetector<TicketReference>(
+                                        new DeleteTicketSqlCommand(connectionString),
+                                        getTicketQuery));
 
             var compositon = new CompositionRoot(
                 userNameQuery, 
@@ -33,7 +42,8 @@ namespace Sample.Tickets.Api
                 getTicketQuery, 
                 addTicketCmd, 
                 updateTicketCmd,
-                deleteTicketCmd);
+                deleteTicketCmd,
+                getVersionQuery);
 
             var config = new HttpConfiguration();
             HttpConfigurator.Configure(config, compositon);

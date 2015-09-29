@@ -36,7 +36,8 @@ namespace Sample.Tickets.Api.UnitTests
                     fixture.Create<Mock<IGetTicketByIdQuery>>().Object,
                     fixture.Create<Mock<ICommand<Ticket>>>().Object,
                     fixture.Create<Mock<ICommand<Ticket>>>().Object,
-                    fixture.Create<Mock<ICommand<Guid>>>().Object
+                    fixture.Create<Mock<ICommand<TicketReference>>>().Object,
+                    fixture.Create<Mock<IGetTicketVersionQuery>>().Object
                     ) { Url = fixture.Create<Mock<UrlHelper>>().Object });
         }
     }

@@ -8,7 +8,13 @@ using System.Threading.Tasks;
 
 namespace Sample.Tickets.Api.Commands
 {
-    public class Ticket
+    public interface ITicketReference
+    {
+        Guid TicketId { get; }
+        ulong ExpectedVersion { get; }
+    }
+
+    public class Ticket : ITicketReference
     {
         public Guid TicketId { get; set; }
         public string Title { get; set; }
@@ -16,6 +22,7 @@ namespace Sample.Tickets.Api.Commands
         public string AssignedTo { get; set; }
         public string Severity { get; set; }
         public string Status { get; set; }
+        public ulong ExpectedVersion { get; set; }
     }
 
     public class SubmitNewTicketSqlCommand : ICommand<Ticket>

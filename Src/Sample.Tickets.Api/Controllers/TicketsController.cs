@@ -7,6 +7,8 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -20,7 +22,8 @@ namespace Sample.Tickets.Api.Controllers
         private readonly IGetTicketByIdQuery _getTicketQuery;
         private readonly ICommand<Ticket> _addTicketCmd;
         private readonly ICommand<Ticket> _updateTicketCmd;
-        private readonly ICommand<Guid> _deleteTicketCmd;
+        private readonly ICommand<TicketReference> _deleteTicketCmd;
+        private readonly IGetTicketVersionQuery _versionQuery;
 
         static TicketsController()
         {
@@ -34,7 +37,8 @@ namespace Sample.Tickets.Api.Controllers
             IGetTicketByIdQuery getTicketQuery,
             ICommand<Ticket> addTicketCmd,
             ICommand<Ticket> updateTicketCmd,
-            ICommand<Guid> deleteTicketCmd)
+            ICommand<TicketReference> deleteTicketCmd,
+            IGetTicketVersionQuery versionQuery)
             : base(userQuery)
         {
             _getTicketQuery = getTicketQuery;
@@ -42,6 +46,7 @@ namespace Sample.Tickets.Api.Controllers
             _addTicketCmd = addTicketCmd;
             _updateTicketCmd = updateTicketCmd;
             _deleteTicketCmd = deleteTicketCmd;
+            _versionQuery = versionQuery;
         }
 
         [Route]
@@ -69,12 +74,10 @@ namespace Sample.Tickets.Api.Controllers
                 }
 
                 var ticketResponse = Mapper.Map<TicketResponseModel>(ticket);
-                return new OkResultWithETag<TicketResponseModel>(
-                        ticketResponse,
-                        this)
-                    {
-                        ETagValue = ticket.Version.ToString()
-                    };
+                return new OkResultWithETag<TicketResponseModel>(ticketResponse, this)
+                {
+                    ETagValue = ticket.Version.ToString()
+                };
             });
         }
 
@@ -87,7 +90,14 @@ namespace Sample.Tickets.Api.Controllers
                 var newTicket = Mapper.Map<Ticket>(model);
                 newTicket.TicketId = id;
 
-                _addTicketCmd.Execute(new Envelope<Ticket>(newTicket, "bob"));
+                try
+                {
+                    _addTicketCmd.Execute(new Envelope<Ticket>(newTicket, userName));
+                }
+                catch(ValidationException e)
+                {
+                    return this.BadRequest(e.Message);
+                }
 
                 var ticket = _getTicketQuery.Execute(id);
                 var response = Mapper.Map<TicketResponseModel>(ticket);
@@ -103,24 +113,65 @@ namespace Sample.Tickets.Api.Controllers
         [Route("{ticketId}")]
         public IHttpActionResult Put(Guid ticketId, TicketModel model)
         {
-            var newTicket = Mapper.Map<Ticket>(model);
-            newTicket.TicketId = ticketId;
+            return InvokeWhenUserExists(userName =>
+            {
+                var newTicket = Mapper.Map<Ticket>(model);
+                newTicket.TicketId = ticketId;
+                newTicket.ExpectedVersion = _versionQuery.Execute(this.Request);
 
-            _updateTicketCmd.Execute(new Envelope<Ticket>(
-                                                    newTicket,
-                                                    "bob"));
+                try
+                {
+                    _updateTicketCmd.Execute(new Envelope<Ticket>(newTicket, userName));
+                }
+                catch(ValidationException e)
+                {
+                    return this.BadRequest(e.Message);
+                }
+                catch(TicketNotFoundException)
+                {
+                    return this.NotFound();
+                }
+                catch(OptimisticConcurrencyException e)
+                {
+                    return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.PreconditionFailed) 
+                    { 
+                        Content = new StringContent(e.Message) 
+                    });
+                }
 
-            return this.Created("", model);
+                var ticket = _getTicketQuery.Execute(ticketId);
+                var response = Mapper.Map<TicketResponseModel>(ticket);
+
+                return new OkResultWithETag<TicketResponseModel>(response, this)
+                {
+                    ETagValue = ticket.Version.ToString()
+                };
+            });
         }
 
         [Route("{ticketId}")]
         public IHttpActionResult Delete(Guid ticketId)
         {
-            _deleteTicketCmd.Execute(new Envelope<Guid>(
-                                                    ticketId,
-                                                    "bob"));
+            return InvokeWhenUserExists(userName =>
+            {
+                try
+                {
+                    _deleteTicketCmd.Execute(new Envelope<TicketReference>(
+                                                            new TicketReference(
+                                                                ticketId, 
+                                                                _versionQuery.Execute(this.Request)), 
+                                                            userName));
+                }
+                catch(OptimisticConcurrencyException e)
+                {
+                    return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.PreconditionFailed)
+                    {
+                        Content = new StringContent(e.Message)
+                    });
+                }
 
-            return this.Ok();
+                return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.NoContent));
+            });
         }
     }
 

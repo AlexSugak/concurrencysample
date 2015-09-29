@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
 using Xunit.Extensions;
+using System.Net.Http.Headers;
+using System.Net;
 
 namespace Sample.Tickets.Api.IntegrationTests
 {
@@ -217,6 +219,9 @@ namespace Sample.Tickets.Api.IntegrationTests
                     assignedTo = newAssignedTo,
                 };
 
+                var version = client.GetAsync("/api/tickets/" + ticketId).Result.Headers.ETag.Tag;
+                client.DefaultRequestHeaders.IfMatch.Add(new EntityTagHeaderValue(version));
+
                 client.PutAsJsonAsync("/api/tickets/" + ticketId, json).Wait();
 
                 var response = client.GetAsync("/api/tickets/" + ticketId).Result;
@@ -228,6 +233,56 @@ namespace Sample.Tickets.Api.IntegrationTests
                 Assert.Equal(newAssignedTo, actual.assignedTo.ToString());
                 Assert.Equal(newSeverity, actual.severity.ToString());
                 Assert.Equal(newStatus, actual.status.ToString());
+            }
+        }
+
+        [Theory]
+        [AutoData]
+        [UseDatabase]
+        public void PUT_ticket_returns_precondition_failed_if_version_doesnt_match(
+            Guid ticketId,
+            string userName,
+            string title,
+            string description,
+            string severity,
+            string assignedTo,
+            string status,
+            string newTitle,
+            string newDescription,
+            string newSeverity,
+            string newAssignedTo,
+            string newStatus
+            )
+        {
+            using (var client = TestServerHttpClientFactory.Create(userName))
+            {
+                var ticket = new
+                {
+                    Id = ticketId,
+                    Title = title,
+                    Description = description,
+                    AssignedTo = assignedTo,
+                    Severity = severity,
+                    Status = status
+                };
+
+                var db = Simple.Data.Database.OpenNamedConnection(ConnectionStringName);
+                db.Tickets.Insert(ticket);
+
+                var json = new
+                {
+                    title = newTitle,
+                    description = newDescription,
+                    severity = newSeverity,
+                    status = newStatus,
+                    assignedTo = newAssignedTo,
+                };
+
+                client.DefaultRequestHeaders.IfMatch.Add(new EntityTagHeaderValue("\"34534543\""));
+
+                var response = client.PutAsJsonAsync("/api/tickets/" + ticketId, json).Result;
+
+                Assert.Equal(HttpStatusCode.PreconditionFailed, response.StatusCode);
             }
         }
 
@@ -258,6 +313,9 @@ namespace Sample.Tickets.Api.IntegrationTests
 
                 var db = Simple.Data.Database.OpenNamedConnection(ConnectionStringName);
                 db.Tickets.Insert(ticket);
+
+                var version = client.GetAsync("/api/tickets/" + ticketId).Result.Headers.ETag.Tag;
+                client.DefaultRequestHeaders.IfMatch.Add(new EntityTagHeaderValue(version));
 
                 client.DeleteAsync("/api/tickets/" + ticketId).Wait();
 

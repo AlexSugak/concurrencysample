@@ -12,6 +12,8 @@ using Sample.Api.Shared;
 using System.Net.Http;
 using Sample.Tickets.Api.Exceptions;
 using System.Web.Http.Routing;
+using Sample.Tickets.Api.Commands;
+using System.Net;
 
 namespace Sample.Tickets.Api.UnitTests
 {
@@ -185,9 +187,162 @@ namespace Sample.Tickets.Api.UnitTests
 
             var actual = sut.Post(ticket);
 
-
             actual.Should().BeOfType<CreatedResultWithETag<TicketResponseModel>>()
                   .Which.ETagValue.Should().Be(ticketDetails.Version.ToString());
+        }
+
+        [Theory]
+        [TicketsControllerAutoData]
+        public void post_returns_400_bad_request_on_validation_error(
+            string userName,
+            TicketModel ticket,
+            ValidationException exception,
+            [Frozen]Mock<IUserNameQuery> userQuery,
+            [Frozen]Mock<ICommand<Ticket>> addCmd,
+            TicketsController sut)
+        {
+            userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>())).Returns(userName);
+            addCmd.Setup(cmd => cmd.Execute(It.IsAny<Envelope<Ticket>>())).Throws(exception);
+
+            var actual = sut.Post(ticket);
+
+            actual.Should().BeOfType<BadRequestErrorMessageResult>();
+        }
+
+        [Theory]
+        [TicketsControllerAutoData]
+        public void put_returns_403_unauthorized_if_no_auth_header(
+            Guid ticketId,
+            TicketModel ticket,
+            TicketsController sut)
+        {
+            var actual = sut.Put(ticketId, ticket);
+
+            actual.Should().BeOfType<UnauthorizedResult>("because user name query returned nothing");
+        }
+
+        [Theory]
+        [TicketsControllerAutoData]
+        public void put_returns_200_ok_with_correct_etag_on_success(
+            string userName,
+            Guid ticketId,
+            TicketModel ticket,
+            TicketDetails ticketDetails,
+            [Frozen]Mock<IUserNameQuery> userQuery,
+            [Frozen]Mock<IGetTicketByIdQuery> ticketQuery,
+            TicketsController sut)
+        {
+            userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>())).Returns(userName);
+            ticketQuery.Setup(q => q.Execute(It.IsAny<Guid>())).Returns(ticketDetails);
+
+            var actual = sut.Put(ticketId, ticket);
+
+            actual.Should().BeOfType<OkResultWithETag<TicketResponseModel>>()
+                .Which.ETagValue.Should().Be(ticketDetails.Version.ToString());
+        }
+
+        [Theory]
+        [TicketsControllerAutoData]
+        public void put_returns_412_precondition_failed_on_version_conflict(
+            string userName,
+            Guid ticketId,
+            TicketModel ticket,
+            OptimisticConcurrencyException exception,
+            [Frozen]Mock<IUserNameQuery> userQuery,
+            [Frozen]Mock<ICommand<Ticket>> updateCmd,
+            TicketsController sut)
+        {
+            userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>())).Returns(userName);
+            updateCmd.Setup(cmd => cmd.Execute(It.IsAny<Envelope<Ticket>>())).Throws(exception);
+
+            var actual = sut.Put(ticketId, ticket);
+
+            actual.Should().BeOfType<ResponseMessageResult>()
+                  .Which.Response.StatusCode.Should().Be(HttpStatusCode.PreconditionFailed);
+        }
+
+        [Theory]
+        [TicketsControllerAutoData]
+        public void put_returns_404_notfound_when_ticket_not_found(
+            string userName,
+            Guid ticketId,
+            TicketModel ticket,
+            TicketNotFoundException exception,
+            [Frozen]Mock<IUserNameQuery> userQuery,
+            [Frozen]Mock<ICommand<Ticket>> updateCmd,
+            TicketsController sut)
+        {
+            userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>())).Returns(userName);
+            updateCmd.Setup(cmd => cmd.Execute(It.IsAny<Envelope<Ticket>>())).Throws(exception);
+
+            var actual = sut.Put(ticketId, ticket);
+
+            actual.Should().BeOfType<NotFoundResult>("because TicketNotFoundException was thrown");
+        }
+
+        [Theory]
+        [TicketsControllerAutoData]
+        public void put_returns_400_bad_request_on_validation_error(
+            string userName,
+            TicketModel ticket,
+            Guid ticketId,
+            ValidationException exception,
+            [Frozen]Mock<IUserNameQuery> userQuery,
+            [Frozen]Mock<ICommand<Ticket>> updateCmd,
+            TicketsController sut)
+        {
+            userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>())).Returns(userName);
+            updateCmd.Setup(cmd => cmd.Execute(It.IsAny<Envelope<Ticket>>())).Throws(exception);
+
+            var actual = sut.Put(ticketId, ticket);
+
+            actual.Should().BeOfType<BadRequestErrorMessageResult>();
+        }
+
+        [Theory]
+        [TicketsControllerAutoData]
+        public void delete_returns_403_unauthorized_if_no_auth_header(
+            Guid ticketId,
+            TicketsController sut)
+        {
+            var actual = sut.Delete(ticketId);
+
+            actual.Should().BeOfType<UnauthorizedResult>("because user name query returned nothing");
+        }
+
+        [Theory]
+        [TicketsControllerAutoData]
+        public void delete_returns_204_no_content_on_success(
+            string userName,
+            Guid ticketId,
+            [Frozen]Mock<IUserNameQuery> userQuery,
+            TicketsController sut)
+        {
+            userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>())).Returns(userName);
+
+            var actual = sut.Delete(ticketId);
+
+            actual.Should().BeOfType<ResponseMessageResult>()
+                .Which.Response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        }
+
+        [Theory]
+        [TicketsControllerAutoData]
+        public void delete_returns_412_precondition_failed_on_version_conflict(
+            string userName,
+            Guid ticketId,
+            OptimisticConcurrencyException exception,
+            [Frozen]Mock<IUserNameQuery> userQuery,
+            [Frozen]Mock<ICommand<TicketReference>> deleteCmd,
+            TicketsController sut)
+        {
+            userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>())).Returns(userName);
+            deleteCmd.Setup(cmd => cmd.Execute(It.IsAny<Envelope<TicketReference>>())).Throws(exception);
+
+            var actual = sut.Delete(ticketId);
+
+            actual.Should().BeOfType<ResponseMessageResult>()
+                .Which.Response.StatusCode.Should().Be(HttpStatusCode.PreconditionFailed);
         }
     }
 }

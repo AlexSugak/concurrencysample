@@ -8,7 +8,20 @@ using System.Threading.Tasks;
 
 namespace Sample.Tickets.Api.Commands
 {
-    public class DeleteTicketSqlCommand : ICommand<Guid>
+    public class TicketReference : ITicketReference
+    {
+        public TicketReference(Guid id, ulong expectedVersion)
+        {
+            TicketId = id;
+            ExpectedVersion = expectedVersion;
+        }
+
+        public Guid TicketId { get; private set; }
+        public ulong ExpectedVersion { get; private set; }
+    }
+
+
+    public class DeleteTicketSqlCommand : ICommand<TicketReference>
     {
         private readonly string _connectionString;
 
@@ -17,7 +30,7 @@ namespace Sample.Tickets.Api.Commands
             _connectionString = connectionString;
         }
 
-        public void Execute(Envelope<Guid> id)
+        public void Execute(Envelope<TicketReference> id)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -27,7 +40,7 @@ namespace Sample.Tickets.Api.Commands
                     string cmdText = "DELETE FROM [dbo].[Tickets] WHERE [Id] = @id";
                     using (var cmd = new SqlCommand(cmdText, transaction.Connection, transaction))
                     {
-                        cmd.Parameters.Add(new SqlParameter("@id", id.Item));
+                        cmd.Parameters.Add(new SqlParameter("@id", id.Item.TicketId));
                         cmd.ExecuteNonQuery();
                     }
 
