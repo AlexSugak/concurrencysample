@@ -53,11 +53,28 @@ TicketsApi.prototype.addTicket = function (userName, ticket, callback) {
     });
 };
 
-TicketsApi.prototype.deleteTicket = function (userName, ticketId, callback) {
+TicketsApi.prototype.deleteTicket = function (userName, expectedVersion, ticketId, callback) {
     debug('deleteDocument using api host: ' + this._getHost());
     superagent
         .del(this._getHost() + '/tickets/' + ticketId)
         .set('Authorization', 'Bearer userName=' + userName)
+        .set('If-Match', expectedVersion)
+        .end(function (err, res) {
+        if (err) {
+            debug('error', err);
+        }
+        callback(err, res);
+    });
+};
+
+TicketsApi.prototype.editTicket = function (userName, expectedVersion, ticketId, ticket, callback) {
+    debug('editTicket using TicketsApi host: ' + this._getHost());
+    superagent
+        .put(this._getHost() + '/tickets/' + ticketId)
+        .set('Content-Type', 'application/json')
+        .set('Authorization', 'Bearer userName=' + userName)
+        .set('If-Match', expectedVersion)
+        .send(ticket)
         .end(function (err, res) {
         if (err) {
             debug('error', err);

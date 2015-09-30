@@ -35,6 +35,18 @@ module.exports = {
         action: nothing,
         handler: require('../components/TicketsView')
     },
+    newTicket: {
+        path: "/tickets/new",
+        method: "GET",
+        action: nothing,
+        handler: require('../components/NewTicketView')
+    },
+    editTicket: {
+        path: "/tickets/:id",
+        method: "GET",
+        action: nothing,
+        handler: require('../components/EditTicketView')
+    },
     error: {
         path: "/error",
         method: "GET",

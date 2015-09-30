@@ -6,7 +6,7 @@ module.exports = {
     name: 'documentsApiPlugin',
     
     plugContext: function (options) {
-        var apiHost = options.config && options.config.API_HOST;
+        var apiHost = options.config && options.config.DOCUMENTS_API_HOST;
 
         return {
             plugActionContext: function (actionContext){

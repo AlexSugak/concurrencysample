@@ -239,6 +239,60 @@ namespace Sample.Tickets.Api.IntegrationTests
         [Theory]
         [AutoData]
         [UseDatabase]
+        public void PUT_ticket_increments_version(
+            Guid ticketId,
+            string userName,
+            string title,
+            string description,
+            string severity,
+            string assignedTo,
+            string status,
+            string newTitle,
+            string newDescription,
+            string newSeverity,
+            string newAssignedTo,
+            string newStatus
+            )
+        {
+            using (var client = TestServerHttpClientFactory.Create(userName))
+            {
+                var ticket = new
+                {
+                    Id = ticketId,
+                    Title = title,
+                    Description = description,
+                    AssignedTo = assignedTo,
+                    Severity = severity,
+                    Status = status
+                };
+
+                var db = Simple.Data.Database.OpenNamedConnection(ConnectionStringName);
+                db.Tickets.Insert(ticket);
+
+                var json = new
+                {
+                    title = newTitle,
+                    description = newDescription,
+                    severity = newSeverity,
+                    status = newStatus,
+                    assignedTo = newAssignedTo,
+                };
+
+                var version = client.GetAsync("/api/tickets/" + ticketId).Result.Headers.ETag.Tag;
+                client.DefaultRequestHeaders.IfMatch.Add(new EntityTagHeaderValue(version));
+
+                client.PutAsJsonAsync("/api/tickets/" + ticketId, json).Wait();
+
+                var response = client.GetAsync("/api/tickets/" + ticketId).Result;
+
+                var newVersion = response.Headers.ETag.Tag;
+                Assert.NotEqual(version, newVersion);
+            }
+        }
+
+        [Theory]
+        [AutoData]
+        [UseDatabase]
         public void PUT_ticket_returns_precondition_failed_if_version_doesnt_match(
             Guid ticketId,
             string userName,

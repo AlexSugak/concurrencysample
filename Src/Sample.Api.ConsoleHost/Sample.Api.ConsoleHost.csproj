@@ -106,6 +106,10 @@
       <Project>{64b3862f-af7a-4bc5-a3dd-d568e81debc8}</Project>
       <Name>Sample.Documents.Api</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Sample.Tickets.Api\Sample.Tickets.Api.csproj">
+      <Project>{ab39441c-6866-4ce0-a178-77fe8bc978ba}</Project>
+      <Name>Sample.Tickets.Api</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="DocumentsDB.mdf">

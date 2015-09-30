@@ -9,6 +9,7 @@ var ErrorMessagesStore = createStore({
     handlers: {
         "event:CheckoutDocumentFailure": "whenErrorOccured",
         "event:DeleteDocumentFailure": "whenErrorOccured",
+        "event:DeleteTicketFailure": "whenErrorOccured",
         "DATA_LOADED": "whenDataLoaded"
     },
     whenErrorOccured: function (error) {

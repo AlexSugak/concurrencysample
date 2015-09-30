@@ -27,7 +27,8 @@ namespace Sample.Tickets.Api.Controllers
 
         static TicketsController()
         {
-            Mapper.CreateMap<TicketDetails, TicketResponseModel>();
+            Mapper.CreateMap<TicketDetails, TicketResponseModel>()
+                        .ForMember(r => r.ETag, d => d.MapFrom(t => "\"" + t.Version + "\""));
             Mapper.CreateMap<TicketModel, Ticket>();
         }
 
@@ -197,5 +198,6 @@ namespace Sample.Tickets.Api.Controllers
         public string AssignedTo { get; set; }
         public string Severity { get; set; }
         public string Status { get; set; }
+        public string ETag { get; set; }
     }
 }

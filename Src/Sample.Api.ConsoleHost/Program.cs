@@ -3,7 +3,6 @@ using System.Configuration;
 using System.Linq;
 using Microsoft.Owin.Hosting;
 using Sample.Database;
-using Sample.Documents.Api;
 
 namespace Sample.Api.ConsoleHost
 {
@@ -13,14 +12,17 @@ namespace Sample.Api.ConsoleHost
         {
             Console.WriteLine("Installing database");
             Runner.MigrateToLatestVersion(
-                ConfigurationManager.ConnectionStrings["DocumentsDBConnectionString"].ConnectionString);
+                ConfigurationManager.ConnectionStrings["DBConnectionString"].ConnectionString);
             Console.WriteLine("Database installed");
 
-            string baseAddress = "http://localhost:8051/";
-            Console.WriteLine("Starting API server at " + baseAddress);
-            using (WebApp.Start<OwinStartup>(url: baseAddress))
+            string documentsBaseAddress = "http://localhost:8051/";
+            string ticketsBaseAddress = "http://localhost:8052/";
+            Console.WriteLine("Starting Documents API server at " + documentsBaseAddress);
+            Console.WriteLine("Starting Tickets API server at " + ticketsBaseAddress);
+            using (WebApp.Start<Sample.Documents.Api.OwinStartup>(url: documentsBaseAddress))
+            using (WebApp.Start<Sample.Tickets.Api.OwinStartup>(url: ticketsBaseAddress))
             {
-                Console.WriteLine("Server started");
+                Console.WriteLine("Servers started");
                 Console.ReadLine(); 
             }
         }

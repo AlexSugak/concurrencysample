@@ -24,12 +24,31 @@ module.exports = function(context, payload, done) {
             return;
         }
         
-        debug('success');
         var documents = res.body.documents;
         context.dispatch("event:FetchAllDocumentsSuccess", documents);
 
-        context.dispatch("DATA_LOADED");
-        done();
-        return;
+        context.ticketsApi.getAllTickets(userName, function (err, res) {
+            if (err) {
+                debug('error', err);
+                context.dispatch("event:FetchAllTicketsFailure", err);
+                done();
+                return;
+            }
+            
+            if (!res.ok) {
+                debug('error', res);
+                context.dispatch("event:FetchAllTicketsFailure", res.body);
+                done();
+                return;
+            }
+
+            debug('success');
+            var tickets = res.body.tickets;
+            context.dispatch("event:FetchAllTicketsSuccess", tickets);
+
+            context.dispatch("DATA_LOADED");
+            done();
+            return;
+        });
     });
 };
