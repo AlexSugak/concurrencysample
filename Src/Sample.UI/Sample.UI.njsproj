@@ -30,27 +30,35 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="actions\addTicket.js" />
+    <Compile Include="actions\clearError.js" />
+    <Compile Include="actions\deleteTicket.js" />
     <Compile Include="actions\editDocument.js" />
     <Compile Include="actions\checkinDocument.js" />
     <Compile Include="actions\checkoutDocument.js" />
     <Compile Include="actions\deleteDocument.js" />
     <Compile Include="actions\addDocument.js" />
+    <Compile Include="actions\editTicket.js" />
     <Compile Include="actions\loginUser.js" />
     <Compile Include="actions\loadData.js" />
-    <Compile Include="Api.js" />
     <Compile Include="app.js" />
     <Compile Include="client.js" />
     <Compile Include="configs\config.js" />
     <Compile Include="configs\routes.js" />
-    <Compile Include="plugins\apiPlugin.js" />
+    <Compile Include="documentsApi.js" />
+    <Compile Include="plugins\documentsApiPlugin.js" />
+    <Compile Include="plugins\ticketsApiPlugin.js" />
     <Compile Include="server.js" />
     <Compile Include="stores\ErrorMessagesStore.js" />
     <Compile Include="stores\AuthStore.js" />
     <Compile Include="stores\DocumentsStore.js" />
     <Compile Include="stores\SyncStore.js" />
+    <Compile Include="stores\TicketsStore.js" />
+    <Compile Include="ticketsApi.js" />
     <Compile Include="webpack.config.js" />
     <Content Include="components\AppPage.jsx" />
     <Content Include="components\EditDocumentView.jsx" />
+    <Content Include="components\EditTicketView.jsx" />
     <Content Include="components\ErrorMessage.jsx" />
     <Content Include="components\NewDocumentView.jsx" />
     <Content Include="components\ErrorView.jsx" />
@@ -58,6 +66,7 @@
     <Content Include="components\DocumentsView.jsx" />
     <Content Include="components\LoginView.jsx" />
     <Content Include="components\FormInput.jsx" />
+    <Content Include="components\NewTicketView.jsx" />
     <Content Include="components\TicketsView.jsx" />
     <Content Include="components\IndexView.jsx" />
     <Content Include="components\TopNav.jsx" />
