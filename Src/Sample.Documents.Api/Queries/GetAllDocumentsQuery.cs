@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sample.Api.Shared;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
@@ -20,38 +21,24 @@ namespace Sample.Documents.Api.Queries
         public string CheckedOutBy { get; set; }
     }
 
-    public class GetAllDocumentsSqlQuery : IGetAllDocumentsQuery
+    public class GetAllDocumentsSqlQuery : SqlOperation, IGetAllDocumentsQuery
     {
-        private readonly string _connectionString;
         public GetAllDocumentsSqlQuery(string connectionString)
+            : base(connectionString)
         {
-            _connectionString = connectionString;
         }
 
         public IEnumerable<DocumentDetails> Execute()
         {
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                connection.Open();
-
-                string cmdText = "SELECT * FROM dbo.Documents";
-                using (var cmd = new SqlCommand(cmdText, connection))
-                {
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            yield return new DocumentDetails()
+            return base.ExecuteReader<DocumentDetails>(
+                "SELECT * FROM dbo.Documents",
+                reader => new DocumentDetails()
                             {
                                 Id = (Guid)reader["Id"],
                                 Title = (string)reader["Title"],
                                 Content = (string)reader["Content"],
                                 CheckedOutBy = reader["CheckedOutBy"] as string
-                            };
-                        }
-                    }
-                }
-            }
+                            });
         }
     }
 }

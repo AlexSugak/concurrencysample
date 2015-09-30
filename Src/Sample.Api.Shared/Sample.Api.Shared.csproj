@@ -61,6 +61,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SecuredApiController.cs" />
     <Compile Include="SimpleToken.cs" />
+    <Compile Include="SqlOperation.cs" />
     <Compile Include="TransactedCommand.cs" />
     <Compile Include="UserNameQuery.cs" />
     <Compile Include="ValidationException.cs" />

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sample.Api.Shared;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
@@ -23,28 +24,19 @@ namespace Sample.Tickets.Api.Queries
         IEnumerable<TicketDetails> Execute();
     }
 
-    public class GetAllTicketsSqlQuery : IGetAllTicketsQuery
+    public class GetAllTicketsSqlQuery : SqlOperation, IGetAllTicketsQuery
     {
-        private readonly string _connectionString;
         public GetAllTicketsSqlQuery(string connectionString)
+            : base(connectionString)
         {
-            _connectionString = connectionString;
         }
 
         public IEnumerable<TicketDetails> Execute()
         {
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                connection.Open();
-
-                string cmdText = "SELECT * FROM [dbo].[Tickets]";
-                using (var cmd = new SqlCommand(cmdText, connection))
-                {
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            yield return new TicketDetails()
+            string cmdText = "SELECT * FROM [dbo].[Tickets]";
+            return base.ExecuteReader<TicketDetails>(
+                cmdText,
+                reader => new TicketDetails()
                             {
                                 Id = (Guid)reader["Id"],
                                 Title = (string)reader["Title"],
@@ -53,11 +45,7 @@ namespace Sample.Tickets.Api.Queries
                                 Status = (string)reader["Status"],
                                 AssignedTo = reader["AssignedTo"] as string,
                                 Version = BitConverter.ToUInt64(((byte[])reader["Version"]).Reverse().ToArray(), 0)
-                            };
-                        }
-                    }
-                }
-            }
+                            });
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Sample.Tickets.Api.Exceptions;
+﻿using Sample.Api.Shared;
+using Sample.Tickets.Api.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -13,46 +14,29 @@ namespace Sample.Tickets.Api.Queries
         TicketDetails Execute(Guid id);
     }
 
-    public class GetTicketByIdQuerySqlQuery : IGetTicketByIdQuery
+    public class GetTicketByIdQuerySqlQuery : SqlOperation, IGetTicketByIdQuery
     {
-        private readonly string _connectionString;
         public GetTicketByIdQuerySqlQuery(string connectionString)
+            : base(connectionString)
         {
-            _connectionString = connectionString;
         }
 
         public TicketDetails Execute(Guid id)
         {
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                connection.Open();
-
-                string cmdText = "SELECT * FROM [dbo].[Tickets] WHERE [Id] = @id";
-                using (var cmd = new SqlCommand(cmdText, connection))
-                {
-                    cmd.Parameters.Add(new SqlParameter("@id", id));
-
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        if (!reader.HasRows)
-                        {
-                            throw new TicketNotFoundException(string.Format("Ticket {0} was not found", id));
-                        }
-
-                        reader.Read();
-                        return new TicketDetails()
-                        {
-                            Id = (Guid)reader["Id"],
-                            Title = (string)reader["Title"],
-                            Description = reader["Description"] as string,
-                            Severity = (string)reader["Severity"],
-                            Status = (string)reader["Status"],
-                            AssignedTo = reader["AssignedTo"] as string,
-                            Version = BitConverter.ToUInt64(((byte[])reader["Version"]).Reverse().ToArray(), 0)
-                        };
-                    }
-                }
-            }
+            return base.ExecuteReaderOnce<TicketDetails>(
+                "SELECT * FROM [dbo].[Tickets] WHERE [Id] = @id",
+                reader => new TicketDetails()
+                            {
+                                Id = (Guid)reader["Id"],
+                                Title = (string)reader["Title"],
+                                Description = reader["Description"] as string,
+                                Severity = (string)reader["Severity"],
+                                Status = (string)reader["Status"],
+                                AssignedTo = reader["AssignedTo"] as string,
+                                Version = BitConverter.ToUInt64(((byte[])reader["Version"]).Reverse().ToArray(), 0)
+                            },
+                () => new TicketNotFoundException(string.Format("Ticket {0} was not found", id)),
+                new SqlParameter("@id", id));
         }
     }
 }

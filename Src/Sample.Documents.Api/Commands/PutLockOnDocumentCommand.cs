@@ -35,29 +35,19 @@ namespace Sample.Documents.Api.Commands
         }
     }
 
-    public class PutLockOnDocumentSqlCommand : ICommand<LockInfo>
+    public class PutLockOnDocumentSqlCommand : SqlOperation, ICommand<LockInfo>
     {
-        private readonly string _connectionString;
-
         public PutLockOnDocumentSqlCommand(string connectionString)
+            : base(connectionString)
         {
-            _connectionString = connectionString;
         }
 
         public void Execute(Envelope<LockInfo> lockInfo)
         {
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                connection.Open();
-                string cmdText = "UPDATE [dbo].[Documents] SET [CheckedOutBy] = @user WHERE [Id] = @id";
-                using (var cmd = new SqlCommand(cmdText, connection))
-                {
-                    cmd.Parameters.Add(new SqlParameter("@id", lockInfo.Item.DocumentId));
-                    cmd.Parameters.Add(new SqlParameter("@user", lockInfo.UserName));
-
-                    cmd.ExecuteNonQuery();
-                }
-            }
+            base.ExecuteNonQuery(
+                "UPDATE [dbo].[Documents] SET [CheckedOutBy] = @user WHERE [Id] = @id",
+                new SqlParameter("@id", lockInfo.Item.DocumentId),
+                new SqlParameter("@user", lockInfo.UserName));
         }
     }
 }

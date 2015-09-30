@@ -77,29 +77,20 @@ namespace Sample.Documents.Api.Commands
         }
     }
 
-    public class SubmitNewDocumentSqlCommand : ICommand<Document>
+    public class SubmitNewDocumentSqlCommand : SqlOperation, ICommand<Document>
     {
-        private readonly string _connectionString;
         public SubmitNewDocumentSqlCommand(string connectionString)
+            : base(connectionString)
         {
-            _connectionString = connectionString;
         }
 
         public void Execute(Envelope<Document> document)
         {
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                connection.Open();
-                string cmdText = "INSERT INTO [dbo].[Documents] ([Id], [Title], [Content]) VALUES (@id, @title, @content)";
-                using (var cmd = new SqlCommand(cmdText, connection))
-                {
-                    cmd.Parameters.Add(new SqlParameter("@id", document.Item.DocumentId));
-                    cmd.Parameters.Add(new SqlParameter("@title", document.Item.Title));
-                    cmd.Parameters.Add(new SqlParameter("@content", document.Item.Content));
-
-                    cmd.ExecuteNonQuery();
-                }
-            }
+            base.ExecuteNonQuery(
+                "INSERT INTO [dbo].[Documents] ([Id], [Title], [Content]) VALUES (@id, @title, @content)",
+                new SqlParameter("@id", document.Item.DocumentId),
+                new SqlParameter("@title", document.Item.Title),
+                new SqlParameter("@content", document.Item.Content));
         }
     }
 }

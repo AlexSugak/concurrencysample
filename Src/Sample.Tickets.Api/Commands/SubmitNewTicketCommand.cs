@@ -25,36 +25,28 @@ namespace Sample.Tickets.Api.Commands
         public ulong ExpectedVersion { get; set; }
     }
 
-    public class SubmitNewTicketSqlCommand : ICommand<Ticket>
+    public class SubmitNewTicketSqlCommand : SqlOperation, ICommand<Ticket>
     {
-        private readonly string _connectionString;
-
         public SubmitNewTicketSqlCommand(string connectionString)
+            : base(connectionString)
         {
-            _connectionString = connectionString;
         }
 
         public void Execute(Envelope<Ticket> ticket)
         {
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                connection.Open();
-                string cmdText = @"INSERT INTO [dbo].[Tickets] 
-                                   ([Id], [Title], [Description], [Severity], [Status], [AssignedTo]) 
-                                   VALUES 
-                                   (@id, @title, @description, @severity, @status, @assignedTo)";
-                using (var cmd = new SqlCommand(cmdText, connection))
-                {
-                    cmd.Parameters.Add(new SqlParameter("@id", ticket.Item.TicketId));
-                    cmd.Parameters.Add(new SqlParameter("@title", ticket.Item.Title));
-                    cmd.Parameters.Add(new SqlParameter("@description", ticket.Item.Description));
-                    cmd.Parameters.Add(new SqlParameter("@severity", ticket.Item.Severity));
-                    cmd.Parameters.Add(new SqlParameter("@status", ticket.Item.Status));
-                    cmd.Parameters.Add(new SqlParameter("@assignedTo", ticket.Item.AssignedTo));
+            string cmdText = @"INSERT INTO [dbo].[Tickets] 
+                               ([Id], [Title], [Description], [Severity], [Status], [AssignedTo]) 
+                               VALUES 
+                               (@id, @title, @description, @severity, @status, @assignedTo)";
 
-                    cmd.ExecuteNonQuery();
-                }
-            }
+            base.ExecuteNonQuery(
+                cmdText,
+                new SqlParameter("@id", ticket.Item.TicketId),
+                new SqlParameter("@title", ticket.Item.Title),
+                new SqlParameter("@description", ticket.Item.Description),
+                new SqlParameter("@severity", ticket.Item.Severity),
+                new SqlParameter("@status", ticket.Item.Status),
+                new SqlParameter("@assignedTo", ticket.Item.AssignedTo));
         }
     }
 }

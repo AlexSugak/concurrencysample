@@ -21,32 +21,18 @@ namespace Sample.Tickets.Api.Commands
     }
 
 
-    public class DeleteTicketSqlCommand : ICommand<TicketReference>
+    public class DeleteTicketSqlCommand : SqlOperation, ICommand<TicketReference>
     {
-        private readonly string _connectionString;
-
         public DeleteTicketSqlCommand(string connectionString)
+            : base(connectionString)
         {
-            _connectionString = connectionString;
         }
 
         public void Execute(Envelope<TicketReference> id)
         {
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                connection.Open();
-                using (var transaction = connection.BeginTransaction())
-                {
-                    string cmdText = "DELETE FROM [dbo].[Tickets] WHERE [Id] = @id";
-                    using (var cmd = new SqlCommand(cmdText, transaction.Connection, transaction))
-                    {
-                        cmd.Parameters.Add(new SqlParameter("@id", id.Item.TicketId));
-                        cmd.ExecuteNonQuery();
-                    }
-
-                    transaction.Commit();
-                }
-            }
+            base.ExecuteNonQuery(
+                "DELETE FROM [dbo].[Tickets] WHERE [Id] = @id", 
+                new SqlParameter("@id", id.Item.TicketId));
         }
     }
 }
