@@ -42,7 +42,7 @@ var TopNav = React.createClass({
 					</ul>
 				  </div>
 				</div>
-			  </nav>
+			 </nav>
 		);
 	}
 });

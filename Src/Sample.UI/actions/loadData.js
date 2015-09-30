@@ -9,7 +9,7 @@ module.exports = function(context, payload, done) {
     var authStore = context.getStore(AuthStore);
     var userName = authStore.getCurrentUser();
 
-    context.api.getAllDocuments(userName, function (err, res) {
+    context.documentsApi.getAllDocuments(userName, function (err, res) {
         if (err) {
             debug('error', err);
             context.dispatch("event:FetchAllDocumentsFailure", err);

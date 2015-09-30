@@ -1,16 +1,16 @@
-﻿"use strict";
+"use strict";
 
-var Api = require('../Api');
+var Api = require('../TicketsApi');
 
 module.exports = {
-    name: 'apiPlugin',
+    name: 'ticketsApiPlugin',
     
     plugContext: function (options) {
         var apiHost = options.config && options.config.API_HOST;
 
         return {
             plugActionContext: function (actionContext){
-                actionContext.api = new Api({
+                actionContext.ticketsApi = new Api({
                     getHost: function () { 
                         return apiHost;
                     }

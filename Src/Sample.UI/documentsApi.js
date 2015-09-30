@@ -1,17 +1,17 @@
 ﻿"use strict";
 
 var superagent = require('superagent');
-var debug = require('debug')('Api');
+var debug = require('debug')('DocumentsApi');
 
-function Api(options){
+function DocumentsApi(options){
     options = options || {};
     var noop = function () { };
 
     this._getHost = options.getHost || noop;
 };
 
-Api.prototype.getAllDocuments = function (userName, callback) {
-    debug('getAllDocuments using api host: ' + this._getHost());
+DocumentsApi.prototype.getAllDocuments = function (userName, callback) {
+    debug('getAllDocuments using DocumentsApi host: ' + this._getHost());
     superagent
         .get(this._getHost() + '/documents/')
         .accept('json')
@@ -24,8 +24,8 @@ Api.prototype.getAllDocuments = function (userName, callback) {
         });
 };
 
-Api.prototype.getDocumentById = function (userName, documentId, callback) {
-    debug('getDocumentById using api host: ' + this._getHost());
+DocumentsApi.prototype.getDocumentById = function (userName, documentId, callback) {
+    debug('getDocumentById using DocumentsApi host: ' + this._getHost());
     superagent
         .get(this._getHost() + '/documents/' + documentId)
         .accept('json')
@@ -38,8 +38,8 @@ Api.prototype.getDocumentById = function (userName, documentId, callback) {
     });
 };
 
-Api.prototype.addDocument = function (userName, document, callback) {
-    debug('addDocument using api host: ' + this._getHost());
+DocumentsApi.prototype.addDocument = function (userName, document, callback) {
+    debug('addDocument using DocumentsApi host: ' + this._getHost());
     superagent
         .post(this._getHost() + '/documents/')
         .set('Content-Type', 'application/json')
@@ -53,8 +53,8 @@ Api.prototype.addDocument = function (userName, document, callback) {
     });
 };
 
-Api.prototype.deleteDocument = function (userName, documentId, callback) {
-    debug('deleteDocument using api host: ' + this._getHost());
+DocumentsApi.prototype.deleteDocument = function (userName, documentId, callback) {
+    debug('deleteDocument using DocumentsApi host: ' + this._getHost());
     superagent
         .del(this._getHost() + '/documents/' + documentId)
         .set('Authorization', 'Bearer userName=' + userName)
@@ -66,8 +66,8 @@ Api.prototype.deleteDocument = function (userName, documentId, callback) {
     });
 };
 
-Api.prototype.checkoutDocument = function (userName, documentId, callback) {
-    debug('checkoutDocument using api host: ' + this._getHost());
+DocumentsApi.prototype.checkoutDocument = function (userName, documentId, callback) {
+    debug('checkoutDocument using DocumentsApi host: ' + this._getHost());
     superagent
         .put(this._getHost() + '/documents/' + documentId + '/lock')
         .set('Authorization', 'Bearer userName=' + userName)
@@ -80,8 +80,8 @@ Api.prototype.checkoutDocument = function (userName, documentId, callback) {
     });
 };
 
-Api.prototype.checkinDocument = function (userName, documentId, callback) {
-    debug('checkinDocument using api host: ' + this._getHost());
+DocumentsApi.prototype.checkinDocument = function (userName, documentId, callback) {
+    debug('checkinDocument using DocumentsApi host: ' + this._getHost());
     superagent
         .del(this._getHost() + '/documents/' + documentId + '/lock')
         .set('Authorization', 'Bearer userName=' + userName)
@@ -93,8 +93,8 @@ Api.prototype.checkinDocument = function (userName, documentId, callback) {
     });
 };
 
-Api.prototype.editDocument = function (userName, documentId, document, callback) {
-    debug('editDocument using api host: ' + this._getHost());
+DocumentsApi.prototype.editDocument = function (userName, documentId, document, callback) {
+    debug('editDocument using DocumentsApi host: ' + this._getHost());
     superagent
         .put(this._getHost() + '/documents/' + documentId)
         .set('Content-Type', 'application/json')
@@ -108,4 +108,4 @@ Api.prototype.editDocument = function (userName, documentId, document, callback)
     });
 };
 
-module.exports = Api;
+module.exports = DocumentsApi;

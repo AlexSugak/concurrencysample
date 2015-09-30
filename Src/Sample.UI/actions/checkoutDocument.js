@@ -11,7 +11,7 @@ module.exports = function (context, payload, done) {
     var authStore = context.getStore(AuthStore);
     var userName = authStore.getCurrentUser();
 
-    context.api.checkoutDocument(userName, payload.documentId, function (err, res) {
+    context.documentsApi.checkoutDocument(userName, payload.documentId, function (err, res) {
         if (err) {
             debug('error', err);
             context.dispatch("event:CheckoutDocumentFailure", err);

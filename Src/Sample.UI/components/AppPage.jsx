@@ -14,14 +14,13 @@ var AuthStore = require("../stores/AuthStore");
 var debug = require("debug")("app");
 
 var AppPage = React.createClass({
-	displayName : "AppPage",
+	displayName: "AppPage",
 
 	render: function render() {
 		var Handler = this.props.currentRoute.get('handler');
 		var currentRoute = this.props.currentRoute.get('name');
 
-		if(!this.props.isUserLoggedIn)
-		{
+		if (!this.props.isUserLoggedIn) {
 			return (
 				<div className="container">
 					<LoginView />
@@ -31,7 +30,7 @@ var AppPage = React.createClass({
 
 		return (
 			<div className="container">
-				<TopNav projectName="Concurrency Samples" route={currentRoute} />
+				<TopNav projectName="Concurrency Samples" route={currentRoute}/>
 				<div>
 					<Handler />
 				</div>
