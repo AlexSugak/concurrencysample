@@ -31,7 +31,7 @@ var DocumentsStore = createStore({
     },
     whenDocumentCheckedOut: function (lockInfo) {
         debug("document checked out");
-        for (i = 0; i < this.documents.length; i++) {
+        for (var i = 0; i < this.documents.length; i++) {
             if (this.documents[i].id === lockInfo.id) {
                 this.documents[i].checkedOutBy = lockInfo.checkedOutBy;
                 break;
@@ -41,7 +41,7 @@ var DocumentsStore = createStore({
     },
     whenDocumentCheckedIn: function (documentId) {
         debug("document checked in");
-        for (i = 0; i < this.documents.length; i++) {
+        for (var i = 0; i < this.documents.length; i++) {
             if (this.documents[i].id === documentId) {
                 this.documents[i].checkedOutBy = null;
                 break;
@@ -51,7 +51,7 @@ var DocumentsStore = createStore({
     },
     whenDocumentEdited: function (document) {
         debug("document edited");
-        for (i = 0; i < this.documents.length; i++) {
+        for (var i = 0; i < this.documents.length; i++) {
             if (this.documents[i].id === document.id) {
                 this.documents[i] = document;
                 break;

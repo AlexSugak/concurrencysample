@@ -14,6 +14,7 @@ module.exports = function (context, payload, done) {
     var documentData = { title: payload.title, content: payload.content };
 
     context.documentsApi.editDocument(userName, payload.id, documentData, function (err, res) {
+        
         if (err) {
             debug('error', err);
             context.dispatch("event:EditDocumentFailure", err);

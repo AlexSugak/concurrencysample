@@ -3,6 +3,7 @@
 var React = require("react");
 var ErrorMessagesStore = require("../stores/ErrorMessagesStore");
 var loadData = require("../actions/loadData");
+var clearError = require("../actions/clearError");
 
 var connectToStores = require('fluxible-addons-react').connectToStores;
 
@@ -12,7 +13,11 @@ var ErrorMessage = React.createClass({
     },
 
 	removeErrorClicked: function(event){
-		this.context.executeAction(loadData, {});
+		if(this.props.loadDataOnClose){
+			this.context.executeAction(loadData, {});
+		}
+
+		this.context.executeAction(clearError, {});
 
 		event.preventDefault();
 	},

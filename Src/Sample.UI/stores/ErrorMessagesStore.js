@@ -10,6 +10,9 @@ var ErrorMessagesStore = createStore({
         "event:CheckoutDocumentFailure": "whenErrorOccured",
         "event:DeleteDocumentFailure": "whenErrorOccured",
         "event:DeleteTicketFailure": "whenErrorOccured",
+        "event:EditTicketConcurrencyError": "whenOptimisticConcurrencyErrorOccured",
+        "event:EditTicketSuccess": "whenErrorCleared",
+        "event:ErrorCleared": "whenErrorCleared",
         "DATA_LOADED": "whenDataLoaded"
     },
     whenErrorOccured: function (error) {
@@ -17,8 +20,18 @@ var ErrorMessagesStore = createStore({
         this.message = error;        
         this.emitChange();
     },
+    whenOptimisticConcurrencyErrorOccured: function (error) {
+        debug("optimistic concurrency error occured", error);
+        this.message = error.message;        
+        this.emitChange();
+    },
     whenDataLoaded: function () {
         debug("data loaded");
+        this.message = null;
+        this.emitChange();
+    },
+    whenErrorCleared: function () {
+        debug("error cleared");
         this.message = null;
         this.emitChange();
     },

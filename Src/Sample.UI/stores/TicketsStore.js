@@ -10,11 +10,13 @@ var TicketsStore = createStore({
         "event:FetchAllTicketsSuccess": "whenTicketsFetched",
         "event:AddTicketSuccess": "whenTicketAdded",
         "event:DeleteTicketSuccess": "whenTicketDeleted",
-        "event:EditTicketSuccess": "whenTicketEdited"
+        "event:EditTicketSuccess": "whenTicketEdited",
+        "event:EditTicketConcurrencyError": "whenConcurrentEditError"
     },
     whenTicketsFetched: function (tickets) {
         debug("tickets fetched");
         this.tickets = tickets;
+        this.serverTickets = [];
         this.emitChange();
     },
     whenTicketAdded: function (ticket) {
@@ -29,24 +31,34 @@ var TicketsStore = createStore({
     },
     whenTicketEdited: function (ticket) {
         debug("ticket edited");
-        for (i = 0; i < this.tickets.length; i++) {
+        for (var i = 0; i < this.tickets.length; i++) {
             if (this.tickets[i].id === ticket.id) {
                 this.tickets[i] = ticket;
                 break;
             }
         }
+        this.serverTickets = this.serverTickets.filter(function (t) { return t.id !== ticket.id; });
+        this.emitChange();
+    },
+    whenConcurrentEditError: function (err) {
+        debug("concurrent ticket edit detected, server version:", err.serverTicket);
+        this.serverTickets = this.serverTickets.filter(function (t) { return t.id !== err.serverTicket.id; });
+        this.serverTickets.push(err.serverTicket);
         this.emitChange();
     },
     initialize: function () {
         this.tickets = [];
+        this.serverTickets = [];
     },
     dehydrate: function () {
         return {
-            tickets: this.tickets
+            tickets: this.tickets,
+            serverTickets: this.serverTickets
         };
     },
     rehydrate: function (state) {
         this.tickets = state.tickets;
+        this.serverTickets = state.serverTickets;
     },
 
     // --- queries ---
@@ -64,6 +76,17 @@ var TicketsStore = createStore({
         }
 
         debug("ticket not found:", ticketId);
+        return null;
+    },
+    getTicketServerVersion: function (ticketId) {
+        for (var i = 0; i < this.serverTickets.length; i++) {
+            if (this.serverTickets[i].id === ticketId) {
+                debug("returning server ticket:", this.serverTickets[i]);
+                return this.serverTickets[i];
+            }
+        }
+
+        debug("server ticket version not found:", ticketId);
         return null;
     }
 });

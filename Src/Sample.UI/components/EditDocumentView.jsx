@@ -41,6 +41,10 @@ var EditDocumentView = React.createClass({
     },
 
 	render: function render() {
+		if(!this.props.document){
+			return null;
+		}
+
 		return (
 			<div className="row">
 				<div className="col-md-6">

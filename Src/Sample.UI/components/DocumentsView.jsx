@@ -95,7 +95,7 @@ var DocumentsView = React.createClass({
 
 		return (
 			<div>
-				<ErrorMessage />
+				<ErrorMessage loadDataOnClose={true}/>
 				<h3>Documents</h3>
 				<div className="row">
 					<div className="col-md-6">
