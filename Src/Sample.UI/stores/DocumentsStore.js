@@ -22,6 +22,7 @@ var DocumentsStore = createStore({
     whenDocumentAdded: function (document) {
         debug("document added");
         this.documents.push(document);
+        this.documents.sort(this.compareTitles);
         this.emitChange();
     },
     whenDocumentDeleted: function (documentId) {
@@ -58,6 +59,13 @@ var DocumentsStore = createStore({
             }
         }
         this.emitChange();
+    },
+    compareTitles: function (a,b) {
+        if (a.title < b.title)
+            return -1;
+        if (a.title > b.title)
+            return 1;
+        return 0;
     },
     initialize: function () {
         this.documents = [];

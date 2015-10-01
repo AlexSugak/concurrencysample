@@ -20,6 +20,7 @@ var TicketsStore = createStore({
     whenTicketAdded: function (ticket) {
         debug("ticket added");
         this.tickets.push(ticket);
+        this.tickets.sort(this.compareTitles);
         this.emitChange();
     },
     whenTicketDeleted: function (ticketId) {
@@ -36,6 +37,13 @@ var TicketsStore = createStore({
             }
         }
         this.emitChange();
+    },
+    compareTitles: function (a,b) {
+        if (a.title < b.title)
+            return -1;
+        if (a.title > b.title)
+            return 1;
+        return 0;
     },
     initialize: function () {
         this.tickets = [];
