@@ -9,11 +9,8 @@ var connectToStores = require('fluxible-addons-react').connectToStores;
 var ErrorView = React.createClass({
 	render: function render() {
 		return (
-			<div className="message">
-				<p> Oops, something wrong has happened! </p>
-				<NavLink routeName="index">
-				<div className="back"> Back to home </div>
-				</NavLink>
+			<div className="alert alert-danger" role="alert">
+				<strong>Something went wrong!</strong>
 			</div>
 		);
 	}

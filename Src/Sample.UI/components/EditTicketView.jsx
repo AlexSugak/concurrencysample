@@ -27,10 +27,10 @@ var FormInputWithConflict = React.createClass({
 	},
 	applyServerVersionClicked: function(event){
 		this.setValue(this.props.serverValue);
-		this.context.executeAction(resolveConflict, { field: this.props.name, ticketId: this.props.ticketId});		
+		this.context.executeAction(resolveConflict, { field: this.props.name, newValue: this.props.serverValue, ticketId: this.props.ticketId});		
 	},
 	applyLocalVersionClicked: function(event){
-		this.context.executeAction(resolveConflict, { field: this.props.name, ticketId: this.props.ticketId});		
+		this.context.executeAction(resolveConflict, { field: this.props.name, newValue: this.getValue(), ticketId: this.props.ticketId});		
 	},
 
 	renderInput: function(){

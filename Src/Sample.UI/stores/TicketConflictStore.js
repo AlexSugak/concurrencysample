@@ -27,6 +27,7 @@ var TicketConflictStore = createStore({
     whenConflictResolved: function (e) {
         debug("conflict resolved:", e);
         this.conflicts[e.ticketId].conflicts = this.conflicts[e.ticketId].conflicts.filter(function (c) { return c.field !== e.field; });
+        this.conflicts[e.ticketId].serverTicket[e.field] = e.newValue;
         this.emitChange();
     },
     getConflicts: function(localTicket, serverTicket){
