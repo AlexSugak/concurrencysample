@@ -36,7 +36,7 @@ var TopNav = React.createClass({
 					<ul className="nav navbar-nav navbar-right">
 						<li>
 							<p className="navbar-text">
-								Welcome, {this.props.userName}
+								Welcome, <strong>{this.props.userName}</strong>
 							</p>
 						</li>
 					</ul>

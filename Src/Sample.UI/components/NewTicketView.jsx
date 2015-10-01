@@ -52,7 +52,7 @@ var NewTicketView = React.createClass({
 						<label htmlFor="title">Title</label>
 						<FormInput name="title" validationError="Title required" required/>
 						<label htmlFor="description">Description</label>
-						<FormInput name="description" inputType="textarea" />
+						<FormInput name="description" />
 						<label htmlFor="severity">Severity</label>
 						<FormInput name="severity" validationError="Severity required" required/>
 						<label htmlFor="status">Status</label>

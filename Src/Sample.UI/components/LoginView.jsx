@@ -42,7 +42,7 @@ var LoginView = React.createClass({
 			<div>
 				<Formsy.Form className="form-signin" onValidSubmit={this.submit} onValid={this.enableButton} onInvalid={this.disableButton}>
 					<h2 className="form-signin-header">Please sign in</h2>
-					<FormInput name="login" validationError="Login required" required/>
+					<FormInput name="login" validationError="Login must contain [a-Z] letters only" validations="isAlpha" required/>
 					<div className="checkbox">
 					</div>
 					<button className="btn btn-lg btn-primary btn-block" type="submit" disabled={!this.state.canSubmit}>Sign in</button>

@@ -24,7 +24,11 @@ module.exports = function (context, payload, done) {
             debug('concurrency error', res);
 
             context.ticketsApi.getTicketById(userName, payload.id, function(errGet, resGet){
-                var err = {message: "Ticket was edited by another user. Please resolve conflicts if any.", serverTicket: resGet.body};
+                var err = {
+                    message: "Ticket was edited by another user. Please resolve conflicts if any.", 
+                    serverTicket: resGet.body,
+                    ticket: payload
+                };
                 context.dispatch("event:EditTicketConcurrencyError", err);
                 done();
                 return;    
