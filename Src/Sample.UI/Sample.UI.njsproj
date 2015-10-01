@@ -41,6 +41,7 @@
     <Compile Include="actions\editTicket.js" />
     <Compile Include="actions\loginUser.js" />
     <Compile Include="actions\loadData.js" />
+    <Compile Include="actions\resolveTicketConflict.js" />
     <Compile Include="app.js" />
     <Compile Include="client.js" />
     <Compile Include="configs\config.js" />
@@ -53,6 +54,7 @@
     <Compile Include="stores\AuthStore.js" />
     <Compile Include="stores\DocumentsStore.js" />
     <Compile Include="stores\SyncStore.js" />
+    <Compile Include="stores\ticketConflictStore.js" />
     <Compile Include="stores\TicketsStore.js" />
     <Compile Include="ticketsApi.js" />
     <Compile Include="webpack.config.js" />
