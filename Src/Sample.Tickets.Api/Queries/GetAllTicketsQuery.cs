@@ -20,7 +20,7 @@ namespace Sample.Tickets.Api.Queries
 
         public IEnumerable<TicketDetails> Execute()
         {
-            string cmdText = "SELECT * FROM [dbo].[Tickets]";
+            string cmdText = "SELECT * FROM [dbo].[Tickets] ORDER BY [Title]";
             return base.ExecuteReader<TicketDetails>(
                 cmdText,
                 reader => new TicketDetails()

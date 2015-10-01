@@ -23,7 +23,7 @@ namespace Sample.Documents.Api.Queries
         public IEnumerable<DocumentDetails> Execute()
         {
             return base.ExecuteReader<DocumentDetails>(
-                "SELECT * FROM dbo.Documents",
+                "SELECT * FROM dbo.Documents ORDER BY [Title]",
                 reader => new DocumentDetails()
                             {
                                 Id = (Guid)reader["Id"],
