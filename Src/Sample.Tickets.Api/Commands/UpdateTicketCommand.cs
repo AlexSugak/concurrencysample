@@ -1,10 +1,6 @@
-﻿using Sample.Api.Shared;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Sample.Api.Shared;
 
 namespace Sample.Tickets.Api.Commands
 {

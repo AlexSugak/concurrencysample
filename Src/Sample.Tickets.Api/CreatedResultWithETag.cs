@@ -12,6 +12,9 @@ using System.Web.Http.Results;
 
 namespace Sample.Tickets.Api
 {
+    /// <summary>
+    /// Represents Created result with ETag header
+    /// </summary>
     public class CreatedResultWithETag<T> : CreatedNegotiatedContentResult<T>
     {
         public CreatedResultWithETag(Uri location, T content, ApiController controller)

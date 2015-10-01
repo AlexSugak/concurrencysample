@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace Sample.Api.Shared
 {
+    /// <summary>
+    /// Base for SQL operations, provides abstractions for common sql queries
+    /// </summary>
     public abstract class SqlOperation
     {
         private readonly string _connectionString;

@@ -1,14 +1,13 @@
-﻿using Sample.Api.Shared;
+﻿using System;
+using Sample.Api.Shared;
 using Sample.Tickets.Api.Exceptions;
 using Sample.Tickets.Api.Queries;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sample.Tickets.Api.Commands
 {
+    /// <summary>
+    /// Checks that expected ticket version matches DB version before executing provided command
+    /// </summary>
     public class TicketConcurrentUpdatesDetector<T> : ICommand<T> where T : ITicketReference
     {
         private readonly ICommand<T> _implementation;

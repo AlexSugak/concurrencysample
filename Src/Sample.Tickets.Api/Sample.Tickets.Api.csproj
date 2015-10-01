@@ -83,7 +83,9 @@
   <ItemGroup>
     <Compile Include="Commands\DeleteTicketCommand.cs" />
     <Compile Include="Commands\SubmitNewTicketCommand.cs" />
+    <Compile Include="Commands\Ticket.cs" />
     <Compile Include="Commands\TicketConcurrentUpdatesDetector.cs" />
+    <Compile Include="Commands\TicketReference.cs" />
     <Compile Include="Commands\TicketValidator.cs" />
     <Compile Include="Commands\UpdateTicketCommand.cs" />
     <Compile Include="CompositionRoot.cs" />
@@ -98,6 +100,7 @@
     <Compile Include="Queries\GetAllTicketsQuery.cs" />
     <Compile Include="Queries\GetTicketByIdQuery.cs" />
     <Compile Include="Queries\GetTicketVersionQuery.cs" />
+    <Compile Include="Queries\TicketDetails.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

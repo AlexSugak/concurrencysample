@@ -1,30 +1,9 @@
-﻿using Sample.Api.Shared;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Sample.Api.Shared;
 
 namespace Sample.Tickets.Api.Commands
 {
-    public interface ITicketReference
-    {
-        Guid TicketId { get; }
-        ulong ExpectedVersion { get; }
-    }
-
-    public class Ticket : ITicketReference
-    {
-        public Guid TicketId { get; set; }
-        public string Title { get; set; }
-        public string Description { get; set; }
-        public string AssignedTo { get; set; }
-        public string Severity { get; set; }
-        public string Status { get; set; }
-        public ulong ExpectedVersion { get; set; }
-    }
-
     public class SubmitNewTicketSqlCommand : SqlOperation, ICommand<Ticket>
     {
         public SubmitNewTicketSqlCommand(string connectionString)

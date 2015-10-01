@@ -79,6 +79,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\DeleteDocumentCommand.cs" />
+    <Compile Include="Commands\Document.cs" />
+    <Compile Include="Commands\DocumentLockValidator.cs" />
+    <Compile Include="Commands\DocumentValidator.cs" />
+    <Compile Include="Commands\LockInfo.cs" />
     <Compile Include="Commands\PutLockOnDocumentCommand.cs" />
     <Compile Include="Commands\RemoveLockFromDocumentCommand.cs" />
     <Compile Include="Commands\UpdateDocumentCommand.cs" />
@@ -87,6 +91,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Exceptions\DocumentLockedException.cs" />
     <Compile Include="Exceptions\DocumentNotFoundException.cs" />
+    <Compile Include="Queries\DocumentDetails.cs" />
     <Compile Include="Queries\GetAllDocumentsQuery.cs" />
     <Compile Include="Controllers\LocksController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

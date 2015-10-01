@@ -5,6 +5,9 @@ using System.Security.Claims;
 
 namespace Sample.Api.Shared
 {
+    /// <summary>
+    /// Represents collection claims, serialized as key-value pairs into string like 'key=value&key2=value2'
+    /// </summary>
     public class SimpleToken : IEnumerable<Claim>
     {
         private readonly IEnumerable<Claim> _claims;

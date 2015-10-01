@@ -13,14 +13,6 @@ namespace Sample.Documents.Api.Queries
         IEnumerable<DocumentDetails> Execute();
     }
 
-    public class DocumentDetails
-    {
-        public Guid Id { get; set; }
-        public string Title { get; set; }
-        public string Content { get; set; }
-        public string CheckedOutBy { get; set; }
-    }
-
     public class GetAllDocumentsSqlQuery : SqlOperation, IGetAllDocumentsQuery
     {
         public GetAllDocumentsSqlQuery(string connectionString)

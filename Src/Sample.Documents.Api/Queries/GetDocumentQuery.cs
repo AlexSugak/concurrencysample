@@ -1,11 +1,7 @@
-﻿using Sample.Api.Shared;
-using Sample.Documents.Api.Exceptions;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Sample.Api.Shared;
+using Sample.Documents.Api.Exceptions;
 
 namespace Sample.Documents.Api.Queries
 {

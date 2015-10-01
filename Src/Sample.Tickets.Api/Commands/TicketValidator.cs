@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace Sample.Tickets.Api.Commands
 {
+    /// <summary>
+    /// Validates ticket data before executing provided command
+    /// </summary>
     public class TicketValidator : ICommand<Ticket>
     {
         private readonly ICommand<Ticket> _implementation;

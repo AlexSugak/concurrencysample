@@ -4,16 +4,6 @@ using Sample.Api.Shared;
 
 namespace Sample.Documents.Api.Commands
 {
-    public class LockInfo : IDocumentReference
-    {
-        public LockInfo(Guid documentId)
-        {
-            DocumentId = documentId;
-        }
-
-        public Guid DocumentId { get; set; }
-    }
-
     public class RemoveLockFromDocumentSqlCommand : SqlOperation, ICommand<LockInfo>
     {
         public RemoveLockFromDocumentSqlCommand(string connectionString)

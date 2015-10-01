@@ -3,6 +3,9 @@ using System.Web.Http;
 
 namespace Sample.Api.Shared
 {
+    /// <summary>
+    /// Base controller for secured APIs, i.e. APIs with auth header checks
+    /// </summary>
     public abstract class SecuredApiController : ApiControllerWithEnvelope
     {
         private readonly IUserNameQuery _userQuery;
