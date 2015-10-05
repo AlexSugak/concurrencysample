@@ -8,6 +8,7 @@ namespace Sample.Tickets.Api.Commands
     /// <summary>
     /// Checks that expected ticket version matches DB version before executing provided command
     /// </summary>
+    [Obsolete("Version checking moved to DB layer.")]
     public class TicketConcurrentUpdatesDetector<T> : ICommand<T> where T : ITicketReference
     {
         private readonly ICommand<T> _implementation;
@@ -24,7 +25,6 @@ namespace Sample.Tickets.Api.Commands
         public void Execute(Envelope<T> input)
         {
             var existing = _getTicketQuery.Execute(input.Item.TicketId);
-
             if(existing.Version != input.Item.ExpectedVersion)
             {
                 throw new OptimisticConcurrencyException(

@@ -380,5 +380,41 @@ namespace Sample.Tickets.Api.IntegrationTests
                 Assert.Equal(0, actual.tickets.Count);
             }
         }
+
+        [Theory]
+        [AutoData]
+        [UseDatabase]
+        public void DELETE_ticket_by_id_returns_precondition_failed_if_version_doesnt_match(
+            Guid ticketId,
+            string userName,
+            string title,
+            string description,
+            string severity,
+            string assignedTo,
+            string status
+            )
+        {
+            using (var client = TestServerHttpClientFactory.Create(userName))
+            {
+                var ticket = new
+                {
+                    Id = ticketId,
+                    Title = title,
+                    Description = description,
+                    AssignedTo = assignedTo,
+                    Severity = severity,
+                    Status = status
+                };
+
+                var db = Simple.Data.Database.OpenNamedConnection(ConnectionStringName);
+                db.Tickets.Insert(ticket);
+
+                client.DefaultRequestHeaders.IfMatch.Add(new EntityTagHeaderValue("\"456456546\""));
+
+                var response = client.DeleteAsync("/api/tickets/" + ticketId).Result;
+
+                Assert.Equal(HttpStatusCode.PreconditionFailed, response.StatusCode);
+            }
+        }
     }
 }

@@ -27,14 +27,12 @@ namespace Sample.Tickets.Api
             var addTicketCmd = new TicketValidator(
                                     new SubmitNewTicketSqlCommand(connectionString));
             var updateTicketCmd = new TransactedCommand<Ticket>(
-                                    new TicketConcurrentUpdatesDetector<Ticket>(
                                         new TicketValidator(
-                                            new UpdateTicketSqlCommand(connectionString)),
-                                        getTicketQuery));
+                                            new UpdateTicketSqlCommand(connectionString))
+                                        );
             var deleteTicketCmd = new TransactedCommand<TicketReference>(
-                                    new TicketConcurrentUpdatesDetector<TicketReference>(
-                                        new DeleteTicketSqlCommand(connectionString),
-                                        getTicketQuery));
+                                        new DeleteTicketSqlCommand(connectionString)
+                                        );
 
             var compositon = new CompositionRoot(
                 userNameQuery, 
