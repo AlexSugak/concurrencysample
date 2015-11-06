@@ -21,7 +21,7 @@ namespace Sample.Tickets.Api
             var connectionString = ConfigurationManager.ConnectionStrings["DBConnectionString"].ConnectionString;
 
             var userNameQuery = new SimppleTokenUserNameQuery();
-            var envelop = new EnvelopeWithUserName(userNameQuery);
+            var envelop = new EnvelopWithUserName(userNameQuery);
             var allTicketsQuery = new SecuredQuery<EmptyRequest, IEnumerable<TicketDetails>>(
                                     new GetAllTicketsSqlQuery(connectionString));
             var getTicketQuery = new SecuredQuery<Guid, TicketDetails>(

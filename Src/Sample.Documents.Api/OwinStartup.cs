@@ -22,7 +22,7 @@ namespace Sample.Documents.Api
             var connectionString = ConfigurationManager.ConnectionStrings["DBConnectionString"].ConnectionString;
 
             var userNameQuery = new SimppleTokenUserNameQuery();
-            var envelop = new EnvelopeWithUserName(userNameQuery);
+            var envelop = new EnvelopWithUserName(userNameQuery);
 
             var getAllDocumentsQuery = new SecuredQuery<EmptyRequest, IEnumerable<DocumentDetails>>(
                                             new GetAllDocumentsSqlQuery(connectionString));

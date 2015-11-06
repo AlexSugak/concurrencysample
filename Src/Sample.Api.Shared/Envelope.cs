@@ -27,16 +27,19 @@ namespace Sample.Api.Shared
         }
     }
 
+    /// <summary>
+    /// wraps any item into envelope using information from request
+    /// </summary>
     public interface IEnvelop
     {
         Envelope<T> Envelop<T>(HttpRequestMessage request, T item);
     }
 
-    public class EnvelopeWithUserName : IEnvelop
+    public class EnvelopWithUserName : IEnvelop
     {
         private readonly IUserNameQuery _userQuery;
 
-        public EnvelopeWithUserName(IUserNameQuery userQuery)
+        public EnvelopWithUserName(IUserNameQuery userQuery)
         {
             _userQuery = userQuery;
         }
