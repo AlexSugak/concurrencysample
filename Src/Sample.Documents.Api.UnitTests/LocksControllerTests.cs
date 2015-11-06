@@ -88,7 +88,7 @@ namespace Sample.Documents.Api.UnitTests
             LocksController sut)
         {
             removeLockCmd.Setup(cmd => cmd.Execute(It.IsAny<Envelope<LockInfo>>()))
-                      .Throws<DocumentLockedException>();
+                         .Throws<DocumentLockedException>();
 
             var response = sut.Delete(documentId);
 

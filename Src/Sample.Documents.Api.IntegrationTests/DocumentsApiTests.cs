@@ -31,6 +31,18 @@ namespace Sample.Documents.Api.IntegrationTests
             }
         }
 
+        [Fact]
+        [UseDatabase]
+        public void GET_documents_returns_401_when_user_not_specified()
+        {
+            using (var client = TestServerHttpClientFactory.Create(null))
+            {
+                var response = client.GetAsync("/api/documents").Result;
+
+                Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+            }
+        }
+
         [Theory]
         [AutoData]
         [UseDatabase]
@@ -121,6 +133,25 @@ namespace Sample.Documents.Api.IntegrationTests
                 var actual = response.Content.ReadAsJsonAsync().Result;
 
                 Assert.Contains(expected, actual.documents);
+            }
+        }
+
+        [Theory]
+        [AutoData]
+        [UseDatabase]
+        public void POST_returns_401_when_no_user_specified(string title, string content)
+        {
+            var document = new
+            {
+                title = title,
+                content = content,
+            };
+
+            using (var client = TestServerHttpClientFactory.Create(null))
+            {
+                var response = client.PostAsJsonAsync("/api/documents", document).Result;
+
+                Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             }
         }
 

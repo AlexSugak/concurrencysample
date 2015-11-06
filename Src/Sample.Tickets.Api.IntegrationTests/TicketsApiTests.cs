@@ -16,8 +16,6 @@ namespace Sample.Tickets.Api.IntegrationTests
 {
     public class TicketsApiTests
     {
-        //breaking the ice
-
         [Theory]
         [AutoData]
         [UseDatabase]
@@ -30,6 +28,18 @@ namespace Sample.Tickets.Api.IntegrationTests
                 var response = client.GetAsync("/api").Result;
 
                 Assert.True(response.IsSuccessStatusCode, "Actual response status code was: " + response.StatusCode);
+            }
+        }
+
+        [Fact]
+        [UseDatabase]
+        public void GET_tickets_returns_401_if_no_user_specified()
+        {
+            using (var client = TestServerHttpClientFactory.Create(null))
+            {
+                var response = client.GetAsync("/api/tickets").Result;
+
+                Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             }
         }
 
@@ -174,6 +184,83 @@ namespace Sample.Tickets.Api.IntegrationTests
                 Assert.Equal(assignedTo, actual.assignedTo.ToString());
                 Assert.Equal(severity, actual.severity.ToString());
                 Assert.Equal(status, actual.status.ToString());
+            }
+        }
+
+        [Theory]
+        [AutoData]
+        [UseDatabase]
+        public void POST_ticket_creates_ticket_in_the_db(
+            Guid ticketId,
+            string userName,
+            string title,
+            string description,
+            string severity,
+            string assignedTo,
+            string status,
+            string newTitle,
+            string newDescription,
+            string newSeverity,
+            string newAssignedTo,
+            string newStatus
+            )
+        {
+            using (var client = TestServerHttpClientFactory.Create(userName))
+            {
+                var json = new
+                {
+                    title = newTitle,
+                    description = newDescription,
+                    severity = newSeverity,
+                    status = newStatus,
+                    assignedTo = newAssignedTo,
+                };
+
+                client.PostAsJsonAsync("/api/tickets/", json).Wait();
+
+                var db = Simple.Data.Database.OpenNamedConnection(ConnectionStringName);
+                var dbTicktets = db.Tickets.All();
+
+                Assert.Equal(1, dbTicktets.Count());
+                Assert.Equal(newTitle, dbTicktets.First().Title.ToString());
+                Assert.Equal(newDescription, dbTicktets.First().Description.ToString());
+                Assert.Equal(newAssignedTo, dbTicktets.First().AssignedTo.ToString());
+                Assert.Equal(newSeverity, dbTicktets.First().Severity.ToString());
+                Assert.Equal(newStatus, dbTicktets.First().Status.ToString());
+            }
+        }
+
+        [Theory]
+        [AutoData]
+        [UseDatabase]
+        public void POST_ticket_returns_401_if_no_user_specified(
+            Guid ticketId,
+            string title,
+            string description,
+            string severity,
+            string assignedTo,
+            string status,
+            string newTitle,
+            string newDescription,
+            string newSeverity,
+            string newAssignedTo,
+            string newStatus
+            )
+        {
+            using (var client = TestServerHttpClientFactory.Create(null))
+            {
+                var json = new
+                {
+                    title = newTitle,
+                    description = newDescription,
+                    severity = newSeverity,
+                    status = newStatus,
+                    assignedTo = newAssignedTo,
+                };
+
+                var response = client.PostAsJsonAsync("/api/tickets/", json).Result;
+
+                Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             }
         }
 

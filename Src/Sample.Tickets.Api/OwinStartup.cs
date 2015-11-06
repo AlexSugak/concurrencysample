@@ -22,18 +22,22 @@ namespace Sample.Tickets.Api
 
             var userNameQuery = new SimppleTokenUserNameQuery();
             var envelop = new EnvelopeWithUserName(userNameQuery);
-            var allTicketsQuery = new GetAllTicketsSqlQuery(connectionString);
-            var getTicketQuery = new GetTicketByIdQuerySqlQuery(connectionString);
+            var allTicketsQuery = new SecuredQuery<EmptyRequest, IEnumerable<TicketDetails>>(
+                                    new GetAllTicketsSqlQuery(connectionString));
+            var getTicketQuery = new SecuredQuery<Guid, TicketDetails>(
+                                    new GetTicketByIdQuerySqlQuery(connectionString));
             var getVersionQuery = new IfMatchHttpHeaderTicketVersionQuery();
-            var addTicketCmd = new TicketValidator(
-                                    new SubmitNewTicketSqlCommand(connectionString));
-            var updateTicketCmd = new TransactedCommand<Ticket>(
+            var addTicketCmd = new TransactedCommand<Ticket>(
+                                    new SecuredCommand<Ticket>(
                                         new TicketValidator(
-                                            new UpdateTicketSqlCommand(connectionString))
-                                        );
+                                            new SubmitNewTicketSqlCommand(connectionString))));
+            var updateTicketCmd = new TransactedCommand<Ticket>(
+                                        new SecuredCommand<Ticket>(
+                                            new TicketValidator(
+                                                new UpdateTicketSqlCommand(connectionString))));
             var deleteTicketCmd = new TransactedCommand<TicketReference>(
-                                        new DeleteTicketSqlCommand(connectionString)
-                                        );
+                                        new SecuredCommand<TicketReference>(
+                                            new DeleteTicketSqlCommand(connectionString)));
 
             var compositon = new CompositionRoot(
                 envelop,

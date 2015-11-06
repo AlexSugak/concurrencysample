@@ -60,6 +60,8 @@
     <Compile Include="ICommand.cs" />
     <Compile Include="IQuery.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SecuredCommand.cs" />
+    <Compile Include="SecuredQuery.cs" />
     <Compile Include="SimpleToken.cs" />
     <Compile Include="SqlOperation.cs" />
     <Compile Include="TransactedCommand.cs" />

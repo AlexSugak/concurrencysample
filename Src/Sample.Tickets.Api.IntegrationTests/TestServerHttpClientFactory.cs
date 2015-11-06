@@ -19,8 +19,11 @@ namespace Sample.Tickets.Api.IntegrationTests
         {
             var server = TestServer.Create(app => new OwinStartup().Configuration(app));
             var client = server.HttpClient;
-            client.DefaultRequestHeaders.Authorization = 
-                    new AuthenticationHeaderValue("Bearer", new SimpleToken(new Claim("userName", userName)).ToString());
+            if (!string.IsNullOrEmpty(userName))
+            {
+                client.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", new SimpleToken(new Claim("userName", userName)).ToString());
+            }
             return client;
         }
     }

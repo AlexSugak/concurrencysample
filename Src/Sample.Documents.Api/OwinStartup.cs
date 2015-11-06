@@ -21,31 +21,39 @@ namespace Sample.Documents.Api
         {
             var connectionString = ConfigurationManager.ConnectionStrings["DBConnectionString"].ConnectionString;
 
-            var getAllDocumentsQuery = new GetAllDocumentsSqlQuery(connectionString);
-            var getDocumentQuery = new GetDocumentSqlQuery(connectionString);
             var userNameQuery = new SimppleTokenUserNameQuery();
             var envelop = new EnvelopeWithUserName(userNameQuery);
 
+            var getAllDocumentsQuery = new SecuredQuery<EmptyRequest, IEnumerable<DocumentDetails>>(
+                                            new GetAllDocumentsSqlQuery(connectionString));
+            var getDocumentQuery = new SecuredQuery<Guid, DocumentDetails>(
+                                        new GetDocumentSqlQuery(connectionString));
+
             var submitDocCmd = new TransactedCommand<Document>(
-                                    new DocumentValidator(
-                                        new SubmitNewDocumentSqlCommand(connectionString)));
+                                    new SecuredCommand<Document>(
+                                        new DocumentValidator(
+                                            new SubmitNewDocumentSqlCommand(connectionString))));
             var updateDocCmd = new TransactedCommand<Document>(
-                                    new DocumentValidator(
-                                        new DocumentLockValidator<Document>(
-                                            new UpdateDocumentSqlCommand(connectionString),
-                                            getDocumentQuery)));
+                                    new SecuredCommand<Document>(
+                                        new DocumentValidator(
+                                            new DocumentLockValidator<Document>(
+                                                new UpdateDocumentSqlCommand(connectionString),
+                                                getDocumentQuery))));
             var putLockCmd = new TransactedCommand<LockInfo>(
-                                    new DocumentLockValidator<LockInfo>(
-                                        new PutLockOnDocumentSqlCommand(connectionString),
-                                        getDocumentQuery));
+                                    new SecuredCommand<LockInfo>(
+                                        new DocumentLockValidator<LockInfo>(
+                                            new PutLockOnDocumentSqlCommand(connectionString),
+                                            getDocumentQuery)));
             var removeLockCmd = new TransactedCommand<LockInfo>(
-                                    new DocumentLockValidator<LockInfo>(
-                                        new RemoveLockFromDocumentSqlCommand(connectionString),
-                                        getDocumentQuery));
+                                    new SecuredCommand<LockInfo>(
+                                        new DocumentLockValidator<LockInfo>(
+                                            new RemoveLockFromDocumentSqlCommand(connectionString),
+                                            getDocumentQuery)));
             var deleteDocCmd = new TransactedCommand<DocumentReference>(
-                                    new DocumentLockValidator<DocumentReference>(
-                                        new DeleteDocumentSqlCommand(connectionString),
-                                        getDocumentQuery));
+                                    new SecuredCommand<DocumentReference>(
+                                        new DocumentLockValidator<DocumentReference>(
+                                            new DeleteDocumentSqlCommand(connectionString),
+                                            getDocumentQuery)));
 
             var config = new HttpConfiguration();
             var compositon = new CompositionRoot(
