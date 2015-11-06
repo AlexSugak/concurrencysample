@@ -13,9 +13,9 @@ namespace Sample.Documents.Api.Commands
         where T : IDocumentReference
     {
         private readonly ICommand<T> _implementation;
-        private readonly IGetDocumentQuery _docQuery;
+        private readonly IQuery<Guid, DocumentDetails> _docQuery;
 
-        public DocumentLockValidator(ICommand<T> implementation, IGetDocumentQuery docQuery)
+        public DocumentLockValidator(ICommand<T> implementation, IQuery<Guid, DocumentDetails> docQuery)
         {
             _implementation = implementation;
             _docQuery = docQuery;
@@ -23,7 +23,7 @@ namespace Sample.Documents.Api.Commands
 
         public void Execute(Envelope<T> lockInfo)
         {
-            var doc = _docQuery.Execute(lockInfo.Item.DocumentId);
+            var doc = _docQuery.Execute(lockInfo.Envelop(lockInfo.Item.DocumentId));
 
             if (!string.IsNullOrEmpty(doc.CheckedOutBy) && doc.CheckedOutBy != lockInfo.UserName)
             {

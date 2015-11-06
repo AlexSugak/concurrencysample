@@ -12,11 +12,11 @@ namespace Sample.Tickets.Api.Commands
     public class TicketConcurrentUpdatesDetector<T> : ICommand<T> where T : ITicketReference
     {
         private readonly ICommand<T> _implementation;
-        private readonly IGetTicketByIdQuery _getTicketQuery;
+        private readonly IQuery<Guid, TicketDetails> _getTicketQuery;
 
         public TicketConcurrentUpdatesDetector(
             ICommand<T> implementation,
-            IGetTicketByIdQuery getTicketQuery)
+            IQuery<Guid, TicketDetails> getTicketQuery)
         {
             _implementation = implementation;
             _getTicketQuery = getTicketQuery;
@@ -24,7 +24,7 @@ namespace Sample.Tickets.Api.Commands
 
         public void Execute(Envelope<T> input)
         {
-            var existing = _getTicketQuery.Execute(input.Item.TicketId);
+            var existing = _getTicketQuery.Execute(input.Envelop(input.Item.TicketId));
             if(existing.Version != input.Item.ExpectedVersion)
             {
                 throw new OptimisticConcurrencyException(

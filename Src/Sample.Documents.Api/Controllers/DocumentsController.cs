@@ -16,22 +16,22 @@ namespace Sample.Documents.Api.Controllers
     /// Controller for documents resource
     /// </summary>
     [RoutePrefix("api/documents")]
-    public class DocumentsController : SecuredApiController
+    public class DocumentsController : ApiControllerWithEnvelope
     {
-        private readonly IGetAllDocumentsQuery _getAllDocuments;
-        private readonly IGetDocumentQuery _getDocument;
+        private readonly IQuery<EmptyRequest, IEnumerable<DocumentDetails>> _getAllDocuments;
+        private readonly IQuery<Guid, DocumentDetails> _getDocument;
         private readonly ICommand<Document> _submitDocumentCmd;
         private readonly ICommand<Document> _updateDocumentCmd;
         private readonly ICommand<DocumentReference> _deleteDocument;
 
         public DocumentsController(
-            IUserNameQuery userQuery,
-            IGetAllDocumentsQuery getAllDocuments,
-            IGetDocumentQuery getDocument,
+            IEnvelop envelop,
+            IQuery<EmptyRequest, IEnumerable<DocumentDetails>> getAllDocuments,
+            IQuery<Guid, DocumentDetails> getDocument,
             ICommand<Document> submitDocumentCmd,
             ICommand<Document> updateDocumentCmd,
             ICommand<DocumentReference> deleteDocument)
-            : base(userQuery)
+            : base(envelop)
         {
             _getAllDocuments = getAllDocuments;
             _getDocument = getDocument;
@@ -43,123 +43,130 @@ namespace Sample.Documents.Api.Controllers
         [Route("")]
         public IHttpActionResult Get()
         {
-            return InvokeWhenUserExists(userName => this.Ok<DocumentsModel>(
-                                                            new DocumentsModel()
-                                                            {
-                                                                Documents = ReadDocuments().ToArray()
-                                                            }));
+            DocumentResponseModel[] docs;
+            try
+            {
+                docs = ReadDocuments().ToArray();
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return this.Unauthorized();
+            }
+
+            return this.Ok<DocumentsModel>(
+                    new DocumentsModel()
+                    {
+                        Documents = docs
+                    });
         }
 
         [Route("{documentId}")]
         public IHttpActionResult GetById(Guid documentId)
         {
-            return InvokeWhenUserExists(userName =>
+            DocumentDetails doc;
+            try
             {
-                DocumentDetails doc;
-                try
-                {
-                    doc = _getDocument.Execute(documentId);
-                }
-                catch(DocumentNotFoundException)
-                {
-                    return this.NotFound();
-                }
+                doc = _getDocument.Execute(Envelop(documentId));
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return this.Unauthorized();
+            }
+            catch (DocumentNotFoundException)
+            {
+                return this.NotFound();
+            }
 
-                return this.Ok<DocumentResponseModel>(
-                                                        new DocumentResponseModel()
-                                                        {
-                                                            Id = doc.Id.ToString(),
-                                                            Title = doc.Title,
-                                                            Content = doc.Content,
-                                                            CheckedOutBy = doc.CheckedOutBy
-                                                        });
-            });
+            return this.Ok<DocumentResponseModel>(MapDocument(doc));
         }
-            
+
 
         [Route("")]
         public IHttpActionResult Post(DocumentModel model)
         {
-            return InvokeWhenUserExists(userName => 
+            var id = Guid.NewGuid();
+            try
             {
-                var id = Guid.NewGuid();
-                try
-                {
-                    _submitDocumentCmd.Execute(Envelop(new Document(id, model.Title, model.Content), userName));
-                }
-                catch(ValidationException e)
-                {
-                    return this.BadRequest(e.Message);
-                }
+                _submitDocumentCmd.Execute(Envelop(new Document(id, model.Title, model.Content)));
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return this.Unauthorized();
+            }
+            catch (ValidationException e)
+            {
+                return this.BadRequest(e.Message);
+            }
 
-                return this.Created<DocumentResponseModel>("", new DocumentResponseModel()
-                {
-                    Id = id.ToString(),
-                    Title = model.Title,
-                    Content = model.Content
-                });
+            return this.Created<DocumentResponseModel>("", new DocumentResponseModel()
+            {
+                Id = id.ToString(),
+                Title = model.Title,
+                Content = model.Content
             });
         }
 
         [Route("{documentId}")]
         public IHttpActionResult Put(DocumentModel model, Guid documentId)
         {
-            return InvokeWhenUserExists(userName =>
+            try
             {
-                try
+                _updateDocumentCmd.Execute(Envelop(new Document(documentId, model.Title, model.Content)));
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return this.Unauthorized();
+            }
+            catch (DocumentLockedException e)
+            {
+                return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.Conflict)
                 {
-                    _updateDocumentCmd.Execute(Envelop(new Document(documentId, model.Title, model.Content), userName));
-                }
-                catch(DocumentLockedException e)
-                {
-                    return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.Conflict) 
-                    { 
-                        Content = new StringContent(e.Message) 
-                    });
-                }
-
-                return this.Ok<DocumentResponseModel>(new DocumentResponseModel()
-                {
-                    Id = documentId.ToString(),
-                    Title = model.Title,
-                    Content = model.Content,
-                    CheckedOutBy = userName
+                    Content = new StringContent(e.Message)
                 });
-            });
+            }
+
+            var doc = _getDocument.Execute(Envelop(documentId));
+            return this.Ok<DocumentResponseModel>(MapDocument(doc));
         }
 
         [Route("{documentId}")]
         public IHttpActionResult Delete(Guid documentId)
         {
-            return InvokeWhenUserExists(userName =>
+            try
             {
-                try
+                _deleteDocument.Execute(Envelop(new DocumentReference(documentId)));
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return this.Unauthorized();
+            }
+            catch (DocumentLockedException e)
+            {
+                return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.Conflict)
                 {
-                    _deleteDocument.Execute(Envelop(new DocumentReference(documentId), userName));
-                }
-                catch(DocumentLockedException e)
-                {
-                    return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.Conflict)
-                    {
-                        Content = new StringContent(e.Message)
-                    });
-                }
+                    Content = new StringContent(e.Message)
+                });
+            }
 
-                return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.NoContent));
-            });
+            return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.NoContent));
         }
 
         private IEnumerable<DocumentResponseModel> ReadDocuments()
         {
             return _getAllDocuments
-                        .Execute()
-                        .Select(d => new DocumentResponseModel()
+                        .Execute(Envelop(new EmptyRequest()))
+                        .Select(MapDocument);
+        }
+
+        private DocumentResponseModel MapDocument(DocumentDetails doc)
+        {
+            return new DocumentResponseModel()
                         {
-                            Id = d.Id.ToString(),
-                            Title = d.Title,
-                            Content = d.Content,
-                            CheckedOutBy = d.CheckedOutBy
-                        });
+                            Id = doc.Id.ToString(),
+                            Title = doc.Title,
+                            Content = doc.Content,
+                            CheckedOutBy = doc.CheckedOutBy
+                        };
         }
     }
 

@@ -6,19 +6,14 @@ using Sample.Api.Shared;
 
 namespace Sample.Tickets.Api.Queries
 {
-    public interface IGetAllTicketsQuery
-    {
-        IEnumerable<TicketDetails> Execute();
-    }
-
-    public class GetAllTicketsSqlQuery : SqlOperation, IGetAllTicketsQuery
+    public class GetAllTicketsSqlQuery : SqlOperation, IQuery<EmptyRequest, IEnumerable<TicketDetails>>
     {
         public GetAllTicketsSqlQuery(string connectionString)
             : base(connectionString)
         {
         }
 
-        public IEnumerable<TicketDetails> Execute()
+        public IEnumerable<TicketDetails> Execute(Envelope<EmptyRequest> request)
         {
             string cmdText = "SELECT * FROM [dbo].[Tickets] ORDER BY [Title]";
             return base.ExecuteReader<TicketDetails>(

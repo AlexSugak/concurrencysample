@@ -5,9 +5,16 @@ namespace Sample.Api.Shared
 {
     public abstract class ApiControllerWithEnvelope : ApiController
     {
-        protected Envelope<T> Envelop<T>(T item, string userName)
+        private readonly IEnvelop _envelop;
+
+        public ApiControllerWithEnvelope(IEnvelop envelop)
         {
-            return new Envelope<T>(item, userName);
+            _envelop = envelop;
+        }
+
+        protected Envelope<T> Envelop<T>(T item)
+        {
+            return _envelop.Envelop(this.Request, item);
         }
     }
 }

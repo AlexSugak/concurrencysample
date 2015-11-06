@@ -7,19 +7,14 @@ using Sample.Tickets.Api.Exceptions;
 
 namespace Sample.Tickets.Api.Queries
 {
-    public interface IGetTicketByIdQuery
-    {
-        TicketDetails Execute(Guid id);
-    }
-
-    public class GetTicketByIdQuerySqlQuery : SqlOperation, IGetTicketByIdQuery
+    public class GetTicketByIdQuerySqlQuery : SqlOperation, IQuery<Guid, TicketDetails>
     {
         public GetTicketByIdQuerySqlQuery(string connectionString)
             : base(connectionString)
         {
         }
 
-        public TicketDetails Execute(Guid id)
+        public TicketDetails Execute(Envelope<Guid> request)
         {
             return base.ExecuteReaderOnce<TicketDetails>(
                 "SELECT * FROM [dbo].[Tickets] WHERE [Id] = @id",
@@ -33,8 +28,8 @@ namespace Sample.Tickets.Api.Queries
                                 AssignedTo = reader["AssignedTo"] as string,
                                 Version = BitConverter.ToUInt64(((byte[])reader["Version"]).Reverse().ToArray(), 0)
                             },
-                () => new TicketNotFoundException(string.Format("Ticket {0} was not found", id)),
-                new SqlParameter("@id", id));
+                () => new TicketNotFoundException(string.Format("Ticket {0} was not found", request.Item)),
+                new SqlParameter("@id", request.Item));
         }
     }
 }

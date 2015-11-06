@@ -24,6 +24,7 @@ namespace Sample.Documents.Api
             var getAllDocumentsQuery = new GetAllDocumentsSqlQuery(connectionString);
             var getDocumentQuery = new GetDocumentSqlQuery(connectionString);
             var userNameQuery = new SimppleTokenUserNameQuery();
+            var envelop = new EnvelopeWithUserName(userNameQuery);
 
             var submitDocCmd = new TransactedCommand<Document>(
                                     new DocumentValidator(
@@ -48,11 +49,11 @@ namespace Sample.Documents.Api
 
             var config = new HttpConfiguration();
             var compositon = new CompositionRoot(
+                                    envelop,
                                     getAllDocumentsQuery,
                                     getDocumentQuery,
                                     submitDocCmd, 
                                     updateDocCmd,
-                                    userNameQuery, 
                                     putLockCmd, 
                                     removeLockCmd,
                                     deleteDocCmd);

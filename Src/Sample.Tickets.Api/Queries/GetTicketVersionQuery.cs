@@ -2,21 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using Sample.Api.Shared;
 
 namespace Sample.Tickets.Api.Queries
 {
-    public interface IGetTicketVersionQuery
+    public class IfMatchHttpHeaderTicketVersionQuery : IQuery<HttpRequestMessage, ulong>
     {
-        ulong Execute(HttpRequestMessage request);
-    }
-
-    public class IfMatchHttpHeaderTicketVersionQuery : IGetTicketVersionQuery
-    {
-        public ulong Execute(HttpRequestMessage request)
+        public ulong Execute(Envelope<HttpRequestMessage> request)
         {
-            if(request.Headers.IfMatch != null)
+            if(request.Item.Headers.IfMatch != null)
             {
-                var value = request.Headers.IfMatch.FirstOrDefault();
+                var value = request.Item.Headers.IfMatch.FirstOrDefault();
                 if (value != null)
                 {
                     return ulong.Parse(value.Tag.TrimStart("\"".ToCharArray()).TrimEnd("\"".ToCharArray()));

@@ -21,6 +21,7 @@ namespace Sample.Tickets.Api
             var connectionString = ConfigurationManager.ConnectionStrings["DBConnectionString"].ConnectionString;
 
             var userNameQuery = new SimppleTokenUserNameQuery();
+            var envelop = new EnvelopeWithUserName(userNameQuery);
             var allTicketsQuery = new GetAllTicketsSqlQuery(connectionString);
             var getTicketQuery = new GetTicketByIdQuerySqlQuery(connectionString);
             var getVersionQuery = new IfMatchHttpHeaderTicketVersionQuery();
@@ -35,13 +36,14 @@ namespace Sample.Tickets.Api
                                         );
 
             var compositon = new CompositionRoot(
-                userNameQuery, 
-                allTicketsQuery, 
-                getTicketQuery, 
-                addTicketCmd, 
+                envelop,
+                userNameQuery,
+                allTicketsQuery,
+                getTicketQuery,
+                getVersionQuery,
+                addTicketCmd,
                 updateTicketCmd,
-                deleteTicketCmd,
-                getVersionQuery);
+                deleteTicketCmd);
 
             var config = new HttpConfiguration();
             HttpConfigurator.Configure(config, compositon);

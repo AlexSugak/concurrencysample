@@ -16,14 +16,14 @@ using System.Web.Http;
 namespace Sample.Tickets.Api.Controllers
 {
     [RoutePrefix("api/tickets")]
-    public class TicketsController : SecuredApiController
+    public class TicketsController : ApiControllerWithEnvelope
     {
-        private readonly IGetAllTicketsQuery _allTicketsQuery;
-        private readonly IGetTicketByIdQuery _getTicketQuery;
+        private readonly IQuery<EmptyRequest, IEnumerable<TicketDetails>> _allTicketsQuery;
+        private readonly IQuery<Guid, TicketDetails> _getTicketQuery;
+        private readonly IQuery<HttpRequestMessage, ulong> _versionQuery;
         private readonly ICommand<Ticket> _addTicketCmd;
         private readonly ICommand<Ticket> _updateTicketCmd;
         private readonly ICommand<TicketReference> _deleteTicketCmd;
-        private readonly IGetTicketVersionQuery _versionQuery;
 
         static TicketsController()
         {
@@ -33,14 +33,14 @@ namespace Sample.Tickets.Api.Controllers
         }
 
         public TicketsController(
-            IUserNameQuery userQuery,
-            IGetAllTicketsQuery allTicketsQuery,
-            IGetTicketByIdQuery getTicketQuery,
+            IEnvelop envelop,
+            IQuery<EmptyRequest, IEnumerable<TicketDetails>> allTicketsQuery,
+            IQuery<Guid, TicketDetails> getTicketQuery,
+            IQuery<HttpRequestMessage, ulong> versionQuery,
             ICommand<Ticket> addTicketCmd,
             ICommand<Ticket> updateTicketCmd,
-            ICommand<TicketReference> deleteTicketCmd,
-            IGetTicketVersionQuery versionQuery)
-            : base(userQuery)
+            ICommand<TicketReference> deleteTicketCmd)
+            : base(envelop)
         {
             _getTicketQuery = getTicketQuery;
             _allTicketsQuery = allTicketsQuery;
@@ -53,126 +53,137 @@ namespace Sample.Tickets.Api.Controllers
         [Route]
         public IHttpActionResult Get()
         {
-            return InvokeWhenUserExists(userName => this.Ok(new TicketsModel() 
+            IEnumerable<TicketDetails> tickets;
+            try
+            {
+                tickets = _allTicketsQuery.Execute(Envelop(new EmptyRequest()));
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return this.Unauthorized();
+            }
+
+            return this.Ok(new TicketsModel() 
             { 
-                Tickets = _allTicketsQuery.Execute().Select(t => Mapper.Map<TicketResponseModel>(t)).ToList() 
-            }));
+                Tickets = tickets.Select(t => Mapper.Map<TicketResponseModel>(t)).ToList() 
+            });
         }
 
-        [Route("{ticketId}", Name="GetTicketById")]
+        [Route("{ticketId}", Name = "GetTicketById")]
         public IHttpActionResult Get(Guid ticketId)
         {
-            return InvokeWhenUserExists(userName => 
+            TicketDetails ticket;
+            try
             {
-                TicketDetails ticket;
-                try
-                {
-                    ticket = _getTicketQuery.Execute(ticketId);
-                }
-                catch(TicketNotFoundException)
-                {
-                    return this.NotFound();
-                }
+                ticket = _getTicketQuery.Execute(Envelop(ticketId));
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return this.Unauthorized();
+            }
+            catch (TicketNotFoundException)
+            {
+                return this.NotFound();
+            }
 
-                var ticketResponse = Mapper.Map<TicketResponseModel>(ticket);
-                return new OkResultWithETag<TicketResponseModel>(ticketResponse, this)
-                {
-                    ETagValue = ticket.Version.ToString()
-                };
-            });
+            var ticketResponse = Mapper.Map<TicketResponseModel>(ticket);
+            return new OkResultWithETag<TicketResponseModel>(ticketResponse, this)
+            {
+                ETagValue = ticket.Version.ToString()
+            };
         }
 
         [Route]
         public IHttpActionResult Post(TicketModel model)
         {
-            return InvokeWhenUserExists(userName =>
+            var id = Guid.NewGuid();
+            var newTicket = Mapper.Map<Ticket>(model);
+            newTicket.TicketId = id;
+
+            try
             {
-                var id = Guid.NewGuid();
-                var newTicket = Mapper.Map<Ticket>(model);
-                newTicket.TicketId = id;
+                _addTicketCmd.Execute(Envelop(newTicket));
+            }
+            catch (ValidationException e)
+            {
+                return this.BadRequest(e.Message);
+            }
+            catch(UnauthorizedAccessException)
+            {
+                return this.Unauthorized();
+            }
 
-                try
-                {
-                    _addTicketCmd.Execute(new Envelope<Ticket>(newTicket, userName));
-                }
-                catch(ValidationException e)
-                {
-                    return this.BadRequest(e.Message);
-                }
+            var ticket = _getTicketQuery.Execute(Envelop(id));
+            var response = Mapper.Map<TicketResponseModel>(ticket);
 
-                var ticket = _getTicketQuery.Execute(id);
-                var response = Mapper.Map<TicketResponseModel>(ticket);
-
-                var uri = this.Url.Link("GetTicketById", new { ticketId = id });
-                return new CreatedResultWithETag<TicketResponseModel>(new Uri(uri), response, this)
-                {
-                    ETagValue = ticket.Version.ToString()
-                };
-            });
+            var uri = this.Url.Link("GetTicketById", new { ticketId = id });
+            return new CreatedResultWithETag<TicketResponseModel>(new Uri(uri), response, this)
+            {
+                ETagValue = ticket.Version.ToString()
+            };
         }
 
         [Route("{ticketId}")]
         public IHttpActionResult Put(Guid ticketId, TicketModel model)
         {
-            return InvokeWhenUserExists(userName =>
+            var newTicket = Mapper.Map<Ticket>(model);
+            newTicket.TicketId = ticketId;
+            newTicket.ExpectedVersion = _versionQuery.Execute(Envelop(this.Request));
+
+            try
             {
-                var newTicket = Mapper.Map<Ticket>(model);
-                newTicket.TicketId = ticketId;
-                newTicket.ExpectedVersion = _versionQuery.Execute(this.Request);
+                _updateTicketCmd.Execute(Envelop(newTicket));
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return this.Unauthorized();
+            }
+            catch (ValidationException e)
+            {
+                return this.BadRequest(e.Message);
+            }
+            catch (TicketNotFoundException)
+            {
+                return this.NotFound();
+            }
+            catch (OptimisticConcurrencyException e)
+            {
+                return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.PreconditionFailed)
+                {
+                    Content = new StringContent(e.Message)
+                });
+            }
 
-                try
-                {
-                    _updateTicketCmd.Execute(new Envelope<Ticket>(newTicket, userName));
-                }
-                catch(ValidationException e)
-                {
-                    return this.BadRequest(e.Message);
-                }
-                catch(TicketNotFoundException)
-                {
-                    return this.NotFound();
-                }
-                catch(OptimisticConcurrencyException e)
-                {
-                    return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.PreconditionFailed) 
-                    { 
-                        Content = new StringContent(e.Message) 
-                    });
-                }
+            var ticket = _getTicketQuery.Execute(Envelop(ticketId));
+            var response = Mapper.Map<TicketResponseModel>(ticket);
 
-                var ticket = _getTicketQuery.Execute(ticketId);
-                var response = Mapper.Map<TicketResponseModel>(ticket);
-
-                return new OkResultWithETag<TicketResponseModel>(response, this)
-                {
-                    ETagValue = ticket.Version.ToString()
-                };
-            });
+            return new OkResultWithETag<TicketResponseModel>(response, this)
+            {
+                ETagValue = ticket.Version.ToString()
+            };
         }
 
         [Route("{ticketId}")]
         public IHttpActionResult Delete(Guid ticketId)
         {
-            return InvokeWhenUserExists(userName =>
+            try
             {
-                try
+                _deleteTicketCmd.Execute(
+                    Envelop(new TicketReference(ticketId, _versionQuery.Execute(Envelop(this.Request)))));
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return this.Unauthorized();
+            }
+            catch (OptimisticConcurrencyException e)
+            {
+                return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.PreconditionFailed)
                 {
-                    _deleteTicketCmd.Execute(new Envelope<TicketReference>(
-                                                            new TicketReference(
-                                                                ticketId, 
-                                                                _versionQuery.Execute(this.Request)), 
-                                                            userName));
-                }
-                catch(OptimisticConcurrencyException e)
-                {
-                    return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.PreconditionFailed)
-                    {
-                        Content = new StringContent(e.Message)
-                    });
-                }
+                    Content = new StringContent(e.Message)
+                });
+            }
 
-                return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.NoContent));
-            });
+            return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.NoContent));
         }
     }
 

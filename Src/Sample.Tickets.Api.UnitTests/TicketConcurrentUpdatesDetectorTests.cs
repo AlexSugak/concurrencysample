@@ -19,11 +19,12 @@ namespace Sample.Tickets.Api.UnitTests
         public void execute_call_inner_command(
             Envelope<Ticket> ticket,
             TicketDetails existingTicket,
-            Mock<IGetTicketByIdQuery> getTicketQuery,
+            Mock<IQuery<Guid, TicketDetails>> getTicketQuery,
             Mock<ICommand<Ticket>> inner)
         {
             existingTicket.Version = ticket.Item.ExpectedVersion;
-            getTicketQuery.Setup(q => q.Execute(ticket.Item.TicketId)).Returns(existingTicket);
+            getTicketQuery.Setup(q => q.Execute(It.Is<Envelope<Guid>>(t => t.Item == ticket.Item.TicketId)))
+                          .Returns(existingTicket);
             var sut = new TicketConcurrentUpdatesDetector<Ticket>(inner.Object, getTicketQuery.Object);
 
             sut.Execute(ticket);
@@ -36,10 +37,11 @@ namespace Sample.Tickets.Api.UnitTests
         public void execute_throws_concurrency_exception_when_versions_dont_match(
             Envelope<Ticket> ticket,
             TicketDetails existingTicket,
-            Mock<IGetTicketByIdQuery> getTicketQuery,
+            Mock<IQuery<Guid, TicketDetails>> getTicketQuery,
             Mock<ICommand<Ticket>> inner)
         {
-            getTicketQuery.Setup(q => q.Execute(ticket.Item.TicketId)).Returns(existingTicket);
+            getTicketQuery.Setup(q => q.Execute(It.Is<Envelope<Guid>>(t => t.Item == ticket.Item.TicketId)))
+                          .Returns(existingTicket);
 
             var sut = new TicketConcurrentUpdatesDetector<Ticket>(inner.Object, getTicketQuery.Object);
 

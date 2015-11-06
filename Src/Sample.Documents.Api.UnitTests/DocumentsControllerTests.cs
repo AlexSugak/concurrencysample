@@ -20,9 +20,12 @@ namespace Sample.Documents.Api.UnitTests
     {
         [Theory]
         [DocumentsControllerAutoData]
-        public void get_returns_correct_result_when_no_auth_header_in_request(  
+        public void get_returns_correct_result_on_unauthorized(  
+            [Frozen]Mock<IQuery<EmptyRequest, IEnumerable<DocumentDetails>>> query,
             DocumentsController sut)
         {
+            query.Setup(q => q.Execute(It.IsAny<Envelope<EmptyRequest>>())).Throws<UnauthorizedAccessException>();
+
             var response = sut.Get();
 
             response.Should().BeOfType<UnauthorizedResult>("because auth header was not specified");
@@ -31,13 +34,8 @@ namespace Sample.Documents.Api.UnitTests
         [Theory]
         [DocumentsControllerAutoData]
         public void get_returns_200_OK_Result(
-            string userName,
-            [Frozen]Mock<IUserNameQuery> userQuery, 
             DocumentsController sut)
         {
-            userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
-                     .Returns(userName);
-
             var result = sut.Get();
 
             result
@@ -50,15 +48,11 @@ namespace Sample.Documents.Api.UnitTests
         [DocumentsControllerAutoData]
         public void get_returns_documents_returned_by_query(
             List<DocumentDetails> documents,
-            string userName,
-            [Frozen]Mock<IUserNameQuery> userQuery,
-            [Frozen]Mock<IGetAllDocumentsQuery> getAllQuery,
+            [Frozen]Mock<IQuery<EmptyRequest, IEnumerable<DocumentDetails>>> getAllQuery,
             DocumentsController sut)
         {
-            getAllQuery.Setup(q => q.Execute())
+            getAllQuery.Setup(q => q.Execute(It.IsAny<Envelope<EmptyRequest>>()))
                        .Returns(documents);
-            userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
-                     .Returns(userName);
 
             var result = sut.Get();
 
@@ -70,10 +64,13 @@ namespace Sample.Documents.Api.UnitTests
 
         [Theory]
         [DocumentsControllerAutoData]
-        public void post_returns_correct_result_when_no_auth_header_in_request(
+        public void post_returns_correct_result_when_unauthorized(
             DocumentModel document,
+            [Frozen]Mock<ICommand<Document>> cmd,
             DocumentsController sut)
         {
+            cmd.Setup(c => c.Execute(It.IsAny<Envelope<Document>>())).Throws<UnauthorizedAccessException>();
+
             var response = sut.Post(document);
 
             response.Should().BeOfType<UnauthorizedResult>("because auth header was not specified");
@@ -83,13 +80,8 @@ namespace Sample.Documents.Api.UnitTests
         [DocumentsControllerAutoData]
         public void post_returns_201_Created_when_command_succeeds(
             DocumentModel document,
-            string userName,
-            [Frozen]Mock<IUserNameQuery> userQuery, 
             DocumentsController sut)
         {
-            userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
-                     .Returns(userName);
-
             var result = sut.Post(document);
 
             result.Should().BeOfType<CreatedNegotiatedContentResult<DocumentResponseModel>>()
@@ -101,15 +93,11 @@ namespace Sample.Documents.Api.UnitTests
         public void post_returns_400_BadRequest_on_validation_exception(
             DocumentModel document,
             ValidationException exception,
-            string userName,
-            [Frozen]Mock<IUserNameQuery> userQuery, 
             [Frozen]Mock<ICommand<Document>> submitNewCmd,
             DocumentsController sut)
         {
             submitNewCmd.Setup(c => c.Execute(It.IsAny<Envelope<Document>>()))
                         .Throws(exception);
-            userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
-                     .Returns(userName);
 
             var result = sut.Post(document);
 
@@ -123,15 +111,11 @@ namespace Sample.Documents.Api.UnitTests
             Guid documentId,
             DocumentModel document,
             DocumentLockedException exception,
-            string userName,
-            [Frozen]Mock<IUserNameQuery> userQuery,
             [Frozen]Mock<ICommand<Document>> updateCmd,
             DocumentsController sut)
         {
             updateCmd.Setup(c => c.Execute(It.IsAny<Envelope<Document>>()))
                      .Throws(exception);
-            userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
-                     .Returns(userName);
 
             var result = sut.Put(document, documentId);
 
@@ -146,15 +130,11 @@ namespace Sample.Documents.Api.UnitTests
         [DocumentsControllerAutoData]
         public void getById_returns_document_returned_by_query(
             DocumentDetails document,
-            string userName,
-            [Frozen]Mock<IUserNameQuery> userQuery,
-            [Frozen]Mock<IGetDocumentQuery> getDocQuery,
+            [Frozen]Mock<IQuery<Guid, DocumentDetails>> getDocQuery,
             DocumentsController sut)
         {
-            getDocQuery.Setup(q => q.Execute(document.Id))
+            getDocQuery.Setup(q => q.Execute(It.Is<Envelope<Guid>>(r => r.Item == document.Id)))
                        .Returns(document);
-            userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
-                     .Returns(userName);
 
             var result = sut.GetById(document.Id);
 
@@ -167,15 +147,11 @@ namespace Sample.Documents.Api.UnitTests
         [DocumentsControllerAutoData]
         public void getById_returns_404_NotFound_when_document_not_found(
             DocumentDetails document,
-            string userName,
-            [Frozen]Mock<IUserNameQuery> userQuery,
-            [Frozen]Mock<IGetDocumentQuery> getDocQuery,
+            [Frozen]Mock<IQuery<Guid, DocumentDetails>> getDocQuery,
             DocumentsController sut)
         {
-            getDocQuery.Setup(q => q.Execute(document.Id))
+            getDocQuery.Setup(q => q.Execute(It.Is<Envelope<Guid>>(r => r.Item == document.Id)))
                        .Throws<DocumentNotFoundException>();
-            userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
-                     .Returns(userName);
 
             var result = sut.GetById(document.Id);
 
@@ -184,10 +160,13 @@ namespace Sample.Documents.Api.UnitTests
 
         [Theory]
         [DocumentsControllerAutoData]
-        public void getVyId_returns_correct_result_when_no_auth_header_in_request(
+        public void getVyId_returns_correct_result_when_unauthorized(
             Guid documentId,
+            [Frozen]Mock<IQuery<Guid, DocumentDetails>> query,
             DocumentsController sut)
         {
+            query.Setup(q => q.Execute(It.IsAny<Envelope<Guid>>())).Throws<UnauthorizedAccessException>();
+
             var response = sut.GetById(documentId);
 
             response.Should().BeOfType<UnauthorizedResult>("because auth header was not specified");
@@ -199,15 +178,11 @@ namespace Sample.Documents.Api.UnitTests
             Guid documentId,
             DocumentModel document,
             DocumentLockedException exception,
-            string userName,
-            [Frozen]Mock<IUserNameQuery> userQuery,
             [Frozen]Mock<ICommand<DocumentReference>> deleteCmd,
             DocumentsController sut)
         {
             deleteCmd.Setup(c => c.Execute(It.IsAny<Envelope<DocumentReference>>()))
                      .Throws(exception);
-            userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
-                     .Returns(userName);
 
             var result = sut.Delete(documentId);
 
@@ -224,13 +199,8 @@ namespace Sample.Documents.Api.UnitTests
             Guid documentId,
             DocumentModel document,
             DocumentLockedException exception,
-            string userName,
-            [Frozen]Mock<IUserNameQuery> userQuery,
             DocumentsController sut)
         {
-            userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
-                     .Returns(userName);
-
             var result = sut.Delete(documentId);
 
             result.Should().BeOfType<ResponseMessageResult>()

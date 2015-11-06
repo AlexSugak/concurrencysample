@@ -8,19 +8,14 @@ using System.Threading.Tasks;
 
 namespace Sample.Documents.Api.Queries
 {
-    public interface IGetAllDocumentsQuery
-    {
-        IEnumerable<DocumentDetails> Execute();
-    }
-
-    public class GetAllDocumentsSqlQuery : SqlOperation, IGetAllDocumentsQuery
+    public class GetAllDocumentsSqlQuery : SqlOperation, IQuery<EmptyRequest, IEnumerable<DocumentDetails>>
     {
         public GetAllDocumentsSqlQuery(string connectionString)
             : base(connectionString)
         {
         }
 
-        public IEnumerable<DocumentDetails> Execute()
+        public IEnumerable<DocumentDetails> Execute(Envelope<EmptyRequest> request)
         {
             return base.ExecuteReader<DocumentDetails>(
                 "SELECT * FROM dbo.Documents ORDER BY [Title]",

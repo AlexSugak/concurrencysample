@@ -14,20 +14,20 @@ using Sample.Documents.Api.Exceptions;
 using Sample.Documents.Api.Controllers;
 using Xunit;
 using Xunit.Extensions;
+using Ploeh.AutoFixture.Xunit;
 
 namespace Sample.Documents.Api.UnitTests
 {
     public class LocksControllerTests
     {
         [Theory]
-        [MoqAutoData]
-        public void PUT_returns_correct_result_when_no_auth_header_in_request(
+        [LocksControllerAutoData]
+        public void PUT_returns_correct_result_when_unauthorized(
             Guid documentId,
-            Mock<IUserNameQuery> userQuery,
-            Mock<ICommand<LockInfo>> putLockCmd,
-            Mock<ICommand<LockInfo>> removeLockCmd)
+            [Frozen]Mock<ICommand<LockInfo>> cmd,
+            LocksController sut)
         {
-            var sut = new LocksController(userQuery.Object, putLockCmd.Object, removeLockCmd.Object);
+            cmd.Setup(c => c.Execute(It.IsAny<Envelope<LockInfo>>())).Throws<UnauthorizedAccessException>();
 
             var response = sut.Put(documentId);
 
@@ -35,20 +35,14 @@ namespace Sample.Documents.Api.UnitTests
         }
 
         [Theory]
-        [MoqAutoData]
+        [LocksControllerAutoData]
         public void PUT_returns_correct_result_on_lock_exception(
             Guid documentId,
-            string userName,
-            Mock<IUserNameQuery> userQuery,
-            Mock<ICommand<LockInfo>> putLockCmd,
-            Mock<ICommand<LockInfo>> removeLockCmd)
+            [Frozen]Mock<ICommand<LockInfo>> putLockCmd,
+            LocksController sut)
         {
             putLockCmd.Setup(cmd => cmd.Execute(It.IsAny<Envelope<LockInfo>>()))
                       .Throws<DocumentLockedException>();
-            userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
-                     .Returns(userName);
-
-            var sut = new LocksController(userQuery.Object, putLockCmd.Object, removeLockCmd.Object);
 
             var response = sut.Put(documentId);
 
@@ -62,33 +56,24 @@ namespace Sample.Documents.Api.UnitTests
         }
 
         [Theory]
-        [MoqAutoData]
+        [LocksControllerAutoData]
         public void PUT_returns_correct_result_when_document_successfully_locked(
             Guid documentId,
-            string userName,
-            Mock<IUserNameQuery> userQuery,
-            Mock<ICommand<LockInfo>> putLockCmd,
-            Mock<ICommand<LockInfo>> removeLockCmd)
+            LocksController sut)
         {
-            userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
-                     .Returns(userName);
-
-            var sut = new LocksController(userQuery.Object, putLockCmd.Object, removeLockCmd.Object);
-
             var response = sut.Put(documentId);
 
             response.Should().BeOfType<OkResult>("because locking of document succeeded");
         }
 
         [Theory]
-        [MoqAutoData]
-        public void DELETE_returns_correct_result_when_no_auth_header_in_request(
+        [LocksControllerAutoData]
+        public void DELETE_returns_correct_result_when_unauthorized(
             Guid documentId,
-            Mock<IUserNameQuery> userQuery,
-            Mock<ICommand<LockInfo>> putLockCmd,
-            Mock<ICommand<LockInfo>> removeLockCmd)
+            [Frozen]Mock<ICommand<LockInfo>> cmd,
+            LocksController sut)
         {
-            var sut = new LocksController(userQuery.Object, putLockCmd.Object, removeLockCmd.Object);
+            cmd.Setup(c => c.Execute(It.IsAny<Envelope<LockInfo>>())).Throws<UnauthorizedAccessException>();
 
             var response = sut.Delete(documentId);
 
@@ -96,20 +81,14 @@ namespace Sample.Documents.Api.UnitTests
         }
 
         [Theory]
-        [MoqAutoData]
+        [LocksControllerAutoData]
         public void DELETE_returns_correct_result_when_document_already_locked_by_another_user(
             Guid documentId,
-            string userName,
-            Mock<IUserNameQuery> userQuery,
-            Mock<ICommand<LockInfo>> putLockCmd,
-            Mock<ICommand<LockInfo>> removeLockCmd)
+            [Frozen]Mock<ICommand<LockInfo>> removeLockCmd,
+            LocksController sut)
         {
             removeLockCmd.Setup(cmd => cmd.Execute(It.IsAny<Envelope<LockInfo>>()))
                       .Throws<DocumentLockedException>();
-            userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
-                     .Returns(userName);
-
-            var sut = new LocksController(userQuery.Object, putLockCmd.Object, removeLockCmd.Object);
 
             var response = sut.Delete(documentId);
 
@@ -123,19 +102,11 @@ namespace Sample.Documents.Api.UnitTests
         }
 
         [Theory]
-        [MoqAutoData]
+        [LocksControllerAutoData]
         public void DELETE_returns_correct_result_when_document_lock_was_removed(
             Guid documentId,
-            string userName,
-            Mock<IUserNameQuery> userQuery,
-            Mock<ICommand<LockInfo>> putLockCmd,
-            Mock<ICommand<LockInfo>> removeLockCmd)
+            LocksController sut)
         {
-            userQuery.Setup(q => q.Execute(It.IsAny<HttpRequestMessage>()))
-                     .Returns(userName);
-
-            var sut = new LocksController(userQuery.Object, putLockCmd.Object, removeLockCmd.Object);
-
             var response = sut.Delete(documentId);
 
             response.Should().BeOfType<ResponseMessageResult>()

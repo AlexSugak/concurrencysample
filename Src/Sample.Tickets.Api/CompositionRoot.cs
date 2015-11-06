@@ -15,23 +15,26 @@ namespace Sample.Tickets.Api
 {
     public class CompositionRoot : IHttpControllerActivator
     {
+        private readonly IEnvelop _envelop;
         private readonly IUserNameQuery _userQuery;
-        private readonly IGetAllTicketsQuery _allTicketsQuery;
-        private readonly IGetTicketByIdQuery _getTicketQuery;
+        private readonly IQuery<EmptyRequest, IEnumerable<TicketDetails>> _allTicketsQuery;
+        private readonly IQuery<Guid, TicketDetails> _getTicketQuery;
+        private readonly IQuery<HttpRequestMessage, ulong> _getVersionQuery;
         private readonly ICommand<Ticket> _addTicketCmd;
         private readonly ICommand<Ticket> _updateTicketCmd;
         private readonly ICommand<TicketReference> _deleteTicketCmd;
-        private readonly IGetTicketVersionQuery _getVersionQuery;
 
         public CompositionRoot(
+            IEnvelop envelop,
             IUserNameQuery userQuery,
-            IGetAllTicketsQuery allTicketsQuery,
-            IGetTicketByIdQuery getTicketQuery,
+            IQuery<EmptyRequest, IEnumerable<TicketDetails>> allTicketsQuery,
+            IQuery<Guid, TicketDetails> getTicketQuery,
+            IQuery<HttpRequestMessage, ulong> getVersionQuery,
             ICommand<Ticket> addTicketCmd,
             ICommand<Ticket> updateTicketCmd,
-            ICommand<TicketReference> deleteTicketCmd,
-            IGetTicketVersionQuery getVersionQuery)
+            ICommand<TicketReference> deleteTicketCmd)
         {
+            _envelop = envelop;
             _userQuery = userQuery;
             _allTicketsQuery = allTicketsQuery;
             _getTicketQuery = getTicketQuery;
@@ -51,13 +54,13 @@ namespace Sample.Tickets.Api
             if (controllerType == typeof(TicketsController))
             {
                 return new TicketsController(
-                    _userQuery, 
-                    _allTicketsQuery, 
-                    _getTicketQuery, 
-                    _addTicketCmd, 
+                    _envelop,
+                    _allTicketsQuery,
+                    _getTicketQuery,
+                    _getVersionQuery,
+                    _addTicketCmd,
                     _updateTicketCmd,
-                    _deleteTicketCmd,
-                    _getVersionQuery);
+                    _deleteTicketCmd);
             }
 
             throw new NotSupportedException(string.Format("Controller type {0} not supported", controllerType.FullName));

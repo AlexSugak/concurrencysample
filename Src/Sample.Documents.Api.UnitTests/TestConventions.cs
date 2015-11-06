@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Moq;
@@ -24,19 +25,49 @@ namespace Sample.Documents.Api.UnitTests
         }
     }
 
+    public class LocksControllerAutoDataAttribute : MoqAutoDataAttribute
+    {
+        public LocksControllerAutoDataAttribute()
+            : base(new Fixture()
+                        .Customize(new LocksControllerCustomization()))
+        {
+        }
+    }
+
     public class DocumentsControllerCustomization : ICustomization
     {
         public void Customize(IFixture fixture)
         {
             fixture.Register<DocumentsController>(() => 
                 new DocumentsController(
-                    fixture.Create<Mock<IUserNameQuery>>().Object,
-                    fixture.Create<Mock<IGetAllDocumentsQuery>>().Object,
-                    fixture.Create<Mock<IGetDocumentQuery>>().Object,
+                    new TestEnvelop(),
+                    fixture.Create<Mock<IQuery<EmptyRequest, IEnumerable<DocumentDetails>>>>().Object,
+                    fixture.Create<Mock<IQuery<Guid, DocumentDetails>>>().Object,
                     fixture.Create<Mock<ICommand<Document>>>().Object,
                     fixture.Create<Mock<ICommand<Document>>>().Object,
                     fixture.Create<Mock<ICommand<DocumentReference>>>().Object
                     ));
+        }
+    }
+
+    public class LocksControllerCustomization : ICustomization
+    {
+        public void Customize(IFixture fixture)
+        {
+            fixture.Register<LocksController>(() =>
+                new LocksController(
+                    new TestEnvelop(),
+                    fixture.Create<Mock<ICommand<LockInfo>>>().Object,
+                    fixture.Create<Mock<ICommand<LockInfo>>>().Object
+                    ));
+        }
+    }
+
+    public class TestEnvelop : IEnvelop
+    {
+        public Envelope<T> Envelop<T>(HttpRequestMessage request, T item)
+        {
+            return new Envelope<T>(item, "foo");
         }
     }
 }

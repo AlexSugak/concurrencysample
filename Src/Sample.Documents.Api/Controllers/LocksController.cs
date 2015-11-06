@@ -14,16 +14,16 @@ namespace Sample.Documents.Api.Controllers
     /// Controller for lock resource
     /// </summary>
     [RoutePrefix("api/documents/{documentId}/lock")]
-    public class LocksController : SecuredApiController
+    public class LocksController : ApiControllerWithEnvelope
     {
         private readonly ICommand<LockInfo> _putLockCmd;
         private readonly ICommand<LockInfo> _removeLockCmd;
 
         public LocksController(
-            IUserNameQuery userQuery,
+            IEnvelop envelop,
             ICommand<LockInfo> putLockCmd,
             ICommand<LockInfo> removeLockCmd)
-            : base(userQuery)
+            : base(envelop)
         {
             _putLockCmd = putLockCmd;
             _removeLockCmd = removeLockCmd;
@@ -32,43 +32,45 @@ namespace Sample.Documents.Api.Controllers
         [Route("")]
         public IHttpActionResult Put(Guid documentId)
         {
-            return InvokeWhenUserExists(userName => 
+            try
             {
-                try
+                _putLockCmd.Execute(Envelop(new LockInfo(documentId)));
+            }
+            catch(UnauthorizedAccessException)
+            {
+                return this.Unauthorized();
+            }
+            catch (DocumentLockedException e)
+            {
+                return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.PreconditionFailed)
                 {
-                    _putLockCmd.Execute(Envelop(new LockInfo(documentId), userName));
-                }
-                catch(DocumentLockedException e)
-                {
-                    return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.PreconditionFailed) 
-                    {
-                        Content = new StringContent(e.Message)
-                    });
-                }
+                    Content = new StringContent(e.Message)
+                });
+            }
 
-                return this.Ok();
-            });
+            return this.Ok();
         }
 
         [Route("")]
         public IHttpActionResult Delete(Guid documentId)
         {
-            return InvokeWhenUserExists(userName =>
+            try
             {
-                try
+                _removeLockCmd.Execute(Envelop(new LockInfo(documentId)));
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return this.Unauthorized();
+            }
+            catch (DocumentLockedException e)
+            {
+                return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.PreconditionFailed)
                 {
-                    _removeLockCmd.Execute(Envelop(new LockInfo(documentId), userName));
-                }
-                catch (DocumentLockedException e)
-                {
-                    return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.PreconditionFailed)
-                    {
-                        Content = new StringContent(e.Message)
-                    });
-                }
+                    Content = new StringContent(e.Message)
+                });
+            }
 
-                return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.NoContent));
-            });
+            return this.ResponseMessage(new HttpResponseMessage(HttpStatusCode.NoContent));
         }
     }
 }

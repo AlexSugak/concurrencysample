@@ -20,12 +20,12 @@ namespace Sample.Documents.Api.UnitTests
             string userName,
             Guid documentId,
             DocumentDetails document,
-            Mock<IGetDocumentQuery> docQuery,
+            Mock<IQuery<Guid, DocumentDetails>> docQuery,
             Mock<ICommand<LockInfo>> inner)
         {
             var lockInfo = new Envelope<LockInfo>(new LockInfo(documentId), userName);
             document.CheckedOutBy = null;
-            docQuery.Setup(q => q.Execute(documentId)).Returns(document);
+            docQuery.Setup(q => q.Execute(It.Is<Envelope<Guid>>(r => r.Item == documentId))).Returns(document);
 
             var sut = new DocumentLockValidator<LockInfo>(inner.Object, docQuery.Object);
 
@@ -40,12 +40,12 @@ namespace Sample.Documents.Api.UnitTests
             string userName,
             Guid documentId,
             DocumentDetails document,
-            Mock<IGetDocumentQuery> docQuery,
+            Mock<IQuery<Guid, DocumentDetails>> docQuery,
             Mock<ICommand<LockInfo>> inner)
         {
             var lockInfo = new Envelope<LockInfo>(new LockInfo(documentId), userName);
             document.CheckedOutBy = userName;
-            docQuery.Setup(q => q.Execute(documentId)).Returns(document);
+            docQuery.Setup(q => q.Execute(It.Is<Envelope<Guid>>(r => r.Item == documentId))).Returns(document);
 
             var sut = new DocumentLockValidator<LockInfo>(inner.Object, docQuery.Object);
 
@@ -61,12 +61,12 @@ namespace Sample.Documents.Api.UnitTests
             string anotherUserName,
             Guid documentId,
             DocumentDetails document,
-            Mock<IGetDocumentQuery> docQuery,
+            Mock<IQuery<Guid, DocumentDetails>> docQuery,
             Mock<ICommand<LockInfo>> inner)
         {
             var lockInfo = new Envelope<LockInfo>(new LockInfo(documentId), userName);
             document.CheckedOutBy = anotherUserName;
-            docQuery.Setup(q => q.Execute(documentId)).Returns(document);
+            docQuery.Setup(q => q.Execute(It.Is<Envelope<Guid>>(r => r.Item == documentId))).Returns(document);
 
             var sut = new DocumentLockValidator<LockInfo>(inner.Object, docQuery.Object);
 

@@ -13,15 +13,23 @@ using Sample.Tickets.Api.Controllers;
 using Sample.Tickets.Api.Queries;
 using Sample.Tickets.Api.Commands;
 using System.Web.Http.Routing;
+using System.Net.Http;
 
 namespace Sample.Tickets.Api.UnitTests
 {
     public class TicketsControllerAutoDataAttribute : MoqAutoDataAttribute
     {
         public TicketsControllerAutoDataAttribute()
-            : base(new Fixture()
-                        .Customize(new TicketsControllerCustomization()))
+            : base(new Fixture().Customize(new TicketsControllerCustomization()))
         {
+        }
+    }
+
+    public class TestEnvelop : IEnvelop
+    {
+        public Envelope<T> Envelop<T>(HttpRequestMessage request, T item)
+        {
+            return new Envelope<T>(item, "foo");
         }
     }
 
@@ -31,13 +39,13 @@ namespace Sample.Tickets.Api.UnitTests
         {
             fixture.Register<TicketsController>(() =>
                 new TicketsController(
-                    fixture.Create<Mock<IUserNameQuery>>().Object,
-                    fixture.Create<Mock<IGetAllTicketsQuery>>().Object,
-                    fixture.Create<Mock<IGetTicketByIdQuery>>().Object,
+                    new TestEnvelop(),
+                    fixture.Create<Mock<IQuery<EmptyRequest, IEnumerable<TicketDetails>>>>().Object,
+                    fixture.Create<Mock<IQuery<Guid, TicketDetails>>>().Object,
+                    fixture.Create<Mock<IQuery<HttpRequestMessage, ulong>>>().Object,
                     fixture.Create<Mock<ICommand<Ticket>>>().Object,
                     fixture.Create<Mock<ICommand<Ticket>>>().Object,
-                    fixture.Create<Mock<ICommand<TicketReference>>>().Object,
-                    fixture.Create<Mock<IGetTicketVersionQuery>>().Object
+                    fixture.Create<Mock<ICommand<TicketReference>>>().Object
                     ) { Url = fixture.Create<Mock<UrlHelper>>().Object });
         }
     }

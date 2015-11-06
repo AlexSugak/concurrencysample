@@ -18,30 +18,30 @@ namespace Sample.Documents.Api
     /// </summary>
     public class CompositionRoot : IHttpControllerActivator
     {
-        private readonly IGetAllDocumentsQuery _getAllDocuments;
-        private readonly IGetDocumentQuery _getDocument;
+        private readonly IEnvelop _envelop;
+        private readonly IQuery<EmptyRequest, IEnumerable<DocumentDetails>> _getAllDocuments;
+        private readonly IQuery<Guid, DocumentDetails> _getDocument;
         private readonly ICommand<Document> _submitDocumentCmd;
         private readonly ICommand<Document> _updateDocumentCmd;
-        private readonly IUserNameQuery _userNameQuery;
         private readonly ICommand<LockInfo> _putLockCmd;
         private readonly ICommand<LockInfo> _removeLockCmd;
         private readonly ICommand<DocumentReference> _deleteDocument;
 
         public CompositionRoot(
-            IGetAllDocumentsQuery getAllDocuments,
-            IGetDocumentQuery getDocument,
+            IEnvelop envelop,
+            IQuery<EmptyRequest, IEnumerable<DocumentDetails>> getAllDocuments,
+            IQuery<Guid, DocumentDetails> getDocument,
             ICommand<Document> submitDocumentCmd,
             ICommand<Document> updateDocumentCmd,
-            IUserNameQuery userNameQuery,
             ICommand<LockInfo> putLockCmd,
             ICommand<LockInfo> removeLockCmd,
             ICommand<DocumentReference> deleteDocument)
         {
+            _envelop = envelop;
             _getAllDocuments = getAllDocuments;
             _getDocument = getDocument;
             _submitDocumentCmd = submitDocumentCmd;
             _updateDocumentCmd = updateDocumentCmd;
-            _userNameQuery = userNameQuery;
             _putLockCmd = putLockCmd;
             _removeLockCmd = removeLockCmd;
             _deleteDocument = deleteDocument;
@@ -60,7 +60,7 @@ namespace Sample.Documents.Api
             if(controllerType == typeof(DocumentsController))
             {
                 return new DocumentsController(
-                    _userNameQuery, 
+                    _envelop, 
                     _getAllDocuments, 
                     _getDocument,
                     _submitDocumentCmd, 
@@ -70,7 +70,7 @@ namespace Sample.Documents.Api
 
             if (controllerType == typeof(LocksController))
             {
-                return new LocksController(_userNameQuery, _putLockCmd, _removeLockCmd);
+                return new LocksController(_envelop, _putLockCmd, _removeLockCmd);
             }
 
             throw new NotImplementedException(
