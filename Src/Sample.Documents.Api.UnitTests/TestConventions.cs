@@ -13,6 +13,7 @@ using Sample.Api.Shared.Tests;
 using Sample.Documents.Api.Commands;
 using Sample.Documents.Api.Controllers;
 using Sample.Documents.Api.Queries;
+using System.Web.Http.Routing;
 
 namespace Sample.Documents.Api.UnitTests
 {
@@ -38,7 +39,7 @@ namespace Sample.Documents.Api.UnitTests
     {
         public void Customize(IFixture fixture)
         {
-            fixture.Register<DocumentsController>(() => 
+            fixture.Register<DocumentsController>(() =>
                 new DocumentsController(
                     new TestEnvelop(),
                     fixture.Create<Mock<IQuery<EmptyRequest, IEnumerable<DocumentDetails>>>>().Object,
@@ -46,7 +47,7 @@ namespace Sample.Documents.Api.UnitTests
                     fixture.Create<Mock<ICommand<Document>>>().Object,
                     fixture.Create<Mock<ICommand<Document>>>().Object,
                     fixture.Create<Mock<ICommand<DocumentReference>>>().Object
-                    ));
+                    ) { Url = fixture.Create<Mock<UrlHelper>>().Object });
         }
     }
 

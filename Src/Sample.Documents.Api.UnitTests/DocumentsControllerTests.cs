@@ -13,6 +13,7 @@ using Sample.Documents.Api.Commands;
 using Sample.Documents.Api.Controllers;
 using Sample.Documents.Api.Exceptions;
 using Xunit.Extensions;
+using System.Web.Http.Routing;
 
 namespace Sample.Documents.Api.UnitTests
 {
@@ -80,8 +81,13 @@ namespace Sample.Documents.Api.UnitTests
         [DocumentsControllerAutoData]
         public void post_returns_201_Created_when_command_succeeds(
             DocumentModel document,
+            [Frozen]Mock<UrlHelper> url,
             DocumentsController sut)
         {
+            var createdUri = "http://localhost:8051/api/documents/123";
+            url.Setup(u => u.Link(It.IsAny<string>(), It.IsAny<object>()))
+                            .Returns(createdUri);
+
             var result = sut.Post(document);
 
             result.Should().BeOfType<CreatedNegotiatedContentResult<DocumentResponseModel>>()

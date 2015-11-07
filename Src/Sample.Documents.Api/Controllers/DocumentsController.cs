@@ -60,7 +60,7 @@ namespace Sample.Documents.Api.Controllers
                     });
         }
 
-        [Route("{documentId}")]
+        [Route("{documentId}", Name = "GetDocumentById")]
         public IHttpActionResult GetById(Guid documentId)
         {
             DocumentDetails doc;
@@ -98,6 +98,7 @@ namespace Sample.Documents.Api.Controllers
                 return this.BadRequest(e.Message);
             }
 
+            var link = this.Url.Link("GetDocumentById", new { documentId = id });
             return this.Created<DocumentResponseModel>("", new DocumentResponseModel()
             {
                 Id = id.ToString(),
