@@ -37,4 +37,13 @@ namespace Sample.Documents.Api.Commands
             _implementation.Execute(lockInfo);
         }
     }
+
+    public static class LockValidatorExtention
+    {
+        public static ICommand<T> WithLockValidation<T>(this ICommand<T> cmd, IQuery<Guid, DocumentDetails> getDocQuery)
+            where T : IDocumentReference
+        {
+            return new DocumentLockValidator<T>(cmd, getDocQuery);
+        }
+    }
 }

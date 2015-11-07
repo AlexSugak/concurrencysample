@@ -14,7 +14,7 @@ namespace Sample.Api.Shared
     }
 
     /// <summary>
-    /// Gets user name by parsing Bearer header into <see cref="SimpleToken"/>
+    /// Gets user name by parsing Authorization header into <see cref="SimpleToken"/>
     /// </summary>
     public class SimppleTokenUserNameQuery : IUserNameQuery
     {

@@ -24,36 +24,32 @@ namespace Sample.Documents.Api
             var userNameQuery = new SimppleTokenUserNameQuery();
             var envelop = new EnvelopWithUserName(userNameQuery);
 
-            var getAllDocumentsQuery = new SecuredQuery<EmptyRequest, IEnumerable<DocumentDetails>>(
-                                            new GetAllDocumentsSqlQuery(connectionString));
-            var getDocumentQuery = new SecuredQuery<Guid, DocumentDetails>(
-                                        new GetDocumentSqlQuery(connectionString));
+            var getAllDocumentsQuery = new GetAllDocumentsSqlQuery(connectionString)
+                                    .Secured();
+            var getDocumentQuery = new GetDocumentSqlQuery(connectionString)
+                                    .Secured();
 
-            var submitDocCmd = new TransactedCommand<Document>(
-                                    new SecuredCommand<Document>(
-                                        new DocumentValidator(
-                                            new SubmitNewDocumentSqlCommand(connectionString))));
-            var updateDocCmd = new TransactedCommand<Document>(
-                                    new SecuredCommand<Document>(
-                                        new DocumentValidator(
-                                            new DocumentLockValidator<Document>(
-                                                new UpdateDocumentSqlCommand(connectionString),
-                                                getDocumentQuery))));
-            var putLockCmd = new TransactedCommand<LockInfo>(
-                                    new SecuredCommand<LockInfo>(
-                                        new DocumentLockValidator<LockInfo>(
-                                            new PutLockOnDocumentSqlCommand(connectionString),
-                                            getDocumentQuery)));
-            var removeLockCmd = new TransactedCommand<LockInfo>(
-                                    new SecuredCommand<LockInfo>(
-                                        new DocumentLockValidator<LockInfo>(
-                                            new RemoveLockFromDocumentSqlCommand(connectionString),
-                                            getDocumentQuery)));
-            var deleteDocCmd = new TransactedCommand<DocumentReference>(
-                                    new SecuredCommand<DocumentReference>(
-                                        new DocumentLockValidator<DocumentReference>(
-                                            new DeleteDocumentSqlCommand(connectionString),
-                                            getDocumentQuery)));
+            var submitDocCmd = new SubmitNewDocumentSqlCommand(connectionString)
+                                    .WithDocumentValidation()
+                                    .Secured()
+                                    .Transacted();
+            var updateDocCmd = new UpdateDocumentSqlCommand(connectionString)
+                                    .WithLockValidation(getDocumentQuery)
+                                    .WithDocumentValidation()
+                                    .Secured()
+                                    .Transacted();
+            var putLockCmd = new PutLockOnDocumentSqlCommand(connectionString)
+                                    .WithLockValidation(getDocumentQuery)
+                                    .Secured()
+                                    .Transacted();
+            var removeLockCmd = new RemoveLockFromDocumentSqlCommand(connectionString)
+                                    .WithLockValidation(getDocumentQuery)
+                                    .Secured()
+                                    .Transacted();
+            var deleteDocCmd = new DeleteDocumentSqlCommand(connectionString)
+                                    .WithLockValidation(getDocumentQuery)
+                                    .Secured()
+                                    .Transacted();
 
             var config = new HttpConfiguration();
             var compositon = new CompositionRoot(

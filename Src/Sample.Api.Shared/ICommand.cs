@@ -11,7 +11,6 @@ namespace Sample.Api.Shared
     /// </summary>
     public interface ICommand<T>
     {
-        //TODO: implement EnvelopCommand: ICommand<T> -> ICommand<Envelope<T>>
         void Execute(Envelope<T> input);
     }
 }

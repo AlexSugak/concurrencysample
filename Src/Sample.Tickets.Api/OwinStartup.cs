@@ -22,22 +22,24 @@ namespace Sample.Tickets.Api
 
             var userNameQuery = new SimppleTokenUserNameQuery();
             var envelop = new EnvelopWithUserName(userNameQuery);
-            var allTicketsQuery = new SecuredQuery<EmptyRequest, IEnumerable<TicketDetails>>(
-                                    new GetAllTicketsSqlQuery(connectionString));
-            var getTicketQuery = new SecuredQuery<Guid, TicketDetails>(
-                                    new GetTicketByIdQuerySqlQuery(connectionString));
+
+            var allTicketsQuery = new GetAllTicketsSqlQuery(connectionString)
+                                    .Secured();
+            var getTicketQuery = new GetTicketByIdQuerySqlQuery(connectionString)
+                                    .Secured();
             var getVersionQuery = new IfMatchHttpHeaderTicketVersionQuery();
-            var addTicketCmd = new TransactedCommand<Ticket>(
-                                    new SecuredCommand<Ticket>(
-                                        new TicketValidator(
-                                            new SubmitNewTicketSqlCommand(connectionString))));
-            var updateTicketCmd = new TransactedCommand<Ticket>(
-                                        new SecuredCommand<Ticket>(
-                                            new TicketValidator(
-                                                new UpdateTicketSqlCommand(connectionString))));
-            var deleteTicketCmd = new TransactedCommand<TicketReference>(
-                                        new SecuredCommand<TicketReference>(
-                                            new DeleteTicketSqlCommand(connectionString)));
+
+            var addTicketCmd = new SubmitNewTicketSqlCommand(connectionString)
+                                    .WithTicketValidation()
+                                    .Secured()
+                                    .Transacted();
+            var updateTicketCmd = new UpdateTicketSqlCommand(connectionString)
+                                    .WithTicketValidation()
+                                    .Secured()
+                                    .Transacted();
+            var deleteTicketCmd = new DeleteTicketSqlCommand(connectionString)
+                                    .Secured()
+                                    .Transacted();
 
             var compositon = new CompositionRoot(
                 envelop,

@@ -29,4 +29,12 @@ namespace Sample.Api.Shared
             return _inner.Execute(request);
         }
     }
+
+    public static class SecuredQueryExtention
+    {
+        public static IQuery<TIn, TOut> Secured<TIn, TOut>(this IQuery<TIn, TOut> query)
+        {
+            return new SecuredQuery<TIn, TOut>(query);
+        }
+    }
 }

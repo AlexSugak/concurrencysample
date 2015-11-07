@@ -55,4 +55,12 @@ namespace Sample.Tickets.Api.Commands
             }
         }
     }
+
+    public static class TicketValidatorExtention
+    {
+        public static ICommand<Ticket> WithTicketValidation(this ICommand<Ticket> cmd)
+        {
+            return new TicketValidator(cmd);
+        }
+    }
 }

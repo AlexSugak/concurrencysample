@@ -18,15 +18,23 @@ namespace Sample.Api.Shared
             _inner = inner;
         }
 
-        public void Execute(Envelope<T> input)
+        public void Execute(Envelope<T> c)
         {
             //TODO: implement proper auth
-            if(string.IsNullOrEmpty(input.UserName))
+            if(string.IsNullOrEmpty(c.UserName))
             {
                 throw new UnauthorizedAccessException("User name required, was empty");
             }
 
-            _inner.Execute(input);
+            _inner.Execute(c);
+        }
+    }
+
+    public static class SecuredCommandExtention
+    {
+        public static ICommand<T> Secured<T>(this ICommand<T> cmd)
+        {
+            return new SecuredCommand<T>(cmd);
         }
     }
 }

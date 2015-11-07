@@ -49,4 +49,12 @@ namespace Sample.Documents.Api.Commands
             }
         }
     }
+
+    public static class DocumentValidatorExtention
+    {
+        public static ICommand<Document> WithDocumentValidation(this ICommand<Document> cmd)
+        {
+            return new DocumentValidator(cmd);
+        }
+    }
 }

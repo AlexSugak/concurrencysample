@@ -3,7 +3,7 @@
 namespace Sample.Api.Shared
 {
     /// <summary>
-    /// Composes 1..N commands into one command
+    /// Composes 0..N commands into one command
     /// </summary>
     public class ComposedCommand<T> : ICommand<T>
     {

@@ -24,4 +24,12 @@ namespace Sample.Api.Shared
             }
         }
     }
+
+    public static class TransactedExtention
+    {
+        public static ICommand<T> Transacted<T>(this ICommand<T> cmd)
+        {
+            return new TransactedCommand<T>(cmd);
+        }
+    }
 }
